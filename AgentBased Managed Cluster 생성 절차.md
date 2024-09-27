@@ -839,7 +839,7 @@ EOF
 $ mkdir add ;cd add
 
 ## create nodes-config.yaml 
-$ cat >nodes-config.yaml<<EOF
+$ cat > nodes-config.yaml<<EOF
 hosts:
 - hostname: worker2.ocp4.example.com
   rootDeviceHints:
