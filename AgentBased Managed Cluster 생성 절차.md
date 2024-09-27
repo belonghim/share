@@ -753,8 +753,8 @@ done
 ## 설치 후 구성
 ```
 ## node label 설정
-$ oc label node worker0 node-role.kubernetes.io/infra=
-$ oc label node worker1 node-role.kubernetes.io/infra=
+$ oc label node worker0.ocp4.example.com node-role.kubernetes.io/infra=
+$ oc label node worker1.ocp4.example.com node-role.kubernetes.io/infra=
 
 ## ingress 노드 선택
 $ oc create -f -<<EOF
@@ -841,7 +841,7 @@ $ mkdir add ;cd add
 ## create nodes-config.yaml 
 $ cat >nodes-config.yaml<<EOF
 hosts:
-- hostname: worker.sno417.jooan.local
+- hostname: worker2.ocp4.example.com
   rootDeviceHints:
     deviceName: /dev/disk/by-path/pci-0000:05:00.0
   interfaces:
