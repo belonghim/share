@@ -44,7 +44,7 @@ worker1.ocp4.example.com.	IN	A	192.168.1.14
 <br><br>
 ## Bastion(또는 Installer pod) 준비 절차
 
-### 사전 설치된 Packages 확인 (ubi8 기준 추가 필요)
+### 사전 설치된 Packages 확인 (registry.redhat.io/ubi8/ubi 기준 추가 필요)
 
 ```
 $ dnf info nmstate bind-utils iputils iproute coreos-installer
@@ -752,6 +752,9 @@ done
 <br><br>
 ## 설치 후 구성
 ```
+## sysadmin KUBECONFIG 적용
+$ export KUBECONFIG=${INSTALL_DIR}/auth/kubeconfig
+
 ## node label 설정
 $ oc label node worker0.ocp4.example.com node-role.kubernetes.io/infra=
 $ oc label node worker1.ocp4.example.com node-role.kubernetes.io/infra=
@@ -775,7 +778,7 @@ spec:
 EOF
 
 ## 인증 정보 생성
-$ htpasswd -Bbc ./htpasswd admin admin
+$ htpasswd -Bbc ./htpasswd admin <password>
 
 ## 인증 정보 관리용 Secret 생성
 $ oc create -f - <<EOF
@@ -826,6 +829,56 @@ subjects:
   kind: User
   name: admin
 EOF
+
+## log in with admin account
+$ unset KUBECONFIG
+$ rm -f .kube/config
+$ oc login -u admin -p <password>
+
+## get the admin token
+$ oc whoami -t
+```
+
+<br><br>
+## Importing to Hub Cluster
+
+### Preparing for cluster import (in Hub Cluster)
+```
+## create Namespace
+$ oc create namespace <managed_cluster_name>
+
+## create ManagedCluster
+$ oc create -f - <<EOF
+apiVersion: cluster.open-cluster-management.io/v1
+kind: ManagedCluster
+metadata:
+  name: <managed_cluster_name>
+  labels:
+    cloud: auto-detect
+    vendor: auto-detect
+spec:
+  hubAcceptsClient: true
+EOF
+```
+
+### Importing a cluster by using the auto import secret (in Hub Cluster)
+```
+## create Namespace
+$ oc create -f - <<EOF
+apiVersion: v1
+kind: Secret
+metadata:
+  name: auto-import-secret
+  namespace: <managed_cluster_name>
+stringData:
+  autoImportRetry: "5"
+  token: <Managed cluster_admin_token>
+  server: <Managed cluster_api_url>
+type: Opaque
+EOF
+
+## Validate the JOINED and AVAILABLE status of the managed cluster
+$ oc get managedcluster <managed_cluster_name>
 
 ```
 
