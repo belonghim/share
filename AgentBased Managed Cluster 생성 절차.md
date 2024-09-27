@@ -692,9 +692,6 @@ done
 ## Remove preexisting ISO images from the data store, if there are any:
 $ govc datastore.rm -ds <iso_datastore> <image>
 
-## Remove preexisting ISO images from the data store, if there are any:
-$ govc datastore.upload -ds <iso_datastore>  vsphere-discovery-image.iso
-
 ## Upload the Assisted Installer discovery ISO:
 $ govc datastore.upload -ds <iso_datastore>  vsphere-discovery-image.iso
 
