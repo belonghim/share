@@ -750,7 +750,7 @@ done
 ```
 
 <br><br>
-## 설치 후 구성
+## 설치 후 구성 명령
 ```
 ## sysadmin KUBECONFIG 적용
 $ export KUBECONFIG=${INSTALL_DIR}/auth/kubeconfig
