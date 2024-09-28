@@ -920,7 +920,7 @@ hosts:
     routes:
       config:
       - destination: 0.0.0.0/0
-        next-hop-address: 192.168.20.1
+        next-hop-address: 192.168.1.1
         next-hop-interface: enp1s0
         table-id: 254
 EOF
