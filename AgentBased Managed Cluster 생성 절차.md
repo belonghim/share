@@ -898,7 +898,7 @@ hosts:
   rootDeviceHints:
     deviceName: /dev/disk/by-path/pci-0000:05:00.0
   interfaces:
-  - macAddress: 00:00:00:00:00:00
+  - macAddress: 00:ef:50:30:f5:b0
     name: enp1s0
   networkConfig:
     interfaces:
