@@ -976,3 +976,12 @@ $  govc ls /<datacenter>/vm/<folder_name>
 ## After 2 minutes, shut down the VMs:
 $ govc vm.power -s=true $VM
 ```
+
+### Joing the node
+
+```
+## approval the node csr
+$ NODE=worker2.ocp4.example.com
+$ for f in $(oc get csr | grep Pending | awk '{print $1}');do echo $f;oc get csr $f -o jsonpath='{.spec.request}'|base64 --decode|openssl req -noout -text|grep $NODE && oc adm certificate approve $f;done
+
+```
