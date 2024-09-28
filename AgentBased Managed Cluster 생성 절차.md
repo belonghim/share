@@ -693,7 +693,7 @@ done
 $ govc datastore.rm -ds <iso_datastore> <image>
 
 ## Upload the Assisted Installer discovery ISO:
-$ govc datastore.upload -ds <iso_datastore>  vsphere-discovery-image.iso
+$ govc datastore.upload -ds <iso_datastore> agent.x86_64.iso
 
 ## Boot three control plane nodes:
 $ govc vm.create -net.adapter <network_adapter_type> \
@@ -705,7 +705,7 @@ $ govc vm.create -net.adapter <network_adapter_type> \
                  -disk-datastore=<datastore_file> \
                  -net.address="<nic_mac_address>" \
                  -iso-datastore=<iso_datastore> \
-                 -iso="vsphere-discovery-image.iso" \
+                 -iso="agent.x86_64.isoo" \
                  -folder="<inventory_folder>" \
                  <hostname>.<cluster_name>.example.com
 
@@ -719,7 +719,7 @@ $ govc vm.create -net.adapter <network_adapter_type> \
                  -disk-datastore=<datastore_file> \
                  -net.address="<nic_mac_address>" \
                  -iso-datastore=<iso_datastore> \
-                 -iso="vsphere-discovery-image.iso" \
+                 -iso="agent.x86_64.iso" \
                  -folder="<inventory_folder>" \
                  <hostname>.<cluster_name>.example.com
 
@@ -886,6 +886,12 @@ $ oc get managedcluster <managed_cluster_name>
 ## Adding AgentBased node
 - https://github.com/openshift/enhancements/blob/master/enhancements/oc/day2-add-nodes.md
 
+### DNS 에 node 추가
+
+```
+worker2.ocp4.example.com.	IN	A	192.168.1.15
+```
+
 ### nodes-config.yaml
 
 ```
@@ -935,4 +941,38 @@ $ oc adm node-image create
 ## ocp 4.16 based command
 ## https://github.com/openshift/installer/blob/master/docs/user/agent/add-node/add-nodes.md
 $ ./node-joiner.sh
+```
+
+### vm.create
+
+```
+## On the command line, power off and delete the preexisting virtual machine:
+$ /usr/local/bin/govc vm.power -off $VM
+$ /usr/local/bin/govc vm.destroy $VM
+
+## Remove the preexisting ISO image from the data store:
+$ govc datastore.rm -ds <iso_datastore> node.iso
+
+## Upload the Assisted Installer discovery ISO:
+$ govc datastore.upload -ds <iso_datastore> node.iso
+
+## Boot at the worker node:
+$ govc vm.create -net.adapter <network_adapter_type> \
+                 -disk.controller <disk_controller_type> \
+                 -pool=<resource_pool> \
+                 -c=4 \
+                 -m=8192 \
+                 -disk=120GB \
+                 -disk-datastore=<datastore_file> \
+                 -net.address="<nic_mac_address>" \
+                 -iso-datastore=<iso_datastore> \
+                 -iso="node.iso" \
+                 -folder="<inventory_folder>" \
+                 <hostname>.<cluster_name>.example.com
+
+## Ensure the VMs are running:
+$  govc ls /<datacenter>/vm/<folder_name>
+
+## After 2 minutes, shut down the VMs:
+$ govc vm.power -s=true $VM
 ```
