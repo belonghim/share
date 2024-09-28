@@ -833,7 +833,7 @@ EOF
 ## log in with admin account
 $ unset KUBECONFIG
 $ rm -f .kube/config
-$ oc login -u admin -p <password> api.ocp4.example.com
+$ oc login -u admin -p <password> api.ocp4.example.com:6443
 
 ## get the admin token
 $ oc whoami -t
