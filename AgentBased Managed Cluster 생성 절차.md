@@ -977,6 +977,16 @@ $  govc ls /<datacenter>/vm/<folder_name>
 $ govc vm.power -s=true $VM
 ```
 
+### disk.enableUUID 설정 및 시작
+
+```
+## Set the disk.enableUUID setting to TRUE:
+$ govc vm.change -vm $VM -e disk.enableUUID=TRUE
+
+## Restart the VM:
+$ govc vm.power -on=true $VM
+```
+
 ### Joing the node
 
 ```
@@ -984,4 +994,33 @@ $ govc vm.power -s=true $VM
 $ NODE=worker2.ocp4.example.com
 $ for f in $(oc get csr | grep Pending | awk '{print $1}');do echo $f;oc get csr $f -o jsonpath='{.spec.request}'|base64 --decode|openssl req -noout -text|grep $NODE && oc adm certificate approve $f;done
 
+```
+
+<br><br>
+## 보안 취약점 조치 예
+
+### kubelet log level
+
+```
+$ oc create -f - <<EOF
+apiVersion: machineconfiguration.openshift.io/v1
+ kind: MachineConfig
+ metadata:
+   labels:
+     machineconfiguration.openshift.io/role: worker
+   name: 99-worker-kubelet-loglevel
+ spec:
+   config:
+     ignition:
+       version: 3.2.0
+     systemd:
+       units:
+         - name: kubelet.service
+           enabled: true
+           dropins:
+             - name: 30-logging.conf
+               contents: |
+                 [Service]
+                 Environment="KUBELET_LOG_LEVEL=4"
+EOF
 ```
