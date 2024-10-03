@@ -202,10 +202,10 @@ policies:
   manifests:
     - path: input-compliance/
   policySets:
-    - opp-clusters
     - opp-hub
+    - opp-clusters
 # Compliance Operator Policies - end
-policySets:
+#policySets:
   - description: The OpenShift Platform Plus policy set applies several policies
       that will install the OpenShift Platform Plus products using best practices
       that allow them to work well together. This policy set is focused on 
