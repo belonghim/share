@@ -2,7 +2,7 @@
 
 # AgentBased Managed Cluster 생성 절차
 
-## 구성도
+## 절차별 예시 구성도
 ![image](https://github.com/belonghim/share/blob/main/Screenshot_20241004_151744_Slides.jpg)
 
 <br><br>
