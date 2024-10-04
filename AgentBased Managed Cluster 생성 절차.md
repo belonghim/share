@@ -706,7 +706,7 @@ $ govc vm.create -net.adapter <network_adapter_type> \
                  -disk-datastore=<datastore_file> \
                  -net.address="<nic_mac_address>" \
                  -iso-datastore=<iso_datastore> \
-                 -iso="agent.x86_64.isoo" \
+                 -iso="agent.x86_64.iso" \
                  -folder="<inventory_folder>" \
                  <hostname>.<cluster_name>.example.com
 
