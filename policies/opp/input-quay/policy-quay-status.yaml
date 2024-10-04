@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: registry-quay-app
-  namespace: local-quay
+  namespace: openshift-quay
 status:
   conditions:
     - status: "True"
@@ -12,7 +12,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: registry-quay-database
-  namespace: local-quay
+  namespace: openshift-quay
 status:
   conditions:
     - status: "True"

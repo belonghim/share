@@ -1225,7 +1225,7 @@ spec:
           objectDefinition:
             apiVersion: v1
             data:
-              host: '{{ (lookup "route.openshift.io/v1" "Route" "local-quay" "registry-quay"
+              host: '{{ (lookup "route.openshift.io/v1" "Route" "openshift-quay" "registry-quay"
                 ).spec.host }}'
             kind: ConfigMap
             metadata:
@@ -1241,7 +1241,7 @@ spec:
               applicationMenu:
                 imageURL: https://upload.wikimedia.org/wikipedia/commons/3/3a/OpenShift-LogoType.svg
                 section: Red Hat applications
-              href: https://{{ (lookup "route.openshift.io/v1" "Route" "local-quay"
+              href: https://{{ (lookup "route.openshift.io/v1" "Route" "openshift-quay"
                 "registry-quay" ).spec.host }}
               location: ApplicationMenu
               text: Red Hat Quay Enterprise Registry
@@ -1251,7 +1251,7 @@ spec:
             kind: Job
             metadata:
               name: create-admin-user
-              namespace: local-quay
+              namespace: openshift-quay
             spec:
               template:
                 spec:
@@ -1283,12 +1283,12 @@ spec:
                         echo "[INFO] Success" 1>&2
                       }
                       echo -n "Waiting for the Quay Registry CR to be available ."
-                      RC=$(oc wait QuayRegistry -n local-quay registry --for=condition=Available=true > /dev/null 2>&1;echo $?)
+                      RC=$(oc wait QuayRegistry -n openshift-quay registry --for=condition=Available=true > /dev/null 2>&1;echo $?)
 
                       while [ $RC -ne 0 ]; do
                         sleep 2
                         echo -n "."
-                        RC=$(oc wait QuayRegistry -n local-quay registry --for=condition=Available=true > /dev/null 2>&1;echo $?)
+                        RC=$(oc wait QuayRegistry -n openshift-quay registry --for=condition=Available=true > /dev/null 2>&1;echo $?)
                       done
                       echo "done"
 
@@ -1296,7 +1296,7 @@ spec:
                       QUAY_ADMIN=quayadmin
                       QUAY_USER=quaydevel
                       QUAY_USER_SECRET=$QUAY_USER
-                      QUAY_NAMESPACE=local-quay
+                      QUAY_NAMESPACE=openshift-quay
                       QUAY_HOST=$(oc get route -n $QUAY_NAMESPACE registry-quay -o jsonpath='{.spec.host}')
                       QUAY_ORG=devel
                       QUAY_ORG_EMAIL=devel@myorg.com
@@ -1423,20 +1423,20 @@ spec:
       kind: OperatorPolicy
       metadata:
         labels:
-          operators.coreos.com/quay-operator.local-quay: ""
+          operators.coreos.com/quay-operator.openshift-quay: ""
         name: operatorpolicy-quay-operator
       spec:
         complianceType: musthave
         operatorGroup:
-          name: local-quay
-          namespace: local-quay
+          name: openshift-quay
+          namespace: openshift-quay
           targetNamespaces:
-          - local-quay
+          - openshift-quay
         remediationAction: enforce
         severity: high
         subscription:
           name: quay-operator
-          namespace: local-quay
+          namespace: openshift-quay
           source: redhat-operators
           sourceNamespace: openshift-marketplace
         upgradeApproval: Automatic
@@ -1454,21 +1454,21 @@ spec:
             metadata:
               labels:
                 openshift.io/cluster-monitoring: "true"
-              name: local-quay
+              name: openshift-quay
         - complianceType: musthave
           objectDefinition:
             apiVersion: v1
             kind: ServiceAccount
             metadata:
               name: create-admin-user
-              namespace: local-quay
+              namespace: openshift-quay
         - complianceType: musthave
           objectDefinition:
             apiVersion: rbac.authorization.k8s.io/v1
             kind: Role
             metadata:
               name: create-admin-user
-              namespace: local-quay
+              namespace: openshift-quay
             rules:
             - apiGroups:
               - ""
@@ -1502,7 +1502,7 @@ spec:
             kind: RoleBinding
             metadata:
               name: create-admin-user
-              namespace: local-quay
+              namespace: openshift-quay
             roleRef:
               apiGroup: rbac.authorization.k8s.io
               kind: Role
@@ -1510,7 +1510,7 @@ spec:
             subjects:
             - kind: ServiceAccount
               name: create-admin-user
-              namespace: local-quay
+              namespace: openshift-quay
         - complianceType: musthave
           objectDefinition:
             apiVersion: v1
@@ -1519,7 +1519,7 @@ spec:
             kind: Secret
             metadata:
               name: init-config-bundle-secret
-              namespace: local-quay
+              namespace: openshift-quay
             type: Opaque
         - complianceType: musthave
           objectDefinition:
@@ -1527,7 +1527,7 @@ spec:
             kind: QuayRegistry
             metadata:
               name: registry
-              namespace: local-quay
+              namespace: openshift-quay
             spec:
               components:
               - kind: objectstorage
@@ -1693,7 +1693,7 @@ spec:
               namespace: openshift-storage
             spec:
               generateBucketName: obc-observability-bucket
-              storageClassName: openshift-storage.noobaa.io
+              storageClassName: ocs-storagecluster-ceph-rgw
             status:
               phase: Bound
         remediationAction: enforce
@@ -1717,6 +1717,26 @@ metadata:
 spec:
   disabled: false
   policy-templates:
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1beta1
+      kind: OperatorPolicy
+      metadata:
+        name: operatorpolicy-local-storage-operator
+      spec:
+        complianceType: musthave
+        operatorGroup:
+          name: openshift-local-storage
+          namespace: openshift-local-storage
+          targetNamespaces:
+          - openshift-local-storage
+        remediationAction: enforce
+        severity: high
+        subscription:
+          name: local-storage-operator
+          namespace: openshift-local-storage
+          source: redhat-operators
+          sourceNamespace: openshift-marketplace
+        upgradeApproval: Automatic
   - objectDefinition:
       apiVersion: policy.open-cluster-management.io/v1beta1
       kind: OperatorPolicy
@@ -1749,9 +1769,60 @@ spec:
             apiVersion: v1
             kind: Namespace
             metadata:
+              name: openshift-local-storage
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: v1
+            kind: Namespace
+            metadata:
               labels:
                 openshift.io/cluster-monitoring: "true"
               name: openshift-storage
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: local.storage.openshift.io/v1alpha1
+            kind: LocalVolumeDiscovery
+            metadata:
+              name: auto-discover-devices
+              namespace: openshift-local-storage
+            spec:
+              nodeSelector:
+                nodeSelectorTerms:
+                - matchExpressions:
+                  - key: cluster.ocs.openshift.io/openshift-storage
+                    operator: Exists
+              tolerations:
+              - effect: NoSchedule
+                key: node-role.kubernetes.io/infra
+                operator: Exists
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: local.storage.openshift.io/v1alpha1
+            kind: LocalVolumeSet
+            metadata:
+              name: odf-localvolumeset
+              namespace: openshift-local-storage
+            spec:
+              deviceInclusionSpec:
+                deviceTypes:
+                - disk
+                minSize: 1Ti
+              maxDeviceCount: 1
+              nodeSelector:
+                nodeSelectorTerms:
+                - matchExpressions:
+                  - key: cluster.ocs.openshift.io/openshift-storage
+                    operator: Exists
+              storageClassName: odf-localvolumeset
+              tolerations:
+              - effect: NoSchedule
+                key: node-role.kubernetes.io/infra
+                operator: Exists
+              volumeMode: Block
+            status:
+              conditions:
+              - status: "True"
+                type: Available
         - complianceType: musthave
           objectDefinition:
             apiVersion: odf.openshift.io/v1alpha1
@@ -1806,23 +1877,6 @@ spec:
         name: policy-odf-cluster
       spec:
         object-templates-raw: |
-          {{- /* create the StorageClass if on VMware */ -}}
-          {{- if (eq (lookup "config.openshift.io/v1" "Infrastructure" "" "cluster").spec.platformSpec.type "VSphere") }}
-          - complianceType: musthave
-            objectDefinition:
-              apiVersion: storage.k8s.io/v1
-              kind: StorageClass
-              metadata:
-                annotations:
-                  storageclass.kubernetes.io/is-default-class: "false"
-                name: thin-csi-odf
-              parameters:
-                StoragePolicyName: "vSAN Default Storage Policy"
-              provisioner: csi.vsphere.vmware.com
-              allowVolumeExpansion: true
-              reclaimPolicy: Delete
-              volumeBindingMode: WaitForFirstConsumer
-          {{- end }}
           - complianceType: musthave
             objectDefinition:
               apiVersion: ocs.openshift.io/v1
@@ -1834,59 +1888,42 @@ spec:
                 name: ocs-storagecluster
                 namespace: openshift-storage
               spec:
-                arbiter: {}
-                encryption:
-                  kms: {}
-                externalStorage: {}
-                managedResources:
-                  cephBlockPools: {}
-                  cephCluster: {}
-                  cephConfig: {}
-                  cephDashboard: {}
-                  cephFilesystems: {}
-                  cephObjectStoreUsers: {}
-                  cephObjectStores: {}
-                  cephToolbox: {}
-                mirroring: {}
-                nodeTopologies: {}
-                resources:
-                  mds: {}
-                  mgr: {}
-                  mon: {}
-                  noobaa-core: {}
-                  noobaa-db: {}
-                  noobaa-endpoint:
-                    limits:
-                      cpu: 1
-                      memory: 500Mi
-                    requests:
-                      cpu: 1
-                      memory: 500Mi
-                  rgw: {}
+                flexibleScaling: true
+                monDataDirHostPath: /var/lib/rook
                 storageDeviceSets:
-                - config: {}
-                  count: 1
+                - count: 1
                   dataPVCTemplate:
-                    metadata: {}
                     spec:
                       accessModes:
                       - ReadWriteOnce
                       resources:
                         requests:
-                          storage: 100Gi
-          {{- if (eq (lookup "config.openshift.io/v1" "Infrastructure" "" "cluster").spec.platformSpec.type "VSphere") }}
-                      storageClassName: thin-csi-odf
-          {{- else }}
-                      storageClassName: gp3-csi
-          {{- end }}
+                          storage: 1Ti
+                      storageClassName: odf-localvolumeset
                       volumeMode: Block
-                    status: {}
-                  name: ocs-deviceset
-                  placement: {}
-                  portable: true
-                  preparePlacement: {}
+                  name: ocs-deviceset-localvolume
                   replica: 3
-                  resources: {}
+                placement:
+                  all:
+                    tolerations:
+                    - effect: NoSchedule
+                      operator: Exists
+                      key: node-role.kubernetes.io/infra
+                  mds:
+                    tolerations:
+                    - effect: NoSchedule
+                      operator: Exists
+                      key: node-role.kubernetes.io/infra
+                  rgw:
+                    tolerations:
+                    - effect: NoSchedule
+                      operator: Exists
+                      key: node-role.kubernetes.io/infra
+                  noobaa-core::
+                    tolerations:
+                    - effect: NoSchedule
+                      operator: Exists
+                      key: node-role.kubernetes.io/infra
         remediationAction: enforce
         severity: high
   remediationAction: enforce
@@ -2019,7 +2056,7 @@ spec:
             kind: Deployment
             metadata:
               name: registry-quay-app
-              namespace: local-quay
+              namespace: openshift-quay
             status:
               conditions:
               - status: "True"
@@ -2030,7 +2067,7 @@ spec:
             kind: Deployment
             metadata:
               name: registry-quay-database
-              namespace: local-quay
+              namespace: openshift-quay
             status:
               conditions:
               - status: "True"

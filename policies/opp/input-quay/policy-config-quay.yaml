@@ -4,7 +4,7 @@ metadata:
   name: quay-config
   namespace: policies
 data:
-  host: '{{ (lookup "route.openshift.io/v1" "Route" "local-quay" "registry-quay" ).spec.host }}'
+  host: '{{ (lookup "route.openshift.io/v1" "Route" "openshift-quay" "registry-quay" ).spec.host }}'
 ---
 apiVersion: console.openshift.io/v1
 kind: ConsoleLink
@@ -14,7 +14,7 @@ spec:
   applicationMenu:
     section: Red Hat applications
     imageURL: 'https://upload.wikimedia.org/wikipedia/commons/3/3a/OpenShift-LogoType.svg'
-  href: 'https://{{ (lookup "route.openshift.io/v1" "Route" "local-quay" "registry-quay" ).spec.host }}'
+  href: 'https://{{ (lookup "route.openshift.io/v1" "Route" "openshift-quay" "registry-quay" ).spec.host }}'
   location: ApplicationMenu
   text: 'Red Hat Quay Enterprise Registry'
 ---
@@ -22,7 +22,7 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: create-admin-user
-  namespace: local-quay
+  namespace: openshift-quay
 spec:
   template:
     spec:
@@ -54,12 +54,12 @@ spec:
             echo "[INFO] Success" 1>&2
           }
           echo -n "Waiting for the Quay Registry CR to be available ."
-          RC=$(oc wait QuayRegistry -n local-quay registry --for=condition=Available=true > /dev/null 2>&1;echo $?)
+          RC=$(oc wait QuayRegistry -n openshift-quay registry --for=condition=Available=true > /dev/null 2>&1;echo $?)
 
           while [ $RC -ne 0 ]; do
             sleep 2
             echo -n "."
-            RC=$(oc wait QuayRegistry -n local-quay registry --for=condition=Available=true > /dev/null 2>&1;echo $?)
+            RC=$(oc wait QuayRegistry -n openshift-quay registry --for=condition=Available=true > /dev/null 2>&1;echo $?)
           done
           echo "done"
 
@@ -67,7 +67,7 @@ spec:
           QUAY_ADMIN=quayadmin
           QUAY_USER=quaydevel
           QUAY_USER_SECRET=$QUAY_USER
-          QUAY_NAMESPACE=local-quay
+          QUAY_NAMESPACE=openshift-quay
           QUAY_HOST=$(oc get route -n $QUAY_NAMESPACE registry-quay -o jsonpath='{.spec.host}')
           QUAY_ORG=devel
           QUAY_ORG_EMAIL=devel@myorg.com

@@ -3,19 +3,19 @@ kind: Namespace
 metadata:
   labels:
     openshift.io/cluster-monitoring: "true"
-  name: local-quay
+  name: openshift-quay
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: create-admin-user
-  namespace: local-quay
+  namespace: openshift-quay
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   name: create-admin-user
-  namespace: local-quay
+  namespace: openshift-quay
 rules:
 - apiGroups:
   - ""
@@ -48,7 +48,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   name: create-admin-user
-  namespace: local-quay
+  namespace: openshift-quay
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
@@ -56,27 +56,27 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: create-admin-user
-  namespace: local-quay
+  namespace: openshift-quay
 ---
 apiVersion: policy.open-cluster-management.io/v1beta1
 kind: OperatorPolicy
 metadata:
   name: operatorpolicy-quay-operator
   labels:
-    operators.coreos.com/quay-operator.local-quay: ""
+    operators.coreos.com/quay-operator.openshift-quay: ""
 spec:
   remediationAction: enforce
   severity: high
   complianceType: musthave
   upgradeApproval: Automatic
   operatorGroup:
-    name: local-quay
-    namespace: local-quay
+    name: openshift-quay
+    namespace: openshift-quay
     targetNamespaces:
-      - local-quay
+      - openshift-quay
   subscription:
     name: quay-operator
-    namespace: local-quay
+    namespace: openshift-quay
     source: redhat-operators
     sourceNamespace: openshift-marketplace
 ---
@@ -86,14 +86,14 @@ data:
 kind: Secret
 metadata:
   name: init-config-bundle-secret
-  namespace: local-quay
+  namespace: openshift-quay
 type: Opaque
 ---
 apiVersion: quay.redhat.com/v1
 kind: QuayRegistry
 metadata:
   name: registry
-  namespace: local-quay
+  namespace: openshift-quay
 spec:
   configBundleSecret: init-config-bundle-secret
   components:

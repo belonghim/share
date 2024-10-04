@@ -21,7 +21,7 @@ metadata:
   namespace: openshift-operators
 apiVersion: v1
 data:
-  token: '{{ fromSecret "local-quay" "quay-integration" "token" }}'
+  token: '{{ fromSecret "openshift-quay" "quay-integration" "token" }}'
 ---
 kind: Secret
 type: Opaque
@@ -30,7 +30,7 @@ metadata:
   namespace: policies
 apiVersion: v1
 data:
-  token: '{{ fromSecret "local-quay" "quay-integration" "token" }}'
+  token: '{{ fromSecret "openshift-quay" "quay-integration" "token" }}'
 ---
 apiVersion: quay.redhat.com/v1
 kind: QuayIntegration
@@ -48,7 +48,7 @@ spec:
 ---
 apiVersion: v1
 data:
-  '{{ (lookup "route.openshift.io/v1" "Route" "local-quay" "registry-quay" ).spec.host }}': |
+  '{{ (lookup "route.openshift.io/v1" "Route" "openshift-quay" "registry-quay" ).spec.host }}': |
     {{ ( fromSecret "openshift-ingress-operator" "router-ca" "tls.crt" ) | base64dec | autoindent }}
 kind: ConfigMap
 metadata:
@@ -65,7 +65,7 @@ spec:
 ---
 apiVersion: v1
 data:
-  registry-quay-local-quay: |
+  registry-quay-openshift-quay: |
     {{ ( fromSecret "openshift-ingress-operator" "router-ca" "tls.crt" ) }}
 kind: Secret
 metadata:
