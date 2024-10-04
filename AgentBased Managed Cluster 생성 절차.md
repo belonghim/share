@@ -458,7 +458,7 @@ spec:
 EOF
 
 ## infra mcp 생성
-oc create -f -<<EOF
+cat > ${INSTALL_DIR}/openshift/mcp-infra.yaml<<EOF
 apiVersion: machineconfiguration.openshift.io/v1
 kind: MachineConfigPool
 metadata:
