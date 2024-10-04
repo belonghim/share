@@ -163,7 +163,7 @@ policies:
   remediationAction: inform
 # ODF Policies - end
 # Quay Policies - start
-- name: policy-install-quay
+- name: policy-quay-install
   categories:
     - SI System and Information Integrity
   controls:
@@ -171,23 +171,23 @@ policies:
   dependencies:
     - name: policy-odf-status
   manifests:
-    - path: input-quay/policy-install-quay.yaml
-- name: policy-config-quay
+    - path: input-quay/policy-quay-install.yaml
+- name: policy-quay-config
   categories:
     - SI System and Information Integrity
   controls: 
     - SI-7 Software Firmware and Information Integrity
   dependencies:
-    - name: policy-install-quay
+    - name: policy-quay-install
   manifests:
-    - path: input-quay/policy-config-quay.yaml
+    - path: input-quay/policy-quay-config.yaml
 - name: policy-quay-status
   categories:
     - SI System and Information Integrity
   controls:
     - SI-7 Software Firmware and Information Integrity
   dependencies:
-    - name: policy-install-quay
+    - name: policy-quay-install
   manifests:
     - path: input-quay/policy-quay-status.yaml
   remediationAction: inform
