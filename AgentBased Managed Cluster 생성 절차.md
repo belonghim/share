@@ -342,6 +342,7 @@ EOF
 ### agent cluster-manifests 생성
 
 ```
+$ export OPENSHIFT_INSTALL_RELEASE_IMAGE_OVERRIDE=${Repository}/openshift/release-images:${ReleaseVersion}-x86_64
 $ openshift-install agent create cluster-manifests --log-level debug --dir ${INSTALL_DIR}
 ```
 
