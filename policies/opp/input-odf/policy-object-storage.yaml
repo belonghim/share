@@ -5,4 +5,4 @@ metadata:
   namespace: openshift-storage
 spec:
   generateBucketName: obc-observability-bucket
-  storageClassName: openshift-storage.noobaa.io
+  storageClassName: ocs-storagecluster-ceph-rgw
