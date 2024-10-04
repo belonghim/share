@@ -68,7 +68,7 @@ spec:
   remediationAction: enforce
   severity: high
   complianceType: musthave
-  upgradeApproval: Automatic
+  upgradeApproval: None
   operatorGroup:
     name: openshift-quay
     namespace: openshift-quay

@@ -16,7 +16,7 @@ spec:
   remediationAction: enforce
   severity: high
   complianceType: musthave
-  upgradeApproval: Automatic
+  upgradeApproval: None
   operatorGroup:
     name: rhacs-operator-group
     namespace: rhacs-operator

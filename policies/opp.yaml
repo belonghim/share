@@ -694,7 +694,7 @@ spec:
           namespace: rhacs-operator
           source: redhat-operators
           sourceNamespace: openshift-marketplace
-        upgradeApproval: Automatic
+        upgradeApproval: None
   - objectDefinition:
       apiVersion: policy.open-cluster-management.io/v1
       kind: ConfigurationPolicy
@@ -971,7 +971,7 @@ spec:
           namespace: rhacs-operator
           source: redhat-operators
           sourceNamespace: openshift-marketplace
-        upgradeApproval: Automatic
+        upgradeApproval: None
   - objectDefinition:
       apiVersion: policy.open-cluster-management.io/v1
       kind: ConfigurationPolicy
@@ -1173,7 +1173,7 @@ spec:
           namespace: openshift-compliance
           source: redhat-operators
           sourceNamespace: openshift-marketplace
-        upgradeApproval: Automatic
+        upgradeApproval: None
   - objectDefinition:
       apiVersion: policy.open-cluster-management.io/v1
       kind: ConfigurationPolicy
@@ -1439,7 +1439,7 @@ spec:
           namespace: openshift-quay
           source: redhat-operators
           sourceNamespace: openshift-marketplace
-        upgradeApproval: Automatic
+        upgradeApproval: None
   - objectDefinition:
       apiVersion: policy.open-cluster-management.io/v1
       kind: ConfigurationPolicy
@@ -1736,7 +1736,7 @@ spec:
           namespace: openshift-local-storage
           source: redhat-operators
           sourceNamespace: openshift-marketplace
-        upgradeApproval: Automatic
+        upgradeApproval: None
   - objectDefinition:
       apiVersion: policy.open-cluster-management.io/v1beta1
       kind: OperatorPolicy
@@ -1745,7 +1745,7 @@ spec:
       spec:
         complianceType: musthave
         operatorGroup:
-          name: openshift-storage-operatorgroup
+          name: openshift-storage
           namespace: openshift-storage
           targetNamespaces:
           - openshift-storage
@@ -1756,7 +1756,7 @@ spec:
           namespace: openshift-storage
           source: redhat-operators
           sourceNamespace: openshift-marketplace
-        upgradeApproval: Automatic
+        upgradeApproval: None
   - objectDefinition:
       apiVersion: policy.open-cluster-management.io/v1
       kind: ConfigurationPolicy

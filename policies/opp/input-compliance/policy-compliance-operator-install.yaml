@@ -11,7 +11,7 @@ spec:
   remediationAction: enforce
   severity: high
   complianceType: musthave
-  upgradeApproval: Automatic
+  upgradeApproval: None
   operatorGroup:
     name: compliance-operator
     namespace: openshift-compliance

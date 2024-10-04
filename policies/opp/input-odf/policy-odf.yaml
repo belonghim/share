@@ -18,7 +18,7 @@ spec:
   remediationAction: enforce
   severity: high
   complianceType: musthave
-  upgradeApproval: Automatic
+  upgradeApproval: None
   operatorGroup:
     name: openshift-local-storage
     namespace: openshift-local-storage
@@ -38,9 +38,9 @@ spec:
   remediationAction: enforce
   severity: high
   complianceType: musthave
-  upgradeApproval: Automatic
+  upgradeApproval: None
   operatorGroup:
-    name: openshift-storage-operatorgroup
+    name: openshift-storage
     namespace: openshift-storage
     targetNamespaces:
       - openshift-storage
