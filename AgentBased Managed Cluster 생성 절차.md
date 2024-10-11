@@ -795,7 +795,7 @@ metadata:
 EOF
 
 ## OAuth에 인증 정보 등록
-$ oc create -f - <<EOF
+$ oc replace -f - <<EOF
 apiVersion: config.openshift.io/v1
 kind: OAuth
 metadata:
