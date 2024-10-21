@@ -1,0 +1,135 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: openshift-local-storage
+---
+apiVersion: policy.open-cluster-management.io/v1beta1
+kind: OperatorPolicy
+metadata:
+  name: local-storage-operator
+spec:
+  remediationAction: enforce
+  severity: high
+  complianceType: musthave
+  upgradeApproval: None
+  operatorGroup:
+    name: openshift-local-storage
+    namespace: openshift-local-storage
+    targetNamespaces:
+    - openshift-local-storage
+  subscription:
+    name: local-storage-operator
+    namespace: openshift-local-storage
+    source: cs-redhat-operator-index
+    sourceNamespace: openshift-marketplace
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  labels:
+    openshift.io/cluster-monitoring: "true"
+  name: openshift-storage
+---
+apiVersion: policy.open-cluster-management.io/v1beta1
+kind: OperatorPolicy
+metadata:
+  name: odf-operator
+spec:
+  remediationAction: enforce
+  severity: high
+  complianceType: musthave
+  upgradeApproval: None
+  operatorGroup:
+    name: openshift-storage
+    namespace: openshift-storage
+    targetNamespaces:
+    - openshift-storage
+  subscription:
+    name: odf-operator
+    namespace: openshift-storage
+    source: cs-redhat-operator-index
+    sourceNamespace: openshift-marketplace
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: stackrox
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: rhacs-operator
+---
+apiVersion: policy.open-cluster-management.io/v1beta1
+kind: OperatorPolicy
+metadata:
+  name: rhacs-operator
+spec:
+  remediationAction: enforce
+  severity: high
+  complianceType: musthave
+  upgradeApproval: None
+  operatorGroup:
+    name: rhacs-operator
+    namespace: rhacs-operator
+  subscription:
+    name: rhacs-operator
+    namespace: rhacs-operator
+    source: cs-redhat-operator-index
+    sourceNamespace: openshift-marketplace
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: openshift-quay
+  labels:
+    openshift.io/cluster-monitoring: "true"
+---
+apiVersion: policy.open-cluster-management.io/v1beta1
+kind: OperatorPolicy
+metadata:
+  name: quay-operator
+  labels:
+    operators.coreos.com/quay-operator.openshift-quay: ""
+spec:
+  remediationAction: enforce
+  severity: high
+  complianceType: musthave
+  upgradeApproval: None
+  operatorGroup:
+    name: openshift-quay
+    namespace: openshift-quay
+  subscription:
+    name: quay-operator
+    namespace: openshift-quay
+    source: cs-redhat-operator-index
+    sourceNamespace: openshift-marketplace
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: openshift-update-service
+  labels:
+    openshift.io/cluster-monitoring: "true"
+---
+apiVersion: policy.open-cluster-management.io/v1beta1
+kind: OperatorPolicy
+metadata:
+  name: cincinnati-operator
+spec:
+  remediationAction: enforce
+  severity: high
+  complianceType: musthave
+  upgradeApproval: None
+  operatorGroup:
+    name: openshift-update-service
+    namespace: openshift-update-service
+    targetNamespaces:
+    - openshift-update-service
+  subscription:
+    name: cincinnati-operator
+    namespace: openshift-update-service
+    source: cs-redhat-operator-index
+    sourceNamespace: openshift-marketplace
+---

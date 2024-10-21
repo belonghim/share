@@ -1,0 +1,57 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: stackrox
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: rhacs-operator
+---
+apiVersion: policy.open-cluster-management.io/v1beta1
+kind: OperatorPolicy
+metadata:
+  name: operatorpolicy-rhacs-operator
+spec:
+  remediationAction: enforce
+  severity: high
+  complianceType: musthave
+  upgradeApproval: Automatic
+  operatorGroup:
+    name: rhacs-operator-group
+    namespace: rhacs-operator
+  subscription:
+    channel: stable
+    name: rhacs-operator
+    namespace: rhacs-operator
+    source: redhat-operators
+    sourceNamespace: openshift-marketplace
+---
+apiVersion: platform.stackrox.io/v1alpha1
+kind: Central
+metadata:
+  namespace: stackrox
+  name: stackrox-central-services
+spec:
+  central:
+    exposure:
+      loadBalancer:
+        enabled: false
+        port: 443
+      nodePort:
+        enabled: false
+      route:
+        enabled: true
+    persistence:
+      persistentVolumeClaim:
+        claimName: stackrox-db
+  egress:
+    connectivityPolicy: Online
+  scanner:
+    analyzer:
+      scaling:
+        autoScaling: Enabled
+        maxReplicas: 5
+        minReplicas: 2
+        replicas: 2
+    scannerComponent: Enabled

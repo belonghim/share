@@ -1,0 +1,135 @@
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: create-admin-user
+  namespace: openshift-quay
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: create-admin-user
+  namespace: openshift-quay
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - secrets
+  verbs:
+  - get
+  - list
+  - create
+  - patch
+  - update
+  - delete
+- apiGroups:
+  - route.openshift.io
+  resources:
+  - routes
+  verbs:
+  - get
+  - list
+- apiGroups:
+  - quay.redhat.com
+  resources:
+  - quayregistries
+  verbs:
+  - get
+  - list
+  - watch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: create-admin-user
+  namespace: openshift-quay
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: create-admin-user
+subjects:
+- kind: ServiceAccount
+  name: create-admin-user
+  namespace: openshift-quay
+---
+#apiVersion: v1
+#data:
+#  config.yaml: RkVBVFVSRV9VU0VSX0lOSVRJQUxJWkU6IHRydWUKQlJPV1NFUl9BUElfQ0FMTFNfWEhSX09OTFk6IGZhbHNlClNVUEVSX1VTRVJTOgotIHF1YXlhZG1pbgpGRUFUVVJFX1VTRVJfQ1JFQVRJT046IHRydWUKRkVBVFVSRV9TVVBFUlVTRVJTX0ZVTExfQUNDRVNTOiB0cnVlCg==
+#kind: Secret
+#metadata:
+#  name: init-config-bundle-secret
+#  namespace: openshift-quay
+#type: Opaque
+#---
+apiVersion: policy.open-cluster-management.io/v1
+kind: ConfigurationPolicy
+metadata:
+  name: init-config-bundle-secret
+spec:
+  remediationAction: enforce
+  severity: high
+  object-templates-raw: |
+    {{- /* read the bucket data and endpoint access data */ -}}
+    {{- $objBucket := (lookup "objectbucket.io/v1alpha1" "ObjectBucket" "" "obc-openshift-quay-registry-quay") }}
+    {{- $awsAccess := (lookup "v1" "Secret" "openshift-quay" "registry-quay") }}
+    {{- /* create the quay config file as a template */ -}}
+    {{- $quayConfig := `
+    DISTRIBUTED_STORAGE_CONFIG:
+      default:
+        - RadosGWStorage
+        - access_key: %[1]s
+          bucket_name: %[2]s
+          hostname: rook-ceph-rgw-ocs-storagecluster-cephobjectstore.openshift-storage.svc
+          is_secure: true
+          port: 443
+          secret_key: %[3]s
+          storage_path: /datastorage/registry-quay
+    DISTRIBUTED_STORAGE_DEFAULT_LOCATIONS: []
+    DISTRIBUTED_STORAGE_PREFERENCE:
+      - default
+    FEATURE_USER_INITIALIZE: true
+    BROWSER_API_CALLS_XHR_ONLY: false
+    SUPER_USERS:
+    - quayadmin
+    FEATURE_USER_CREATION: true
+    FEATURE_SUPERUSERS_FULL_ACCESS: true`
+    }}
+
+    {{- /* create the secret using the quay configuration template created above. */ -}}
+    - complianceType: mustonlyhave
+      objectDefinition:
+        apiVersion: v1
+        kind: Secret
+        metadata:
+          name: init-config-bundle-secret
+          namespace: openshift-quay
+        type: Opaque
+        data:
+          config.yaml: {{ (printf $quayConfig ($awsAccess.data.AWS_ACCESS_KEY_ID | base64dec) $objBucket.spec.endpoint.bucketName ($awsAccess.data.AWS_SECRET_ACCESS_KEY | base64dec)) | base64enc }}
+---
+apiVersion: v1
+data:
+  clair-config.yaml: aW5kZXhlcjoKICBjb25uc3RyaW5nOiBob3N0PTE5Mi4xNjguMTAuMTEgcG9ydD01NDMyIGRibmFtZT1jbGFpci1kYXRhYmFzZSB1c2VyPWNsYWlyYWRtaW4gcGFzc3dvcmQ9Y2xhaXJhZG1pbjEhIHNzbG1vZGU9ZGlzYWJsZQogIHNjYW5sb2NrX3JldHJ5OiAxMAogIGxheWVyX3NjYW5fY29uY3VycmVuY3k6IDUKICBtaWdyYXRpb25zOiB0cnVlCiAgYWlyZ2FwOiB0cnVlCiAgc2Nhbm5lcjoKICAgIHJlcG86CiAgICAgIHJoZWwtcmVwb3NpdG9yeS1zY2FubmVyOgogICAgICAgIHJlcG8yY3BlX21hcHBpbmdfZmlsZTogL2RhdGEvcmVwb3NpdG9yeS10by1jcGUuanNvbgogICAgcGFja2FnZToKICAgICAgcmhlbF9jb250YWluZXJzY2FubmVyOgogICAgICAgIG5hbWUycmVwb3NfbWFwcGluZ19maWxlOiAvZGF0YS9jb250YWluZXItbmFtZS1yZXBvcy1tYXAuanNvbgptYXRjaGVyOgogIGNvbm5zdHJpbmc6IGhvc3Q9MTkyLjE2OC4xMC4xMSBwb3J0PTU0MzIgZGJuYW1lPWNsYWlyLWRhdGFiYXNlIHVzZXI9Y2xhaXJhZG1pbiBwYXNzd29yZD1jbGFpcmFkbWluMSEgc3NsbW9kZT1kaXNhYmxlCiAgZGlzYWJsZV91cGRhdGVyczogdHJ1ZQogIG1heF9jb25uX3Bvb2w6IDEwMAogIG1pZ3JhdGlvbnM6IHRydWUKICBpbmRleGVyX2FkZHI6IGNsYWlyLWluZGV4ZXIKbm90aWZpZXI6CiAgY29ubnN0cmluZzogaG9zdD0xOTIuMTY4LjEwLjExIHBvcnQ9NTQzMiBkYm5hbWU9Y2xhaXItZGF0YWJhc2UgdXNlcj1jbGFpcmFkbWluIHBhc3N3b3JkPWNsYWlyYWRtaW4xISBzc2xtb2RlPWRpc2FibGUKICBkZWxpdmVyeV9pbnRlcnZhbDogMW0KICBwb2xsX2ludGVydmFsOiA1bQogIG1pZ3JhdGlvbnM6IHRydWUKICB3ZWJob29rOgogICAgY2FsbGJhY2s6IGh0dHA6Ly9xdWF5LXJlZ2lzdHJ5LWNsYWlyLWFwcC9ub3RpZmllci9hcGkvdjEvbm90aWZpY2F0aW9ucwogICAgdGFyZ2V0OiBodHRwczovL3JlZ2lzdHJ5LmFwcHMucGFhcy53b29yaWZnLmNvbS9zZWNzY2FuL25vdGlmaWNhdGlvbg==
+  config.yaml: QVVUSEVOVElDQVRJT05fVFlQRTogT0lEQwpCQU5LX0xPR0lOX0NPTkZJRzoKICBDTElFTlRfSUQ6IHF1YXktZW50ZXJwcmlzZQogIENMSUVOVF9TRUNSRVQ6IHpaVnRGMERuTXpWNWpvR0FZOVBZZXRCeHVqUVNjV3NMCiAgT0lEQ19TRVJWRVI6IGh0dHBzOi8va2V5Y2xvYWsucGFhcy53b29yaWZnLmNvbTo4MTQzL3JlYWxtcy93b29yaS1yZWFsbS8KICBTRVJWSUNFX05BTUU6IFdvb3JpQmFuayBTU08KICBQUkVGRVJSRURfR1JPVVBfQ0xBSU1fTkFNRTogcXVheS1ncm91cAogIExPR0lOX1NDT1BFUzogWyAnb3BlbmlkJyBdCiAgT0lEQ19ESVNBQkxFX1VTRVJfRU5EUE9JTlQ6IGZhbHNlCkNBUkRfTE9HSU5fQ09ORklHOgogIENMSUVOVF9JRDogcXVheS1lbnRlcnByaXNlCiAgQ0xJRU5UX1NFQ1JFVDogUXBJU0w1Qkt2QWkwQmdtYzNJOVRUZWgydDBzQU9HOW0KICBPSURDX1NFUlZFUjogaHR0cHM6Ly9rZXljbG9hay5wYWFzLndvb3JpZmcuY29tOjgxNDMvcmVhbG1zL2NhcmQtcmVhbG0vCiAgU0VSVklDRV9OQU1FOiBXb29yaUNhcmQgU1NPCiAgUFJFRkVSUkVEX0dST1VQX0NMQUlNX05BTUU6IHF1YXktZ3JvdXAKICBMT0dJTl9TQ09QRVM6IFsgJ29wZW5pZCcgXQogIE9JRENfRElTQUJMRV9VU0VSX0VORFBPSU5UOiBmYWxzZQpGRUFUVVJFX1RFQU1fU1lOQ0lORzogdHJ1ZQpGRUFUVVJFX05PTlNVUEVSVVNFUl9URUFNX1NZTkNJTkdfU0VUVVA6IHRydWUKRkVBVFVSRV9VSV9WMjogdHJ1ZQpERUZBVUxUX1RBR19FWFBJUkFUSU9OOiAydwpQUkVGRVJSRURfVVJMX1NDSEVNRTogaHR0cApTRVJWRVJfSE9TVE5BTUU6IHJlZ2lzdHJ5LmFwcHMucGFhcy53b29yaWZnLmNvbQpTRVRVUF9DT01QTEVURTogdHJ1ZQpTVVBFUl9VU0VSUzoKICAtIHF1YXlhZG1pbgpGRUFUVVJFX1VTRVJfQ1JFQVRJT046IHRydWUKRkVBVFVSRV9VU0VSX0lOSVRJQUxJWkU6IHRydWUKRkVBVFVSRV9TVVBFUlVTRVJTX09SR19DUkVBVElPTl9PTkxZOiB0cnVlCkZFQVRVUkVfU1VQRVJVU0VSU19GVUxMX0FDQ0VTUzogdHJ1ZQpGRUFUVVJFX1JFU1RSSUNURURfVVNFUlM6IGZhbHNlIApSRVNUUklDVEVEX1VTRVJTX1dISVRFTElTVDoKICAtIHF1YXlhZG1pbgpCUk9XU0VSX0FQSV9DQUxMU19YSFJfT05MWTogZmFsc2UKVEFHX0VYUElSQVRJT05fT1BUSU9OUzoKICAtIDFkCiAgLSAxdwogIC0gMncKICAtIDR3CkRCX1VSSTogcG9zdGdyZXNxbDovL3F1YXlhZG1pbjpxdWF5YWRtaW4xIUAxOTIuMTY4LjEwLjExOjU0MzEvcXVheS1kYXRhYmFzZQpEQl9DT05ORUNUSU9OX0FSR1M6CiAgc3NsbW9kZTogZGlzYWJsZQo=
+kind: Secret
+metadata:
+  name: quay-config-bundle
+  namespace: openshift-quay
+type: Opaque
+---
+apiVersion: quay.redhat.com/v1
+kind: QuayRegistry
+metadata:
+  name: quay-registry
+  namespace: openshift-quay
+spec:
+  configBundleSecret: quay-config-bundle
+  components:
+  - kind: clairpostgres
+    managed: false
+  - kind: postgres
+    managed: false
+  - kind: mirror
+    managed: false
+  - kind: horizontalpodautoscaler
+    managed: false
