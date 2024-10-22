@@ -27,12 +27,12 @@ spec:
       tolerations:
       - effect: NoSchedule
         operator: Exists
-        key: node-role.kubernetes.io/odf
+        key: node.ocs.openshift.io/storage
     mds:
       tolerations:
       - effect: NoSchedule
         operator: Exists
-        key: node-role.kubernetes.io/odf
+        key: node.ocs.openshift.io/storage
       podAntiAffinity:
         preferredDuringSchedulingIgnoredDuringExecution:
         - weight: 49
@@ -51,7 +51,7 @@ spec:
       tolerations:
       - effect: NoSchedule
         operator: Exists
-        key: node-role.kubernetes.io/odf
+        key: node.ocs.openshift.io/storage
       podAntiAffinity:
         preferredDuringSchedulingIgnoredDuringExecution:
         - weight: 47
@@ -64,7 +64,7 @@ spec:
       tolerations:
       - effect: NoSchedule
         operator: Exists
-        key: node-role.kubernetes.io/odf
+        key: node.ocs.openshift.io/storage
 ---
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
@@ -76,19 +76,13 @@ metadata:
 apiVersion: v1
 data:
   CSI_PLUGIN_TOLERATIONS: |
-    - key: node-role.kubernetes.io/infra
-      operator: Exists
-      effect: NoSchedule
-    - key: node-role.kubernetes.io/odf
+    - key: node.ocs.openshift.io/storage
       operator: Exists
       effect: NoSchedule
   CSI_PROVISIONER_TOLERATIONS: |
     - effect: NoSchedule
       operator: Exists
-      key: node-role.kubernetes.io/infra
-    - effect: NoSchedule
-      operator: Exists
-      key: node-role.kubernetes.io/odf
+      key: node.ocs.openshift.io/storage
   CSI_PROVISIONER_NODE_AFFINITY: "cluster.ocs.openshift.io/openshift-storage="
 kind: ConfigMap
 metadata:

@@ -1197,7 +1197,7 @@ spec:
                 all:
                   tolerations:
                   - effect: NoSchedule
-                    key: node-role.kubernetes.io/odf
+                    key: node.ocs.openshift.io/storage
                     operator: Exists
                 mds:
                   podAntiAffinity:
@@ -1216,12 +1216,12 @@ spec:
                       weight: 48
                   tolerations:
                   - effect: NoSchedule
-                    key: node-role.kubernetes.io/odf
+                    key: node.ocs.openshift.io/storage
                     operator: Exists
                 'noobaa-core:':
                   tolerations:
                   - effect: NoSchedule
-                    key: node-role.kubernetes.io/odf
+                    key: node.ocs.openshift.io/storage
                     operator: Exists
                 rgw:
                   podAntiAffinity:
@@ -1234,7 +1234,7 @@ spec:
                       weight: 47
                   tolerations:
                   - effect: NoSchedule
-                    key: node-role.kubernetes.io/odf
+                    key: node.ocs.openshift.io/storage
                     operator: Exists
               storageDeviceSets:
               - count: 1
@@ -1262,20 +1262,14 @@ spec:
             apiVersion: v1
             data:
               CSI_PLUGIN_TOLERATIONS: |
-                - key: node-role.kubernetes.io/infra
-                  operator: Exists
-                  effect: NoSchedule
-                - key: node-role.kubernetes.io/odf
+                - key: node.ocs.openshift.io/storage
                   operator: Exists
                   effect: NoSchedule
               CSI_PROVISIONER_NODE_AFFINITY: cluster.ocs.openshift.io/openshift-storage=
               CSI_PROVISIONER_TOLERATIONS: |
                 - effect: NoSchedule
                   operator: Exists
-                  key: node-role.kubernetes.io/infra
-                - effect: NoSchedule
-                  operator: Exists
-                  key: node-role.kubernetes.io/odf
+                  key: node.ocs.openshift.io/storage
             kind: ConfigMap
             metadata:
               name: rook-ceph-operator-config
