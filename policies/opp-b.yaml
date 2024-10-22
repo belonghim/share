@@ -328,6 +328,60 @@ spec:
           sourceNamespace: openshift-marketplace
         upgradeApproval: Automatic
   - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1beta1
+      kind: OperatorPolicy
+      metadata:
+        name: servicemeshoperator
+      spec:
+        complianceType: musthave
+        operatorGroup:
+          name: openshift-operators
+          namespace: openshift-operators
+        remediationAction: enforce
+        severity: high
+        subscription:
+          name: servicemeshoperator
+          namespace: openshift-operators
+          source: cs-redhat-operator-index
+          sourceNamespace: openshift-marketplace
+        upgradeApproval: Automatic
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1beta1
+      kind: OperatorPolicy
+      metadata:
+        name: kiali-ossm
+      spec:
+        complianceType: musthave
+        operatorGroup:
+          name: openshift-operators
+          namespace: openshift-operators
+        remediationAction: enforce
+        severity: high
+        subscription:
+          name: kiali-ossm
+          namespace: openshift-operators
+          source: cs-redhat-operator-index
+          sourceNamespace: openshift-marketplace
+        upgradeApproval: Automatic
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1beta1
+      kind: OperatorPolicy
+      metadata:
+        name: tempo-product
+      spec:
+        complianceType: musthave
+        operatorGroup:
+          name: openshift-tempo-operator
+          namespace: openshift-tempo-operator
+        remediationAction: enforce
+        severity: high
+        subscription:
+          name: tempo-product
+          namespace: openshift-tempo-operator
+          source: cs-redhat-operator-index
+          sourceNamespace: openshift-marketplace
+        upgradeApproval: Automatic
+  - objectDefinition:
       apiVersion: policy.open-cluster-management.io/v1
       kind: ConfigurationPolicy
       metadata:
@@ -346,6 +400,18 @@ spec:
             kind: Namespace
             metadata:
               name: openshift-logging
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: v1
+            kind: Namespace
+            metadata:
+              name: openshift-operators
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: v1
+            kind: Namespace
+            metadata:
+              name: openshift-tempo-operator
         remediationAction: enforce
         severity: medium
   remediationAction: enforce
@@ -448,6 +514,60 @@ spec:
           sourceNamespace: openshift-marketplace
         upgradeApproval: Automatic
   - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1beta1
+      kind: OperatorPolicy
+      metadata:
+        name: servicemeshoperator
+      spec:
+        complianceType: musthave
+        operatorGroup:
+          name: openshift-operators
+          namespace: openshift-operators
+        remediationAction: enforce
+        severity: high
+        subscription:
+          name: servicemeshoperator
+          namespace: openshift-operators
+          source: cs-redhat-operator-index
+          sourceNamespace: openshift-marketplace
+        upgradeApproval: Automatic
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1beta1
+      kind: OperatorPolicy
+      metadata:
+        name: kiali-ossm
+      spec:
+        complianceType: musthave
+        operatorGroup:
+          name: openshift-operators
+          namespace: openshift-operators
+        remediationAction: enforce
+        severity: high
+        subscription:
+          name: kiali-ossm
+          namespace: openshift-operators
+          source: cs-redhat-operator-index
+          sourceNamespace: openshift-marketplace
+        upgradeApproval: Automatic
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1beta1
+      kind: OperatorPolicy
+      metadata:
+        name: tempo-product
+      spec:
+        complianceType: musthave
+        operatorGroup:
+          name: openshift-tempo-operator
+          namespace: openshift-tempo-operator
+        remediationAction: enforce
+        severity: high
+        subscription:
+          name: tempo-product
+          namespace: openshift-tempo-operator
+          source: cs-redhat-operator-index
+          sourceNamespace: openshift-marketplace
+        upgradeApproval: Automatic
+  - objectDefinition:
       apiVersion: policy.open-cluster-management.io/v1
       kind: ConfigurationPolicy
       metadata:
@@ -484,6 +604,18 @@ spec:
               labels:
                 openshift.io/cluster-monitoring: "true"
               name: openshift-update-service
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: v1
+            kind: Namespace
+            metadata:
+              name: openshift-operators
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: v1
+            kind: Namespace
+            metadata:
+              name: openshift-tempo-operator
         remediationAction: enforce
         severity: medium
   remediationAction: enforce
@@ -713,6 +845,60 @@ spec:
           sourceNamespace: openshift-marketplace
         upgradeApproval: None
   - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1beta1
+      kind: OperatorPolicy
+      metadata:
+        name: servicemeshoperator
+      spec:
+        complianceType: musthave
+        operatorGroup:
+          name: openshift-operators
+          namespace: openshift-operators
+        remediationAction: enforce
+        severity: high
+        subscription:
+          name: servicemeshoperator
+          namespace: openshift-operators
+          source: cs-redhat-operator-index
+          sourceNamespace: openshift-marketplace
+        upgradeApproval: Automatic
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1beta1
+      kind: OperatorPolicy
+      metadata:
+        name: kiali-ossm
+      spec:
+        complianceType: musthave
+        operatorGroup:
+          name: openshift-operators
+          namespace: openshift-operators
+        remediationAction: enforce
+        severity: high
+        subscription:
+          name: kiali-ossm
+          namespace: openshift-operators
+          source: cs-redhat-operator-index
+          sourceNamespace: openshift-marketplace
+        upgradeApproval: Automatic
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1beta1
+      kind: OperatorPolicy
+      metadata:
+        name: tempo-product
+      spec:
+        complianceType: musthave
+        operatorGroup:
+          name: openshift-tempo-operator
+          namespace: openshift-tempo-operator
+        remediationAction: enforce
+        severity: high
+        subscription:
+          name: tempo-product
+          namespace: openshift-tempo-operator
+          source: cs-redhat-operator-index
+          sourceNamespace: openshift-marketplace
+        upgradeApproval: Automatic
+  - objectDefinition:
       apiVersion: policy.open-cluster-management.io/v1
       kind: ConfigurationPolicy
       metadata:
@@ -731,6 +917,18 @@ spec:
             kind: Namespace
             metadata:
               name: openshift-logging
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: v1
+            kind: Namespace
+            metadata:
+              name: openshift-operators
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: v1
+            kind: Namespace
+            metadata:
+              name: openshift-tempo-operator
         remediationAction: enforce
         severity: medium
   remediationAction: enforce
@@ -833,6 +1031,60 @@ spec:
           sourceNamespace: openshift-marketplace
         upgradeApproval: None
   - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1beta1
+      kind: OperatorPolicy
+      metadata:
+        name: servicemeshoperator
+      spec:
+        complianceType: musthave
+        operatorGroup:
+          name: openshift-operators
+          namespace: openshift-operators
+        remediationAction: enforce
+        severity: high
+        subscription:
+          name: servicemeshoperator
+          namespace: openshift-operators
+          source: cs-redhat-operator-index
+          sourceNamespace: openshift-marketplace
+        upgradeApproval: Automatic
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1beta1
+      kind: OperatorPolicy
+      metadata:
+        name: kiali-ossm
+      spec:
+        complianceType: musthave
+        operatorGroup:
+          name: openshift-operators
+          namespace: openshift-operators
+        remediationAction: enforce
+        severity: high
+        subscription:
+          name: kiali-ossm
+          namespace: openshift-operators
+          source: cs-redhat-operator-index
+          sourceNamespace: openshift-marketplace
+        upgradeApproval: Automatic
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1beta1
+      kind: OperatorPolicy
+      metadata:
+        name: tempo-product
+      spec:
+        complianceType: musthave
+        operatorGroup:
+          name: openshift-tempo-operator
+          namespace: openshift-tempo-operator
+        remediationAction: enforce
+        severity: high
+        subscription:
+          name: tempo-product
+          namespace: openshift-tempo-operator
+          source: cs-redhat-operator-index
+          sourceNamespace: openshift-marketplace
+        upgradeApproval: Automatic
+  - objectDefinition:
       apiVersion: policy.open-cluster-management.io/v1
       kind: ConfigurationPolicy
       metadata:
@@ -869,6 +1121,18 @@ spec:
               labels:
                 openshift.io/cluster-monitoring: "true"
               name: openshift-update-service
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: v1
+            kind: Namespace
+            metadata:
+              name: openshift-operators
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: v1
+            kind: Namespace
+            metadata:
+              name: openshift-tempo-operator
         remediationAction: enforce
         severity: medium
   remediationAction: enforce
@@ -923,7 +1187,7 @@ spec:
       apiVersion: policy.open-cluster-management.io/v1
       kind: ConfigurationPolicy
       metadata:
-        name: policy-observability-operator2
+        name: policy-observability-operator
       spec:
         object-templates:
         - complianceType: musthave
@@ -946,7 +1210,7 @@ spec:
       apiVersion: policy.open-cluster-management.io/v1
       kind: ConfigurationPolicy
       metadata:
-        name: policy-observability-operator3
+        name: policy-observability-operator2
       spec:
         object-templates:
         - complianceType: musthave
@@ -997,7 +1261,7 @@ spec:
       apiVersion: policy.open-cluster-management.io/v1
       kind: ConfigurationPolicy
       metadata:
-        name: policy-observability-operator4
+        name: policy-observability-operator3
       spec:
         object-templates:
         - complianceType: musthave

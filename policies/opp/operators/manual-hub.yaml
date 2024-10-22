@@ -133,3 +133,67 @@ spec:
     source: cs-redhat-operator-index
     sourceNamespace: openshift-marketplace
 ---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: openshift-operators
+---
+apiVersion: policy.open-cluster-management.io/v1beta1
+kind: OperatorPolicy
+metadata:
+  name: servicemeshoperator
+spec:
+  remediationAction: enforce
+  severity: high
+  complianceType: musthave
+  upgradeApproval: Automatic
+  operatorGroup:
+    name: openshift-operators
+    namespace: openshift-operators
+  subscription:
+    name: servicemeshoperator
+    namespace: openshift-operators
+    source: cs-redhat-operator-index
+    sourceNamespace: openshift-marketplace
+---
+apiVersion: policy.open-cluster-management.io/v1beta1
+kind: OperatorPolicy
+metadata:
+  name: kiali-ossm
+spec:
+  remediationAction: enforce
+  severity: high
+  complianceType: musthave
+  upgradeApproval: Automatic
+  operatorGroup:
+    name: openshift-operators
+    namespace: openshift-operators
+  subscription:
+    name: kiali-ossm
+    namespace: openshift-operators
+    source: cs-redhat-operator-index
+    sourceNamespace: openshift-marketplace
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: openshift-tempo-operator
+---
+apiVersion: policy.open-cluster-management.io/v1beta1
+kind: OperatorPolicy
+metadata:
+  name: tempo-product
+spec:
+  remediationAction: enforce
+  severity: high
+  complianceType: musthave
+  upgradeApproval: Automatic
+  operatorGroup:
+    name: openshift-tempo-operator
+    namespace: openshift-tempo-operator
+  subscription:
+    name: tempo-product
+    namespace: openshift-tempo-operator
+    source: cs-redhat-operator-index
+    sourceNamespace: openshift-marketplace
+---
