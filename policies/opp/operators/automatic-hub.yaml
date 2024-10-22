@@ -148,7 +148,7 @@ spec:
   complianceType: musthave
   upgradeApproval: Automatic
   operatorGroup:
-    name: openshift-operators
+    name: global-operators
     namespace: openshift-operators
   subscription:
     name: servicemeshoperator
@@ -166,7 +166,7 @@ spec:
   complianceType: musthave
   upgradeApproval: Automatic
   operatorGroup:
-    name: openshift-operators
+    name: global-operators
     namespace: openshift-operators
   subscription:
     name: kiali-ossm

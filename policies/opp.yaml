@@ -361,7 +361,7 @@ spec:
       spec:
         complianceType: musthave
         operatorGroup:
-          name: openshift-operators
+          name: global-operators
           namespace: openshift-operators
         remediationAction: enforce
         severity: high
@@ -379,7 +379,7 @@ spec:
       spec:
         complianceType: musthave
         operatorGroup:
-          name: openshift-operators
+          name: global-operators
           namespace: openshift-operators
         remediationAction: enforce
         severity: high
@@ -718,7 +718,7 @@ spec:
       spec:
         complianceType: musthave
         operatorGroup:
-          name: openshift-operators
+          name: global-operators
           namespace: openshift-operators
         remediationAction: enforce
         severity: high
@@ -736,7 +736,7 @@ spec:
       spec:
         complianceType: musthave
         operatorGroup:
-          name: openshift-operators
+          name: global-operators
           namespace: openshift-operators
         remediationAction: enforce
         severity: high
