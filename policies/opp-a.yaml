@@ -1189,6 +1189,9 @@ spec:
                 - effect: NoSchedule
                   operator: Exists
                   key: node-role.kubernetes.io/infra
+                - effect: NoSchedule
+                  operator: Exists
+                  key: node-role.kubernetes.io/odf
             kind: ConfigMap
             metadata:
               name: rook-ceph-operator-config

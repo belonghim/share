@@ -86,6 +86,9 @@ data:
     - effect: NoSchedule
       operator: Exists
       key: node-role.kubernetes.io/infra
+    - effect: NoSchedule
+      operator: Exists
+      key: node-role.kubernetes.io/odf
   CSI_PROVISIONER_NODE_AFFINITY: "cluster.ocs.openshift.io/openshift-storage="
 kind: ConfigMap
 metadata:
