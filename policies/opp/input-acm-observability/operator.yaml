@@ -52,6 +52,7 @@ metadata:
 spec:
   observabilityAddonSpec: {}
   storageConfig:
+    storageClass: ocs-storagecluster-ceph-rbd
     metricObjectStorage:
       name: thanos-object-storage
       key: thanos.yaml

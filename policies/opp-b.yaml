@@ -2134,6 +2134,7 @@ spec:
                 node-role.kubernetes.io/acm: ""
               observabilityAddonSpec: {}
               storageConfig:
+                storageClass: ocs-storagecluster-ceph-rbd
                 metricObjectStorage:
                   key: thanos.yaml
                   name: thanos-object-storage
