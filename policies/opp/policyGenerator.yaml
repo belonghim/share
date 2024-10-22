@@ -220,15 +220,15 @@ policies:
     - opp-hub
 # Hub Automatic Operators Policies - end
 # Clusters Automatic Operators Policies - start
-- name: automatic-clusters-operators-install
-  categories:
-    - SI System and Information Integrity
-  controls:
-    - SI-7 Software Firmware and Information Integrity
-  manifests:
-    - path: operators/automatic-clusters.yaml
-  policySets:
-    - opp-clusters
+#- name: automatic-clusters-operators-install
+#  categories:
+#    - SI System and Information Integrity
+#  controls:
+#    - SI-7 Software Firmware and Information Integrity
+#  manifests:
+#    - path: operators/automatic-clusters.yaml
+#  policySets:
+#    - opp-clusters
 # Clusters Automatic Operators Policies - end
 # Hub Manual Operators Policies - start
 - name: manual-hub-operators-install
@@ -242,15 +242,15 @@ policies:
     - manual-opp-hub
 # Hub Manual Operators Policies - end
 # Clusters Manual Operators Policies - start
-- name: manual-clusters-operators-install
-  categories:
-    - SI System and Information Integrity
-  controls:
-    - SI-7 Software Firmware and Information Integrity
-  manifests:
-    - path: operators/manual-clusters.yaml
-  policySets:
-    - manual-opp-clusters
+#- name: manual-clusters-operators-install
+#  categories:
+#    - SI System and Information Integrity
+#  controls:
+#    - SI-7 Software Firmware and Information Integrity
+#  manifests:
+#    - path: operators/manual-clusters.yaml
+#  policySets:
+#    - manual-opp-clusters
 # Clusters Manual Operators Policies - end
 # All Automatic Operators Policies - start
 - name: automatic-all-operators-install

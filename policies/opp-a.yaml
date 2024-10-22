@@ -268,166 +268,6 @@ metadata:
     policy.open-cluster-management.io/standards: NIST SP 800-53
   labels:
     open-cluster-management.io/policy-set: opp
-  name: automatic-clusters-operators-install
-  namespace: policies
-spec:
-  disabled: false
-  policy-templates:
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1beta1
-      kind: OperatorPolicy
-      metadata:
-        name: node-healthcheck-operator
-      spec:
-        complianceType: musthave
-        operatorGroup:
-          name: openshift-workload-availability
-          namespace: openshift-workload-availability
-        remediationAction: enforce
-        severity: high
-        subscription:
-          name: node-healthcheck-operator
-          namespace: openshift-workload-availability
-          source: cs-redhat-operator-index
-          sourceNamespace: openshift-marketplace
-        upgradeApproval: Automatic
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1beta1
-      kind: OperatorPolicy
-      metadata:
-        name: self-node-remediation
-      spec:
-        complianceType: musthave
-        operatorGroup:
-          name: openshift-workload-availability
-          namespace: openshift-workload-availability
-        remediationAction: enforce
-        severity: high
-        subscription:
-          name: self-node-remediation
-          namespace: openshift-workload-availability
-          source: cs-redhat-operator-index
-          sourceNamespace: openshift-marketplace
-        upgradeApproval: Automatic
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1beta1
-      kind: OperatorPolicy
-      metadata:
-        name: cluster-logging
-      spec:
-        complianceType: musthave
-        operatorGroup:
-          name: openshift-logging
-          namespace: openshift-logging
-        remediationAction: enforce
-        severity: high
-        subscription:
-          name: cluster-logging
-          namespace: openshift-logging
-          source: cs-redhat-operator-index
-          sourceNamespace: openshift-marketplace
-        upgradeApproval: Automatic
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1beta1
-      kind: OperatorPolicy
-      metadata:
-        name: servicemeshoperator
-      spec:
-        complianceType: musthave
-        operatorGroup:
-          name: openshift-operators
-          namespace: openshift-operators
-        remediationAction: enforce
-        severity: high
-        subscription:
-          name: servicemeshoperator
-          namespace: openshift-operators
-          source: cs-redhat-operator-index
-          sourceNamespace: openshift-marketplace
-        upgradeApproval: Automatic
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1beta1
-      kind: OperatorPolicy
-      metadata:
-        name: kiali-ossm
-      spec:
-        complianceType: musthave
-        operatorGroup:
-          name: openshift-operators
-          namespace: openshift-operators
-        remediationAction: enforce
-        severity: high
-        subscription:
-          name: kiali-ossm
-          namespace: openshift-operators
-          source: cs-redhat-operator-index
-          sourceNamespace: openshift-marketplace
-        upgradeApproval: Automatic
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1beta1
-      kind: OperatorPolicy
-      metadata:
-        name: tempo-product
-      spec:
-        complianceType: musthave
-        operatorGroup:
-          name: openshift-tempo-operator
-          namespace: openshift-tempo-operator
-        remediationAction: enforce
-        severity: high
-        subscription:
-          name: tempo-product
-          namespace: openshift-tempo-operator
-          source: cs-redhat-operator-index
-          sourceNamespace: openshift-marketplace
-        upgradeApproval: Automatic
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1
-      kind: ConfigurationPolicy
-      metadata:
-        name: automatic-clusters-operators-install
-      spec:
-        object-templates:
-        - complianceType: musthave
-          objectDefinition:
-            apiVersion: v1
-            kind: Namespace
-            metadata:
-              name: openshift-workload-availability
-        - complianceType: musthave
-          objectDefinition:
-            apiVersion: v1
-            kind: Namespace
-            metadata:
-              name: openshift-logging
-        - complianceType: musthave
-          objectDefinition:
-            apiVersion: v1
-            kind: Namespace
-            metadata:
-              name: openshift-operators
-        - complianceType: musthave
-          objectDefinition:
-            apiVersion: v1
-            kind: Namespace
-            metadata:
-              name: openshift-tempo-operator
-        remediationAction: enforce
-        severity: medium
-  remediationAction: enforce
----
-apiVersion: policy.open-cluster-management.io/v1
-kind: Policy
-metadata:
-  annotations:
-    argocd.argoproj.io/compare-options: IgnoreExtraneous
-    policy.open-cluster-management.io/categories: SI System and Information Integrity
-    policy.open-cluster-management.io/controls: SI-7 Software Firmware and Information
-      Integrity
-    policy.open-cluster-management.io/description: ""
-    policy.open-cluster-management.io/standards: NIST SP 800-53
-  labels:
-    open-cluster-management.io/policy-set: opp
   name: automatic-hub-operators-install
   namespace: policies
 spec:
@@ -785,166 +625,6 @@ metadata:
     policy.open-cluster-management.io/standards: NIST SP 800-53
   labels:
     open-cluster-management.io/policy-set: opp
-  name: manual-clusters-operators-install
-  namespace: policies
-spec:
-  disabled: false
-  policy-templates:
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1beta1
-      kind: OperatorPolicy
-      metadata:
-        name: node-healthcheck-operator
-      spec:
-        complianceType: musthave
-        operatorGroup:
-          name: openshift-workload-availability
-          namespace: openshift-workload-availability
-        remediationAction: enforce
-        severity: high
-        subscription:
-          name: node-healthcheck-operator
-          namespace: openshift-workload-availability
-          source: cs-redhat-operator-index
-          sourceNamespace: openshift-marketplace
-        upgradeApproval: None
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1beta1
-      kind: OperatorPolicy
-      metadata:
-        name: self-node-remediation
-      spec:
-        complianceType: musthave
-        operatorGroup:
-          name: openshift-workload-availability
-          namespace: openshift-workload-availability
-        remediationAction: enforce
-        severity: high
-        subscription:
-          name: self-node-remediation
-          namespace: openshift-workload-availability
-          source: cs-redhat-operator-index
-          sourceNamespace: openshift-marketplace
-        upgradeApproval: None
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1beta1
-      kind: OperatorPolicy
-      metadata:
-        name: cluster-logging
-      spec:
-        complianceType: musthave
-        operatorGroup:
-          name: openshift-logging
-          namespace: openshift-logging
-        remediationAction: enforce
-        severity: high
-        subscription:
-          name: cluster-logging
-          namespace: openshift-logging
-          source: cs-redhat-operator-index
-          sourceNamespace: openshift-marketplace
-        upgradeApproval: None
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1beta1
-      kind: OperatorPolicy
-      metadata:
-        name: servicemeshoperator
-      spec:
-        complianceType: musthave
-        operatorGroup:
-          name: openshift-operators
-          namespace: openshift-operators
-        remediationAction: enforce
-        severity: high
-        subscription:
-          name: servicemeshoperator
-          namespace: openshift-operators
-          source: cs-redhat-operator-index
-          sourceNamespace: openshift-marketplace
-        upgradeApproval: Automatic
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1beta1
-      kind: OperatorPolicy
-      metadata:
-        name: kiali-ossm
-      spec:
-        complianceType: musthave
-        operatorGroup:
-          name: openshift-operators
-          namespace: openshift-operators
-        remediationAction: enforce
-        severity: high
-        subscription:
-          name: kiali-ossm
-          namespace: openshift-operators
-          source: cs-redhat-operator-index
-          sourceNamespace: openshift-marketplace
-        upgradeApproval: Automatic
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1beta1
-      kind: OperatorPolicy
-      metadata:
-        name: tempo-product
-      spec:
-        complianceType: musthave
-        operatorGroup:
-          name: openshift-tempo-operator
-          namespace: openshift-tempo-operator
-        remediationAction: enforce
-        severity: high
-        subscription:
-          name: tempo-product
-          namespace: openshift-tempo-operator
-          source: cs-redhat-operator-index
-          sourceNamespace: openshift-marketplace
-        upgradeApproval: Automatic
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1
-      kind: ConfigurationPolicy
-      metadata:
-        name: manual-clusters-operators-install
-      spec:
-        object-templates:
-        - complianceType: musthave
-          objectDefinition:
-            apiVersion: v1
-            kind: Namespace
-            metadata:
-              name: openshift-workload-availability
-        - complianceType: musthave
-          objectDefinition:
-            apiVersion: v1
-            kind: Namespace
-            metadata:
-              name: openshift-logging
-        - complianceType: musthave
-          objectDefinition:
-            apiVersion: v1
-            kind: Namespace
-            metadata:
-              name: openshift-operators
-        - complianceType: musthave
-          objectDefinition:
-            apiVersion: v1
-            kind: Namespace
-            metadata:
-              name: openshift-tempo-operator
-        remediationAction: enforce
-        severity: medium
-  remediationAction: enforce
----
-apiVersion: policy.open-cluster-management.io/v1
-kind: Policy
-metadata:
-  annotations:
-    argocd.argoproj.io/compare-options: IgnoreExtraneous
-    policy.open-cluster-management.io/categories: SI System and Information Integrity
-    policy.open-cluster-management.io/controls: SI-7 Software Firmware and Information
-      Integrity
-    policy.open-cluster-management.io/description: ""
-    policy.open-cluster-management.io/standards: NIST SP 800-53
-  labels:
-    open-cluster-management.io/policy-set: opp
   name: manual-hub-operators-install
   namespace: policies
 spec:
@@ -1047,7 +727,7 @@ spec:
           namespace: openshift-operators
           source: cs-redhat-operator-index
           sourceNamespace: openshift-marketplace
-        upgradeApproval: Automatic
+        upgradeApproval: None
   - objectDefinition:
       apiVersion: policy.open-cluster-management.io/v1beta1
       kind: OperatorPolicy
@@ -1065,7 +745,7 @@ spec:
           namespace: openshift-operators
           source: cs-redhat-operator-index
           sourceNamespace: openshift-marketplace
-        upgradeApproval: Automatic
+        upgradeApproval: None
   - objectDefinition:
       apiVersion: policy.open-cluster-management.io/v1beta1
       kind: OperatorPolicy
@@ -1083,7 +763,7 @@ spec:
           namespace: openshift-tempo-operator
           source: cs-redhat-operator-index
           sourceNamespace: openshift-marketplace
-        upgradeApproval: Automatic
+        upgradeApproval: None
   - objectDefinition:
       apiVersion: policy.open-cluster-management.io/v1
       kind: ConfigurationPolicy
@@ -1187,7 +867,7 @@ spec:
       apiVersion: policy.open-cluster-management.io/v1
       kind: ConfigurationPolicy
       metadata:
-        name: policy-observability-operator
+        name: policy-observability-operator2
       spec:
         object-templates:
         - complianceType: musthave
@@ -1210,7 +890,7 @@ spec:
       apiVersion: policy.open-cluster-management.io/v1
       kind: ConfigurationPolicy
       metadata:
-        name: policy-observability-operator2
+        name: policy-observability-operator3
       spec:
         object-templates:
         - complianceType: musthave
@@ -1238,7 +918,7 @@ spec:
       apiVersion: policy.open-cluster-management.io/v1
       kind: ConfigurationPolicy
       metadata:
-        name: policy-observability-operator3
+        name: policy-observability-operator4
       spec:
         object-templates:
         - complianceType: musthave
@@ -1973,7 +1653,6 @@ spec:
   description: ""
   policies:
   - manual-all-operators-install
-  - manual-clusters-operators-install
   - update-proxy-sync
 ---
 apiVersion: policy.open-cluster-management.io/v1beta1
@@ -2017,7 +1696,6 @@ spec:
     to every managed cluster.
   policies:
   - automatic-all-operators-install
-  - automatic-clusters-operators-install
   - update-proxy-sync
 ---
 apiVersion: policy.open-cluster-management.io/v1beta1

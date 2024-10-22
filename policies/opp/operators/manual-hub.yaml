@@ -146,7 +146,7 @@ spec:
   remediationAction: enforce
   severity: high
   complianceType: musthave
-  upgradeApproval: Automatic
+  upgradeApproval: None
   operatorGroup:
     name: openshift-operators
     namespace: openshift-operators
@@ -164,7 +164,7 @@ spec:
   remediationAction: enforce
   severity: high
   complianceType: musthave
-  upgradeApproval: Automatic
+  upgradeApproval: None
   operatorGroup:
     name: openshift-operators
     namespace: openshift-operators
@@ -187,7 +187,7 @@ spec:
   remediationAction: enforce
   severity: high
   complianceType: musthave
-  upgradeApproval: Automatic
+  upgradeApproval: None
   operatorGroup:
     name: openshift-tempo-operator
     namespace: openshift-tempo-operator
