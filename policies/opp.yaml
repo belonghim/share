@@ -288,6 +288,12 @@ spec:
         remediationAction: enforce
         severity: high
         subscription:
+          config:
+            nodeSelector:
+              cluster.ocs.openshift.io/openshift-storage: ""
+            tolerations:
+            - effect: NoSchedule
+              operator: Exists
           name: local-storage-operator
           namespace: openshift-local-storage
           source: cs-redhat-operator-index
@@ -308,6 +314,12 @@ spec:
         remediationAction: enforce
         severity: high
         subscription:
+          config:
+            nodeSelector:
+              cluster.ocs.openshift.io/openshift-storage: ""
+            tolerations:
+            - effect: NoSchedule
+              operator: Exists
           name: odf-operator
           namespace: openshift-storage
           source: cs-redhat-operator-index
@@ -328,6 +340,12 @@ spec:
         remediationAction: enforce
         severity: high
         subscription:
+          config:
+            nodeSelector:
+              node-role.kubernetes.io/quay: ""
+            tolerations:
+            - effect: NoSchedule
+              operator: Exists
           name: quay-operator
           namespace: openshift-quay
           source: cs-redhat-operator-index
@@ -348,6 +366,12 @@ spec:
         remediationAction: enforce
         severity: high
         subscription:
+          config:
+            nodeSelector:
+              node-role.kubernetes.io/acm: ""
+            tolerations:
+            - effect: NoSchedule
+              operator: Exists
           name: cincinnati-operator
           namespace: openshift-update-service
           source: cs-redhat-operator-index
@@ -366,6 +390,12 @@ spec:
         remediationAction: enforce
         severity: high
         subscription:
+          config:
+            nodeSelector:
+              node-role.kubernetes.io/acm: ""
+            tolerations:
+            - effect: NoSchedule
+              operator: Exists
           name: servicemeshoperator
           namespace: openshift-operators
           source: cs-redhat-operator-index
@@ -384,6 +414,12 @@ spec:
         remediationAction: enforce
         severity: high
         subscription:
+          config:
+            nodeSelector:
+              node-role.kubernetes.io/acm: ""
+            tolerations:
+            - effect: NoSchedule
+              operator: Exists
           name: kiali-ossm
           namespace: openshift-operators
           source: cs-redhat-operator-index
@@ -402,6 +438,12 @@ spec:
         remediationAction: enforce
         severity: high
         subscription:
+          config:
+            nodeSelector:
+              node-role.kubernetes.io/acm: ""
+            tolerations:
+            - effect: NoSchedule
+              operator: Exists
           name: tempo-product
           namespace: openshift-tempo-operator
           source: cs-redhat-operator-index
@@ -645,6 +687,12 @@ spec:
         remediationAction: enforce
         severity: high
         subscription:
+          config:
+            nodeSelector:
+              cluster.ocs.openshift.io/openshift-storage: ""
+            tolerations:
+            - effect: NoSchedule
+              operator: Exists
           name: local-storage-operator
           namespace: openshift-local-storage
           source: cs-redhat-operator-index
@@ -665,6 +713,12 @@ spec:
         remediationAction: enforce
         severity: high
         subscription:
+          config:
+            nodeSelector:
+              cluster.ocs.openshift.io/openshift-storage: ""
+            tolerations:
+            - effect: NoSchedule
+              operator: Exists
           name: odf-operator
           namespace: openshift-storage
           source: cs-redhat-operator-index
@@ -685,6 +739,12 @@ spec:
         remediationAction: enforce
         severity: high
         subscription:
+          config:
+            nodeSelector:
+              node-role.kubernetes.io/quay: ""
+            tolerations:
+            - effect: NoSchedule
+              operator: Exists
           name: quay-operator
           namespace: openshift-quay
           source: cs-redhat-operator-index
@@ -705,6 +765,12 @@ spec:
         remediationAction: enforce
         severity: high
         subscription:
+          config:
+            nodeSelector:
+              node-role.kubernetes.io/acm: ""
+            tolerations:
+            - effect: NoSchedule
+              operator: Exists
           name: cincinnati-operator
           namespace: openshift-update-service
           source: cs-redhat-operator-index
@@ -723,6 +789,12 @@ spec:
         remediationAction: enforce
         severity: high
         subscription:
+          config:
+            nodeSelector:
+              node-role.kubernetes.io/acm: ""
+            tolerations:
+            - effect: NoSchedule
+              operator: Exists
           name: servicemeshoperator
           namespace: openshift-operators
           source: cs-redhat-operator-index
@@ -741,6 +813,12 @@ spec:
         remediationAction: enforce
         severity: high
         subscription:
+          config:
+            nodeSelector:
+              node-role.kubernetes.io/acm: ""
+            tolerations:
+            - effect: NoSchedule
+              operator: Exists
           name: kiali-ossm
           namespace: openshift-operators
           source: cs-redhat-operator-index
@@ -759,6 +837,12 @@ spec:
         remediationAction: enforce
         severity: high
         subscription:
+          config:
+            nodeSelector:
+              node-role.kubernetes.io/acm: ""
+            tolerations:
+            - effect: NoSchedule
+              operator: Exists
           name: tempo-product
           namespace: openshift-tempo-operator
           source: cs-redhat-operator-index

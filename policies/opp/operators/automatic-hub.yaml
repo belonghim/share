@@ -23,6 +23,12 @@ spec:
     namespace: openshift-local-storage
     source: cs-redhat-operator-index
     sourceNamespace: openshift-marketplace
+    config:
+      nodeSelector:
+        cluster.ocs.openshift.io/openshift-storage: ""
+      tolerations:
+      - effect: NoSchedule
+        operator: Exists
 ---
 apiVersion: v1
 kind: Namespace
@@ -50,6 +56,12 @@ spec:
     namespace: openshift-storage
     source: cs-redhat-operator-index
     sourceNamespace: openshift-marketplace
+    config:
+      nodeSelector:
+        cluster.ocs.openshift.io/openshift-storage: ""
+      tolerations:
+      - effect: NoSchedule
+        operator: Exists
 ---
 #apiVersion: v1
 #kind: Namespace
@@ -105,6 +117,12 @@ spec:
     namespace: openshift-quay
     source: cs-redhat-operator-index
     sourceNamespace: openshift-marketplace
+    config:
+      nodeSelector:
+        node-role.kubernetes.io/quay: ""
+      tolerations:
+      - effect: NoSchedule
+        operator: Exists
 ---
 apiVersion: v1
 kind: Namespace
@@ -132,6 +150,12 @@ spec:
     namespace: openshift-update-service
     source: cs-redhat-operator-index
     sourceNamespace: openshift-marketplace
+    config:
+      nodeSelector:
+        node-role.kubernetes.io/acm: ""
+      tolerations:
+      - effect: NoSchedule
+        operator: Exists
 ---
 apiVersion: v1
 kind: Namespace
@@ -155,6 +179,12 @@ spec:
     namespace: openshift-operators
     source: cs-redhat-operator-index
     sourceNamespace: openshift-marketplace
+    config:
+      nodeSelector:
+        node-role.kubernetes.io/acm: ""
+      tolerations:
+      - effect: NoSchedule
+        operator: Exists
 ---
 apiVersion: policy.open-cluster-management.io/v1beta1
 kind: OperatorPolicy
@@ -173,6 +203,12 @@ spec:
     namespace: openshift-operators
     source: cs-redhat-operator-index
     sourceNamespace: openshift-marketplace
+    config:
+      nodeSelector:
+        node-role.kubernetes.io/acm: ""
+      tolerations:
+      - effect: NoSchedule
+        operator: Exists
 ---
 apiVersion: v1
 kind: Namespace
@@ -196,4 +232,10 @@ spec:
     namespace: openshift-tempo-operator
     source: cs-redhat-operator-index
     sourceNamespace: openshift-marketplace
+    config:
+      nodeSelector:
+        node-role.kubernetes.io/acm: ""
+      tolerations:
+      - effect: NoSchedule
+        operator: Exists
 ---
