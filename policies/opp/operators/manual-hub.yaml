@@ -51,34 +51,34 @@ spec:
     source: cs-redhat-operator-index
     sourceNamespace: openshift-marketplace
 ---
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: stackrox
----
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: rhacs-operator
----
-apiVersion: policy.open-cluster-management.io/v1beta1
-kind: OperatorPolicy
-metadata:
-  name: rhacs-operator
-spec:
-  remediationAction: enforce
-  severity: high
-  complianceType: musthave
-  upgradeApproval: None
-  operatorGroup:
-    name: rhacs-operator
-    namespace: rhacs-operator
-  subscription:
-    name: rhacs-operator
-    namespace: rhacs-operator
-    source: cs-redhat-operator-index
-    sourceNamespace: openshift-marketplace
----
+#apiVersion: v1
+#kind: Namespace
+#metadata:
+#  name: stackrox
+#---
+#apiVersion: v1
+#kind: Namespace
+#metadata:
+#  name: rhacs-operator
+#---
+#apiVersion: policy.open-cluster-management.io/v1beta1
+#kind: OperatorPolicy
+#metadata:
+#  name: rhacs-operator
+#spec:
+#  remediationAction: enforce
+#  severity: high
+#  complianceType: musthave
+#  upgradeApproval: None
+#  operatorGroup:
+#    name: rhacs-operator
+#    namespace: rhacs-operator
+#  subscription:
+#    name: rhacs-operator
+#    namespace: rhacs-operator
+#    source: cs-redhat-operator-index
+#    sourceNamespace: openshift-marketplace
+#---
 apiVersion: v1
 kind: Namespace
 metadata:
