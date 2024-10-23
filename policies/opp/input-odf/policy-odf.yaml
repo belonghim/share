@@ -13,7 +13,7 @@ spec:
   tolerations:
   - effect: NoSchedule
     operator: Exists
-    key: node-role.kubernetes.io/odf
+    key: node.ocs.openshift.io/storage
 ---
 apiVersion: local.storage.openshift.io/v1alpha1
 kind: LocalVolumeSet
@@ -31,11 +31,11 @@ spec:
   deviceInclusionSpec:
     deviceTypes:
     - disk
-    minSize: 1Gi
+    minSize: 100Gi
   tolerations:
   - effect: NoSchedule
     operator: Exists
-    key: node-role.kubernetes.io/odf
+    key: node.ocs.openshift.io/storage
 status:
   conditions:
     - status: "True"

@@ -293,6 +293,7 @@ spec:
               cluster.ocs.openshift.io/openshift-storage: ""
             tolerations:
             - effect: NoSchedule
+              key: node.ocs.openshift.io/storage
               operator: Exists
           name: local-storage-operator
           namespace: openshift-local-storage
@@ -319,6 +320,7 @@ spec:
               cluster.ocs.openshift.io/openshift-storage: ""
             tolerations:
             - effect: NoSchedule
+              key: node.ocs.openshift.io/storage
               operator: Exists
           name: odf-operator
           namespace: openshift-storage
@@ -345,6 +347,7 @@ spec:
               node-role.kubernetes.io/quay: ""
             tolerations:
             - effect: NoSchedule
+              key: node-role.kubernetes.io/infra
               operator: Exists
           name: quay-operator
           namespace: openshift-quay
@@ -371,6 +374,7 @@ spec:
               node-role.kubernetes.io/acm: ""
             tolerations:
             - effect: NoSchedule
+              key: node-role.kubernetes.io/infra
               operator: Exists
           name: cincinnati-operator
           namespace: openshift-update-service
@@ -395,6 +399,7 @@ spec:
               node-role.kubernetes.io/acm: ""
             tolerations:
             - effect: NoSchedule
+              key: node-role.kubernetes.io/infra
               operator: Exists
           name: servicemeshoperator
           namespace: openshift-operators
@@ -419,6 +424,7 @@ spec:
               node-role.kubernetes.io/acm: ""
             tolerations:
             - effect: NoSchedule
+              key: node-role.kubernetes.io/infra
               operator: Exists
           name: kiali-ossm
           namespace: openshift-operators
@@ -443,6 +449,7 @@ spec:
               node-role.kubernetes.io/acm: ""
             tolerations:
             - effect: NoSchedule
+              key: node-role.kubernetes.io/infra
               operator: Exists
           name: tempo-product
           namespace: openshift-tempo-operator
@@ -692,6 +699,7 @@ spec:
               cluster.ocs.openshift.io/openshift-storage: ""
             tolerations:
             - effect: NoSchedule
+              key: node.ocs.openshift.io/storage
               operator: Exists
           name: local-storage-operator
           namespace: openshift-local-storage
@@ -718,6 +726,7 @@ spec:
               cluster.ocs.openshift.io/openshift-storage: ""
             tolerations:
             - effect: NoSchedule
+              key: node.ocs.openshift.io/storage
               operator: Exists
           name: odf-operator
           namespace: openshift-storage
@@ -744,6 +753,7 @@ spec:
               node-role.kubernetes.io/quay: ""
             tolerations:
             - effect: NoSchedule
+              key: node-role.kubernetes.io/infra
               operator: Exists
           name: quay-operator
           namespace: openshift-quay
@@ -770,6 +780,7 @@ spec:
               node-role.kubernetes.io/acm: ""
             tolerations:
             - effect: NoSchedule
+              key: node-role.kubernetes.io/infra
               operator: Exists
           name: cincinnati-operator
           namespace: openshift-update-service
@@ -794,6 +805,7 @@ spec:
               node-role.kubernetes.io/acm: ""
             tolerations:
             - effect: NoSchedule
+              key: node-role.kubernetes.io/infra
               operator: Exists
           name: servicemeshoperator
           namespace: openshift-operators
@@ -818,6 +830,7 @@ spec:
               node-role.kubernetes.io/acm: ""
             tolerations:
             - effect: NoSchedule
+              key: node-role.kubernetes.io/infra
               operator: Exists
           name: kiali-ossm
           namespace: openshift-operators
@@ -842,6 +855,7 @@ spec:
               node-role.kubernetes.io/acm: ""
             tolerations:
             - effect: NoSchedule
+              key: node-role.kubernetes.io/infra
               operator: Exists
           name: tempo-product
           namespace: openshift-tempo-operator
@@ -994,7 +1008,7 @@ spec:
                 storageClass: ocs-storagecluster-ceph-rbd
               tolerations:
               - effect: NoSchedule
-                key: node-role.kubernetes.io/acm
+                key: node-role.kubernetes.io/infra
                 operator: Exists
         remediationAction: enforce
         severity: medium
@@ -1108,7 +1122,7 @@ spec:
                     operator: Exists
               tolerations:
               - effect: NoSchedule
-                key: node-role.kubernetes.io/odf
+                key: node.ocs.openshift.io/storage
                 operator: Exists
         - complianceType: musthave
           objectDefinition:
@@ -1121,7 +1135,7 @@ spec:
               deviceInclusionSpec:
                 deviceTypes:
                 - disk
-                minSize: 1Gi
+                minSize: 100Gi
               nodeSelector:
                 nodeSelectorTerms:
                 - matchExpressions:
@@ -1130,7 +1144,7 @@ spec:
               storageClassName: odf-localvolumeset
               tolerations:
               - effect: NoSchedule
-                key: node-role.kubernetes.io/odf
+                key: node.ocs.openshift.io/storage
                 operator: Exists
               volumeMode: Block
             status:

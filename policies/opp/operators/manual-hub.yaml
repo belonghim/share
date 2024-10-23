@@ -29,6 +29,7 @@ spec:
       tolerations:
       - effect: NoSchedule
         operator: Exists
+        key: node.ocs.openshift.io/storage
 ---
 apiVersion: v1
 kind: Namespace
@@ -62,6 +63,7 @@ spec:
       tolerations:
       - effect: NoSchedule
         operator: Exists
+        key: node.ocs.openshift.io/storage
 ---
 #apiVersion: v1
 #kind: Namespace
@@ -123,6 +125,7 @@ spec:
       tolerations:
       - effect: NoSchedule
         operator: Exists
+        key: node-role.kubernetes.io/infra
 ---
 apiVersion: v1
 kind: Namespace
@@ -156,6 +159,7 @@ spec:
       tolerations:
       - effect: NoSchedule
         operator: Exists
+        key: node-role.kubernetes.io/infra
 ---
 apiVersion: v1
 kind: Namespace
@@ -185,6 +189,7 @@ spec:
       tolerations:
       - effect: NoSchedule
         operator: Exists
+        key: node-role.kubernetes.io/infra
 ---
 apiVersion: policy.open-cluster-management.io/v1beta1
 kind: OperatorPolicy
@@ -209,6 +214,7 @@ spec:
       tolerations:
       - effect: NoSchedule
         operator: Exists
+        key: node-role.kubernetes.io/infra
 ---
 apiVersion: v1
 kind: Namespace
@@ -238,4 +244,5 @@ spec:
       tolerations:
       - effect: NoSchedule
         operator: Exists
+        key: node-role.kubernetes.io/infra
 ---

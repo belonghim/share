@@ -61,7 +61,7 @@ spec:
   tolerations:
   - effect: NoSchedule
     operator: Exists
-    key: node-role.kubernetes.io/acm
+    key: node-role.kubernetes.io/infra
 ---
 apiVersion: console.openshift.io/v1
 kind: ConsoleLink
