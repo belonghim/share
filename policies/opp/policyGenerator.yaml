@@ -215,7 +215,7 @@ policies:
   controls:
     - SI-7 Software Firmware and Information Integrity
   manifests:
-    - path: operators/automatic-hub.yaml
+    - path: install/automatic-hub.yaml
   policySets:
     - opp-hub
 # Hub Automatic Operators Policies - end
@@ -226,7 +226,7 @@ policies:
 #  controls:
 #    - SI-7 Software Firmware and Information Integrity
 #  manifests:
-#    - path: operators/automatic-clusters.yaml
+#    - path: install/automatic-clusters.yaml
 #  policySets:
 #    - opp-clusters
 # Clusters Automatic Operators Policies - end
@@ -237,7 +237,7 @@ policies:
   controls:
     - SI-7 Software Firmware and Information Integrity
   manifests:
-    - path: operators/manual-hub.yaml
+    - path: install/manual-hub.yaml
   policySets:
     - manual-opp-hub
 # Hub Manual Operators Policies - end
@@ -248,7 +248,7 @@ policies:
 #  controls:
 #    - SI-7 Software Firmware and Information Integrity
 #  manifests:
-#    - path: operators/manual-clusters.yaml
+#    - path: install/manual-clusters.yaml
 #  policySets:
 #    - manual-opp-clusters
 # Clusters Manual Operators Policies - end
@@ -259,7 +259,7 @@ policies:
   controls:
     - SI-7 Software Firmware and Information Integrity
   manifests:
-    - path: operators/automatic-all.yaml
+    - path: install/automatic-all.yaml
   policySets:
     - opp-hub
     - opp-clusters
@@ -271,7 +271,7 @@ policies:
   controls:
     - SI-7 Software Firmware and Information Integrity
   manifests:
-    - path: operators/manual-all.yaml
+    - path: install/manual-all.yaml
   policySets:
     - manual-opp-hub
     - manual-opp-clusters
@@ -297,9 +297,21 @@ policies:
   manifests:
     - path: update/proxy-sync.yaml
   policySets:
-    - manual-opp-clusters
     - opp-clusters
+    - manual-opp-clusters
 # All Proxy Router Bundle Policies - end
+# Remediation config Policies - start
+- name: remediation-config
+  categories:
+    - SI System and Information Integrity
+  controls:
+    - SI-7 Software Firmware and Information Integrity
+  manifests:
+    - path: remediation/config.yaml
+  policySets:
+    - opp-hub
+    - opp-clusters
+# Remediation config Policies - end
 policySets:
   - description: The OpenShift Platform Plus policy set applies several policies
       that will install the OpenShift Platform Plus products using best practices
