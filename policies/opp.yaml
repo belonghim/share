@@ -951,7 +951,7 @@ spec:
       apiVersion: policy.open-cluster-management.io/v1
       kind: ConfigurationPolicy
       metadata:
-        name: policy-observability-operator2
+        name: policy-observability-operator
       spec:
         object-templates:
         - complianceType: musthave
@@ -974,7 +974,7 @@ spec:
       apiVersion: policy.open-cluster-management.io/v1
       kind: ConfigurationPolicy
       metadata:
-        name: policy-observability-operator3
+        name: policy-observability-operator2
       spec:
         object-templates:
         - complianceType: musthave
@@ -994,7 +994,7 @@ spec:
                 storageClass: ocs-storagecluster-ceph-rbd
               tolerations:
               - effect: NoSchedule
-                key: node-role.kubernetes.io/infra
+                key: node-role.kubernetes.io/acm
                 operator: Exists
         remediationAction: enforce
         severity: medium
@@ -1002,7 +1002,7 @@ spec:
       apiVersion: policy.open-cluster-management.io/v1
       kind: ConfigurationPolicy
       metadata:
-        name: policy-observability-operator4
+        name: policy-observability-operator3
       spec:
         object-templates:
         - complianceType: musthave
@@ -1108,7 +1108,7 @@ spec:
                     operator: Exists
               tolerations:
               - effect: NoSchedule
-                key: node-role.kubernetes.io/infra
+                key: node-role.kubernetes.io/odf
                 operator: Exists
         - complianceType: musthave
           objectDefinition:
@@ -1130,7 +1130,7 @@ spec:
               storageClassName: odf-localvolumeset
               tolerations:
               - effect: NoSchedule
-                key: node-role.kubernetes.io/infra
+                key: node-role.kubernetes.io/odf
                 operator: Exists
               volumeMode: Block
             status:

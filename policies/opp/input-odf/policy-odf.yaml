@@ -13,7 +13,7 @@ spec:
   tolerations:
   - effect: NoSchedule
     operator: Exists
-    key: node-role.kubernetes.io/infra
+    key: node-role.kubernetes.io/odf
 ---
 apiVersion: local.storage.openshift.io/v1alpha1
 kind: LocalVolumeSet
@@ -35,7 +35,7 @@ spec:
   tolerations:
   - effect: NoSchedule
     operator: Exists
-    key: node-role.kubernetes.io/infra
+    key: node-role.kubernetes.io/odf
 status:
   conditions:
     - status: "True"
