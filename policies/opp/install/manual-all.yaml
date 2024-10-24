@@ -12,7 +12,7 @@ spec:
   remediationAction: enforce
   severity: high
   complianceType: musthave
-  upgradeApproval: None
+  upgradeApproval: Manual
   operatorGroup:
     name: openshift-workload-availability
     namespace: openshift-workload-availability
@@ -30,7 +30,7 @@ spec:
   remediationAction: enforce
   severity: high
   complianceType: musthave
-  upgradeApproval: None
+  upgradeApproval: Manual
   operatorGroup:
     name: openshift-workload-availability
     namespace: openshift-workload-availability
@@ -53,13 +53,59 @@ spec:
   remediationAction: enforce
   severity: high
   complianceType: musthave
-  upgradeApproval: None
+  upgradeApproval: Manual
   operatorGroup:
     name: openshift-logging
     namespace: openshift-logging
   subscription:
     name: cluster-logging
     namespace: openshift-logging
+    source: cs-redhat-operator-index
+    sourceNamespace: openshift-marketplace
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: openshift-gitops
+---
+apiVersion: policy.open-cluster-management.io/v1beta1
+kind: OperatorPolicy
+metadata:
+  name: openshift-gitops-operator
+spec:
+  remediationAction: enforce
+  severity: high
+  complianceType: musthave
+  upgradeApproval: Manual
+  operatorGroup:
+    name: openshift-gitops-operator
+    namespace: openshift-gitops-operator
+  subscription:
+    name: openshift-gitops-operator
+    namespace: openshift-openshift-gitops
+    source: cs-redhat-operator-index
+    sourceNamespace: openshift-marketplace
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: metallb-system
+---
+apiVersion: policy.open-cluster-management.io/v1beta1
+kind: OperatorPolicy
+metadata:
+  name: metallb-operator
+spec:
+  remediationAction: enforce
+  severity: high
+  complianceType: musthave
+  upgradeApproval: Manual
+  operatorGroup:
+    name: metallb-system
+    namespace: metallb-system
+  subscription:
+    name: metallb-operator
+    namespace: metallb-system
     source: cs-redhat-operator-index
     sourceNamespace: openshift-marketplace
 ---

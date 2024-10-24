@@ -3,13 +3,13 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: create-admin-user
-  namespace: openshift-quay
+  namespace: quay-enterprise
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   name: create-admin-user
-  namespace: openshift-quay
+  namespace: quay-enterprise
 rules:
 - apiGroups:
   - ""
@@ -42,7 +42,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   name: create-admin-user
-  namespace: openshift-quay
+  namespace: quay-enterprise
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
@@ -50,7 +50,7 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: create-admin-user
-  namespace: openshift-quay
+  namespace: quay-enterprise
 ---
 #apiVersion: v1
 #data:
@@ -58,7 +58,7 @@ subjects:
 #kind: Secret
 #metadata:
 #  name: init-config-bundle-secret
-#  namespace: openshift-quay
+#  namespace: quay-enterprise
 #type: Opaque
 #---
 apiVersion: policy.open-cluster-management.io/v1
@@ -70,8 +70,8 @@ spec:
   severity: high
   object-templates-raw: |
     {{- /* read the bucket data and endpoint access data */ -}}
-    {{- $objBucket := (lookup "objectbucket.io/v1alpha1" "ObjectBucket" "" "obc-openshift-quay-registry-quay") }}
-    {{- $awsAccess := (lookup "v1" "Secret" "openshift-quay" "registry-quay") }}
+    {{- $objBucket := (lookup "objectbucket.io/v1alpha1" "ObjectBucket" "" "obc-quay-enterprise-registry-quay") }}
+    {{- $awsAccess := (lookup "v1" "Secret" "quay-enterprise" "registry-quay") }}
     {{- /* create the quay config file as a template */ -}}
     {{- $quayConfig := `
     DISTRIBUTED_STORAGE_CONFIG:
@@ -102,7 +102,7 @@ spec:
         kind: Secret
         metadata:
           name: init-config-bundle-secret
-          namespace: openshift-quay
+          namespace: quay-enterprise
         type: Opaque
         data:
           config.yaml: {{ (printf $quayConfig ($awsAccess.data.AWS_ACCESS_KEY_ID | base64dec) $objBucket.spec.endpoint.bucketName ($awsAccess.data.AWS_SECRET_ACCESS_KEY | base64dec)) | base64enc }}
@@ -114,14 +114,14 @@ data:
 kind: Secret
 metadata:
   name: quay-config-bundle
-  namespace: openshift-quay
+  namespace: quay-enterprise
 type: Opaque
 ---
 apiVersion: quay.redhat.com/v1
 kind: QuayRegistry
 metadata:
   name: quay-registry
-  namespace: openshift-quay
+  namespace: quay-enterprise
 spec:
   configBundleSecret: quay-config-bundle
   components:

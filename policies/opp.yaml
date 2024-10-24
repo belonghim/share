@@ -234,6 +234,42 @@ spec:
           sourceNamespace: openshift-marketplace
         upgradeApproval: Automatic
   - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1beta1
+      kind: OperatorPolicy
+      metadata:
+        name: openshift-gitops-operator
+      spec:
+        complianceType: musthave
+        operatorGroup:
+          name: openshift-gitops-operator
+          namespace: openshift-gitops-operator
+        remediationAction: enforce
+        severity: high
+        subscription:
+          name: openshift-gitops-operator
+          namespace: openshift-openshift-gitops
+          source: cs-redhat-operator-index
+          sourceNamespace: openshift-marketplace
+        upgradeApproval: Automatic
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1beta1
+      kind: OperatorPolicy
+      metadata:
+        name: metallb-operator
+      spec:
+        complianceType: musthave
+        operatorGroup:
+          name: metallb-system
+          namespace: metallb-system
+        remediationAction: enforce
+        severity: high
+        subscription:
+          name: metallb-operator
+          namespace: metallb-system
+          source: cs-redhat-operator-index
+          sourceNamespace: openshift-marketplace
+        upgradeApproval: Automatic
+  - objectDefinition:
       apiVersion: policy.open-cluster-management.io/v1
       kind: ConfigurationPolicy
       metadata:
@@ -252,6 +288,18 @@ spec:
             kind: Namespace
             metadata:
               name: openshift-logging
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: v1
+            kind: Namespace
+            metadata:
+              name: openshift-gitops
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: v1
+            kind: Namespace
+            metadata:
+              name: metallb-system
         remediationAction: enforce
         severity: medium
   remediationAction: enforce
@@ -602,7 +650,7 @@ spec:
           namespace: openshift-workload-availability
           source: cs-redhat-operator-index
           sourceNamespace: openshift-marketplace
-        upgradeApproval: None
+        upgradeApproval: Manual
   - objectDefinition:
       apiVersion: policy.open-cluster-management.io/v1beta1
       kind: OperatorPolicy
@@ -620,7 +668,7 @@ spec:
           namespace: openshift-workload-availability
           source: cs-redhat-operator-index
           sourceNamespace: openshift-marketplace
-        upgradeApproval: None
+        upgradeApproval: Manual
   - objectDefinition:
       apiVersion: policy.open-cluster-management.io/v1beta1
       kind: OperatorPolicy
@@ -638,7 +686,43 @@ spec:
           namespace: openshift-logging
           source: cs-redhat-operator-index
           sourceNamespace: openshift-marketplace
-        upgradeApproval: None
+        upgradeApproval: Manual
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1beta1
+      kind: OperatorPolicy
+      metadata:
+        name: openshift-gitops-operator
+      spec:
+        complianceType: musthave
+        operatorGroup:
+          name: openshift-gitops-operator
+          namespace: openshift-gitops-operator
+        remediationAction: enforce
+        severity: high
+        subscription:
+          name: openshift-gitops-operator
+          namespace: openshift-openshift-gitops
+          source: cs-redhat-operator-index
+          sourceNamespace: openshift-marketplace
+        upgradeApproval: Manual
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1beta1
+      kind: OperatorPolicy
+      metadata:
+        name: metallb-operator
+      spec:
+        complianceType: musthave
+        operatorGroup:
+          name: metallb-system
+          namespace: metallb-system
+        remediationAction: enforce
+        severity: high
+        subscription:
+          name: metallb-operator
+          namespace: metallb-system
+          source: cs-redhat-operator-index
+          sourceNamespace: openshift-marketplace
+        upgradeApproval: Manual
   - objectDefinition:
       apiVersion: policy.open-cluster-management.io/v1
       kind: ConfigurationPolicy
@@ -658,6 +742,18 @@ spec:
             kind: Namespace
             metadata:
               name: openshift-logging
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: v1
+            kind: Namespace
+            metadata:
+              name: openshift-gitops
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: v1
+            kind: Namespace
+            metadata:
+              name: metallb-system
         remediationAction: enforce
         severity: medium
   remediationAction: enforce
@@ -1391,8 +1487,8 @@ spec:
           objectDefinition:
             apiVersion: v1
             data:
-              host: '{{ (lookup "route.openshift.io/v1" "Route" "openshift-quay" "quay-registry-quay"
-                ).spec.host }}'
+              host: '{{ (lookup "route.openshift.io/v1" "Route" "quay-enterprise"
+                "quay-registry-quay" ).spec.host }}'
             kind: ConfigMap
             metadata:
               name: quay-config
@@ -1407,7 +1503,7 @@ spec:
               applicationMenu:
                 imageURL: https://upload.wikimedia.org/wikipedia/commons/3/3a/OpenShift-LogoType.svg
                 section: Red Hat applications
-              href: https://{{ (lookup "route.openshift.io/v1" "Route" "openshift-quay"
+              href: https://{{ (lookup "route.openshift.io/v1" "Route" "quay-enterprise"
                 "quay-registry-quay" ).spec.host }}
               location: ApplicationMenu
               text: Red Hat Quay Enterprise Registry
@@ -1446,8 +1542,8 @@ spec:
       spec:
         object-templates-raw: |
           {{- /* read the bucket data and endpoint access data */ -}}
-          {{- $objBucket := (lookup "objectbucket.io/v1alpha1" "ObjectBucket" "" "obc-openshift-quay-registry-quay") }}
-          {{- $awsAccess := (lookup "v1" "Secret" "openshift-quay" "registry-quay") }}
+          {{- $objBucket := (lookup "objectbucket.io/v1alpha1" "ObjectBucket" "" "obc-quay-enterprise-registry-quay") }}
+          {{- $awsAccess := (lookup "v1" "Secret" "quay-enterprise" "registry-quay") }}
           {{- /* create the quay config file as a template */ -}}
           {{- $quayConfig := `
           DISTRIBUTED_STORAGE_CONFIG:
@@ -1478,7 +1574,7 @@ spec:
               kind: Secret
               metadata:
                 name: init-config-bundle-secret
-                namespace: openshift-quay
+                namespace: quay-enterprise
               type: Opaque
               data:
                 config.yaml: {{ (printf $quayConfig ($awsAccess.data.AWS_ACCESS_KEY_ID | base64dec) $objBucket.spec.endpoint.bucketName ($awsAccess.data.AWS_SECRET_ACCESS_KEY | base64dec)) | base64enc }}
@@ -1497,14 +1593,14 @@ spec:
             kind: ServiceAccount
             metadata:
               name: create-admin-user
-              namespace: openshift-quay
+              namespace: quay-enterprise
         - complianceType: musthave
           objectDefinition:
             apiVersion: rbac.authorization.k8s.io/v1
             kind: Role
             metadata:
               name: create-admin-user
-              namespace: openshift-quay
+              namespace: quay-enterprise
             rules:
             - apiGroups:
               - ""
@@ -1538,7 +1634,7 @@ spec:
             kind: RoleBinding
             metadata:
               name: create-admin-user
-              namespace: openshift-quay
+              namespace: quay-enterprise
             roleRef:
               apiGroup: rbac.authorization.k8s.io
               kind: Role
@@ -1546,7 +1642,7 @@ spec:
             subjects:
             - kind: ServiceAccount
               name: create-admin-user
-              namespace: openshift-quay
+              namespace: quay-enterprise
         - complianceType: musthave
           objectDefinition:
             apiVersion: v1
@@ -1556,7 +1652,7 @@ spec:
             kind: Secret
             metadata:
               name: quay-config-bundle
-              namespace: openshift-quay
+              namespace: quay-enterprise
             type: Opaque
         - complianceType: musthave
           objectDefinition:
@@ -1564,7 +1660,7 @@ spec:
             kind: QuayRegistry
             metadata:
               name: quay-registry
-              namespace: openshift-quay
+              namespace: quay-enterprise
             spec:
               components:
               - kind: clairpostgres
@@ -1616,7 +1712,7 @@ spec:
             kind: Deployment
             metadata:
               name: quay-registry-quay-app
-              namespace: openshift-quay
+              namespace: quay-enterprise
             status:
               conditions:
               - status: "True"
@@ -1661,7 +1757,7 @@ spec:
             kind: ObjectBucketClaim
             metadata:
               name: registry-quay
-              namespace: openshift-quay
+              namespace: quay-enterprise
             spec:
               generateBucketName: registry-quay
               storageClassName: ocs-storagecluster-ceph-rgw
