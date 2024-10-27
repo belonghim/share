@@ -380,13 +380,13 @@ spec:
       kind: OperatorPolicy
       metadata:
         labels:
-          operators.coreos.com/quay-operator.openshift-quay: ""
+          operators.coreos.com/quay-operator.quay-enterprise: ""
         name: quay-operator
       spec:
         complianceType: musthave
         operatorGroup:
-          name: openshift-quay
-          namespace: openshift-quay
+          name: quay-enterprise
+          namespace: quay-enterprise
         remediationAction: enforce
         severity: high
         subscription:
@@ -398,7 +398,7 @@ spec:
               key: node-role.kubernetes.io/infra
               operator: Exists
           name: quay-operator
-          namespace: openshift-quay
+          namespace: quay-enterprise
           source: cs-redhat-operator-index
           sourceNamespace: openshift-marketplace
         upgradeApproval: Automatic
@@ -532,7 +532,7 @@ spec:
             metadata:
               labels:
                 openshift.io/cluster-monitoring: "true"
-              name: openshift-quay
+              name: quay-enterprise
         - complianceType: musthave
           objectDefinition:
             apiVersion: v1
@@ -834,13 +834,13 @@ spec:
       kind: OperatorPolicy
       metadata:
         labels:
-          operators.coreos.com/quay-operator.openshift-quay: ""
+          operators.coreos.com/quay-operator.quay-enterprise: ""
         name: quay-operator
       spec:
         complianceType: musthave
         operatorGroup:
-          name: openshift-quay
-          namespace: openshift-quay
+          name: quay-enterprise
+          namespace: quay-enterprise
         remediationAction: enforce
         severity: high
         subscription:
@@ -852,7 +852,7 @@ spec:
               key: node-role.kubernetes.io/infra
               operator: Exists
           name: quay-operator
-          namespace: openshift-quay
+          namespace: quay-enterprise
           source: cs-redhat-operator-index
           sourceNamespace: openshift-marketplace
         upgradeApproval: None
@@ -986,7 +986,7 @@ spec:
             metadata:
               labels:
                 openshift.io/cluster-monitoring: "true"
-              name: openshift-quay
+              name: quay-enterprise
         - complianceType: musthave
           objectDefinition:
             apiVersion: v1

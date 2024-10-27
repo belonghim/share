@@ -1,0 +1,216 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: openshift-logging
+---
+apiVersion: operators.coreos.com/v1
+kind: OperatorGroup
+metadata:
+  name: openshift-logging
+  namespace: openshift-logging
+spec:
+  targetNamespaces:
+  - openshift-logging
+---
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  name: cluster-logging
+  namespace: openshift-logging
+spec:
+  name: cluster-logging
+  source: cs-redhat-operator-index
+  sourceNamespace: openshift-marketplace
+  installPlanApproval: Manual
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: stackrox
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: rhacs-operator
+---
+apiVersion: operators.coreos.com/v1
+kind: OperatorGroup
+metadata:
+  name: rhacs-operator
+  namespace: rhacs-operator
+---
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  name: rhacs-operator
+  namespace: rhacs-operator
+spec:
+  name: rhacs-operator
+  source: cs-redhat-operator-index
+  sourceNamespace: openshift-marketplace
+  installPlanApproval: Manual
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: openshift-compliance
+---
+apiVersion: operators.coreos.com/v1
+kind: OperatorGroup
+metadata:
+  name: openshift-compliance
+  namespace: openshift-compliance
+spec:
+  targetNamespaces:
+  - openshift-compliance
+---
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  name: compliance-operator
+  namespace: openshift-compliance
+spec:
+  name: compliance-operator
+  source: cs-redhat-operator-index
+  sourceNamespace: openshift-marketplace
+  installPlanApproval: Manual
+---
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  name: container-security-operator
+  namespace: openshift-operators
+spec:
+  name: container-security-operator
+  source: cs-redhat-operator-index
+  sourceNamespace: openshift-marketplace
+  installPlanApproval: Manual
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: openshift-ingress-node-firewall
+---
+apiVersion: operators.coreos.com/v1
+kind: OperatorGroup
+metadata:
+  name: openshift-ingress-node-firewall
+  namespace: openshift-ingress-node-firewall
+---
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  name: ingress-node-firewall
+  namespace: openshift-ingress-node-firewall
+spec:
+  name: ingress-node-firewall
+  source: cs-redhat-operator-index
+  sourceNamespace: openshift-marketplace
+  installPlanApproval: Manual
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: openshift-nmstate
+---
+apiVersion: operators.coreos.com/v1
+kind: OperatorGroup
+metadata:
+  name: openshift-nmstate
+  namespace: openshift-nmstate
+spec:
+  targetNamespaces:
+  - openshift-nmstate
+---
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  name: kubernetes-nmstate-operator
+  namespace: openshift-nmstate
+spec:
+  name: kubernetes-nmstate-operator
+  source: cs-redhat-operator-index
+  sourceNamespace: openshift-marketplace
+  installPlanApproval: Manual
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: openshift-workload-availability
+---
+apiVersion: operators.coreos.com/v1
+kind: OperatorGroup
+metadata:
+  name: openshift-workload-availability
+  namespace: openshift-workload-availability
+---
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  name: node-healthcheck-operator
+  namespace: openshift-workload-availability
+spec:
+  name: node-healthcheck-operator
+  source: cs-redhat-operator-index
+  sourceNamespace: openshift-marketplace
+  installPlanApproval: Manual
+---
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  name: self-node-remediation
+  namespace: openshift-workload-availability
+spec:
+  name: self-node-remediation
+  source: cs-redhat-operator-index
+  sourceNamespace: openshift-marketplace
+  installPlanApproval: Manual
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: metallb-system
+---
+apiVersion: operators.coreos.com/v1
+kind: OperatorGroup
+metadata:
+  name: metallb-system
+  namespace: metallb-system
+---
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  name: metallb-operator
+  namespace: metallb-system
+spec:
+  name: metallb-operator
+  source: cs-redhat-operator-index
+  sourceNamespace: openshift-marketplace
+  installPlanApproval: Manual
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: openshift-adp
+---
+apiVersion: operators.coreos.com/v1
+kind: OperatorGroup
+metadata:
+  name: openshift-adp
+  namespace: openshift-adp
+spec:
+  targetNamespaces:
+  - openshift-adp
+---
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  name: redhat-oadp-operator
+  namespace: openshift-adp
+spec:
+  name: redhat-oadp-operator
+  source: cs-redhat-operator-index
+  sourceNamespace: openshift-marketplace
+  installPlanApproval: Manual
+---

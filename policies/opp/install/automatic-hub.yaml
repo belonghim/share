@@ -96,7 +96,7 @@ spec:
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: openshift-quay
+  name: quay-enterprise
   labels:
     openshift.io/cluster-monitoring: "true"
 ---
@@ -105,18 +105,18 @@ kind: OperatorPolicy
 metadata:
   name: quay-operator
   labels:
-    operators.coreos.com/quay-operator.openshift-quay: ""
+    operators.coreos.com/quay-operator.quay-enterprise: ""
 spec:
   remediationAction: enforce
   severity: high
   complianceType: musthave
   upgradeApproval: Automatic
   operatorGroup:
-    name: openshift-quay
-    namespace: openshift-quay
+    name: quay-enterprise
+    namespace: quay-enterprise
   subscription:
     name: quay-operator
-    namespace: openshift-quay
+    namespace: quay-enterprise
     source: cs-redhat-operator-index
     sourceNamespace: openshift-marketplace
     config:

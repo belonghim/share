@@ -1,0 +1,10 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: quay-registry-quay-app
+  namespace: quay-enterprise
+status:
+  conditions:
+    - status: "True"
+      type: Available
+---

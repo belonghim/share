@@ -2,6 +2,70 @@
 apiVersion: v1
 kind: Namespace
 metadata:
+  name: open-cluster-management
+---
+apiVersion: policy.open-cluster-management.io/v1beta1
+kind: OperatorPolicy
+metadata:
+  name: advanced-cluster-management
+spec:
+  remediationAction: enforce
+  severity: high
+  complianceType: musthave
+  upgradeApproval: None
+  operatorGroup:
+    name: open-cluster-management
+    namespace: open-cluster-management
+    targetNamespaces:
+    - open-cluster-management
+  subscription:
+    name: advanced-cluster-management
+    namespace: open-cluster-management
+    source: cs-redhat-operator-index
+    sourceNamespace: openshift-marketplace
+    config:
+      nodeSelector:
+        node-role.kubernetes.io/acm: ""
+      tolerations:
+      - effect: NoSchedule
+        operator: Exists
+        key: node-role.kubernetes.io/infra
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: multicluster-engine
+---
+apiVersion: policy.open-cluster-management.io/v1beta1
+kind: OperatorPolicy
+metadata:
+  name: multicluster-engine
+spec:
+  remediationAction: enforce
+  severity: high
+  complianceType: musthave
+  upgradeApproval: None
+  operatorGroup:
+    name: default
+    namespace: multicluster-engine
+    targetNamespaces:
+    - multicluster-engine
+  subscription:
+    name: multicluster-engine
+    namespace: multicluster-engine
+    source: cs-redhat-operator-index
+    sourceNamespace: openshift-marketplace
+    config:
+      nodeSelector:
+        node-role.kubernetes.io/acm: ""
+      tolerations:
+      - effect: NoSchedule
+        operator: Exists
+        key: node-role.kubernetes.io/infra
+---
+apiVersion: v1
+kind: Namespace
+metadata:
   name: openshift-local-storage
 ---
 apiVersion: policy.open-cluster-management.io/v1beta1
@@ -65,34 +129,6 @@ spec:
         operator: Exists
         key: node.ocs.openshift.io/storage
 ---
-#apiVersion: v1
-#kind: Namespace
-#metadata:
-#  name: stackrox
-#---
-#apiVersion: v1
-#kind: Namespace
-#metadata:
-#  name: rhacs-operator
-#---
-#apiVersion: policy.open-cluster-management.io/v1beta1
-#kind: OperatorPolicy
-#metadata:
-#  name: rhacs-operator
-#spec:
-#  remediationAction: enforce
-#  severity: high
-#  complianceType: musthave
-#  upgradeApproval: None
-#  operatorGroup:
-#    name: rhacs-operator
-#    namespace: rhacs-operator
-#  subscription:
-#    name: rhacs-operator
-#    namespace: rhacs-operator
-#    source: cs-redhat-operator-index
-#    sourceNamespace: openshift-marketplace
-#---
 apiVersion: v1
 kind: Namespace
 metadata:
@@ -127,6 +163,114 @@ spec:
         operator: Exists
         key: node-role.kubernetes.io/infra
 ---
+apiVersion: policy.open-cluster-management.io/v1beta1
+kind: OperatorPolicy
+metadata:
+  name: servicemeshoperator
+spec:
+  remediationAction: enforce
+  severity: high
+  complianceType: musthave
+  upgradeApproval: None
+  subscription:
+    name: servicemeshoperator
+    namespace: openshift-operators
+    source: cs-redhat-operator-index
+    sourceNamespace: openshift-marketplace
+    config:
+      nodeSelector:
+        node-role.kubernetes.io/acm: ""
+      tolerations:
+      - effect: NoSchedule
+        operator: Exists
+        key: node-role.kubernetes.io/infra
+---
+apiVersion: policy.open-cluster-management.io/v1beta1
+kind: OperatorPolicy
+metadata:
+  name: kiali-ossm
+spec:
+  remediationAction: enforce
+  severity: high
+  complianceType: musthave
+  upgradeApproval: None
+  subscription:
+    name: kiali-ossm
+    namespace: openshift-operators
+    source: cs-redhat-operator-index
+    sourceNamespace: openshift-marketplace
+    config:
+      nodeSelector:
+        node-role.kubernetes.io/acm: ""
+      tolerations:
+      - effect: NoSchedule
+        operator: Exists
+        key: node-role.kubernetes.io/infra
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: openshift-tempo-operator
+  labels:
+    openshift.io/cluster-monitoring: "true"
+---
+apiVersion: policy.open-cluster-management.io/v1beta1
+kind: OperatorPolicy
+metadata:
+  name: tempo-product
+spec:
+  remediationAction: enforce
+  severity: high
+  complianceType: musthave
+  upgradeApproval: None
+  operatorGroup:
+    name: openshift-tempo-operator
+    namespace: openshift-tempo-operator
+  subscription:
+    name: tempo-product
+    namespace: openshift-tempo-operator
+    source: cs-redhat-operator-index
+    sourceNamespace: openshift-marketplace
+    config:
+      nodeSelector:
+        node-role.kubernetes.io/acm: ""
+      tolerations:
+      - effect: NoSchedule
+        operator: Exists
+        key: node-role.kubernetes.io/infra
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: openshift-gitops-operator
+  labels:
+    openshift.io/cluster-monitoring: "true"
+---
+apiVersion: policy.open-cluster-management.io/v1beta1
+kind: OperatorPolicy
+metadata:
+  name: openshift-gitops-operator
+spec:
+  remediationAction: enforce
+  severity: high
+  complianceType: musthave
+  upgradeApproval: None
+  operatorGroup:
+    name: openshift-gitops-operator
+    namespace: openshift-gitops-operator
+  subscription:
+    name: openshift-gitops-operator
+    namespace: openshift-gitops-operator
+    source: cs-redhat-operator-index
+    sourceNamespace: openshift-marketplace
+    config:
+      nodeSelector:
+        node-role.kubernetes.io/acm: ""
+      tolerations:
+      - effect: NoSchedule
+        operator: Exists
+        key: node-role.kubernetes.io/infra
+---
 apiVersion: v1
 kind: Namespace
 metadata:
@@ -151,91 +295,6 @@ spec:
   subscription:
     name: cincinnati-operator
     namespace: openshift-update-service
-    source: cs-redhat-operator-index
-    sourceNamespace: openshift-marketplace
-    config:
-      nodeSelector:
-        node-role.kubernetes.io/acm: ""
-      tolerations:
-      - effect: NoSchedule
-        operator: Exists
-        key: node-role.kubernetes.io/infra
----
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: openshift-operators
----
-apiVersion: policy.open-cluster-management.io/v1beta1
-kind: OperatorPolicy
-metadata:
-  name: servicemeshoperator
-spec:
-  remediationAction: enforce
-  severity: high
-  complianceType: musthave
-  upgradeApproval: None
-  operatorGroup:
-    name: global-operators
-    namespace: openshift-operators
-  subscription:
-    name: servicemeshoperator
-    namespace: openshift-operators
-    source: cs-redhat-operator-index
-    sourceNamespace: openshift-marketplace
-    config:
-      nodeSelector:
-        node-role.kubernetes.io/acm: ""
-      tolerations:
-      - effect: NoSchedule
-        operator: Exists
-        key: node-role.kubernetes.io/infra
----
-apiVersion: policy.open-cluster-management.io/v1beta1
-kind: OperatorPolicy
-metadata:
-  name: kiali-ossm
-spec:
-  remediationAction: enforce
-  severity: high
-  complianceType: musthave
-  upgradeApproval: None
-  operatorGroup:
-    name: global-operators
-    namespace: openshift-operators
-  subscription:
-    name: kiali-ossm
-    namespace: openshift-operators
-    source: cs-redhat-operator-index
-    sourceNamespace: openshift-marketplace
-    config:
-      nodeSelector:
-        node-role.kubernetes.io/acm: ""
-      tolerations:
-      - effect: NoSchedule
-        operator: Exists
-        key: node-role.kubernetes.io/infra
----
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: openshift-tempo-operator
----
-apiVersion: policy.open-cluster-management.io/v1beta1
-kind: OperatorPolicy
-metadata:
-  name: tempo-product
-spec:
-  remediationAction: enforce
-  severity: high
-  complianceType: musthave
-  upgradeApproval: None
-  operatorGroup:
-    name: openshift-tempo-operator
-    namespace: openshift-tempo-operator
-  subscription:
-    name: tempo-product
-    namespace: openshift-tempo-operator
     source: cs-redhat-operator-index
     sourceNamespace: openshift-marketplace
     config:
