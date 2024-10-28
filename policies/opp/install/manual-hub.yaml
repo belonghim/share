@@ -12,7 +12,7 @@ spec:
   remediationAction: enforce
   severity: high
   complianceType: musthave
-  upgradeApproval: None
+  upgradeApproval: Manual
   operatorGroup:
     name: openshift-local-storage
     namespace: openshift-local-storage
@@ -46,7 +46,7 @@ spec:
   remediationAction: enforce
   severity: high
   complianceType: musthave
-  upgradeApproval: None
+  upgradeApproval: Manual
   operatorGroup:
     name: openshift-storage
     namespace: openshift-storage
@@ -83,7 +83,7 @@ spec:
 #  remediationAction: enforce
 #  severity: high
 #  complianceType: musthave
-#  upgradeApproval: None
+#  upgradeApproval: Manual
 #  operatorGroup:
 #    name: rhacs-operator
 #    namespace: rhacs-operator
@@ -110,7 +110,7 @@ spec:
   remediationAction: enforce
   severity: high
   complianceType: musthave
-  upgradeApproval: None
+  upgradeApproval: Manual
   operatorGroup:
     name: quay-enterprise
     namespace: quay-enterprise
@@ -142,7 +142,7 @@ spec:
   remediationAction: enforce
   severity: high
   complianceType: musthave
-  upgradeApproval: None
+  upgradeApproval: Manual
   operatorGroup:
     name: openshift-update-service
     namespace: openshift-update-service
@@ -174,10 +174,7 @@ spec:
   remediationAction: enforce
   severity: high
   complianceType: musthave
-  upgradeApproval: None
-  operatorGroup:
-    name: global-operators
-    namespace: openshift-operators
+  upgradeApproval: Manual
   subscription:
     name: servicemeshoperator
     namespace: openshift-operators
@@ -199,10 +196,7 @@ spec:
   remediationAction: enforce
   severity: high
   complianceType: musthave
-  upgradeApproval: None
-  operatorGroup:
-    name: global-operators
-    namespace: openshift-operators
+  upgradeApproval: Manual
   subscription:
     name: kiali-ossm
     namespace: openshift-operators
@@ -229,7 +223,7 @@ spec:
   remediationAction: enforce
   severity: high
   complianceType: musthave
-  upgradeApproval: None
+  upgradeApproval: Manual
   operatorGroup:
     name: openshift-tempo-operator
     namespace: openshift-tempo-operator

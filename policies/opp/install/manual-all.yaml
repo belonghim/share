@@ -31,9 +31,6 @@ spec:
   severity: high
   complianceType: musthave
   upgradeApproval: Manual
-  operatorGroup:
-    name: openshift-workload-availability
-    namespace: openshift-workload-availability
   subscription:
     name: self-node-remediation
     namespace: openshift-workload-availability
@@ -66,7 +63,7 @@ spec:
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: openshift-gitops
+  name: openshift-gitops-operator
 ---
 apiVersion: policy.open-cluster-management.io/v1beta1
 kind: OperatorPolicy
@@ -82,7 +79,7 @@ spec:
     namespace: openshift-gitops-operator
   subscription:
     name: openshift-gitops-operator
-    namespace: openshift-openshift-gitops
+    namespace: openshift-gitops-operator
     source: cs-redhat-operator-index
     sourceNamespace: openshift-marketplace
 ---
