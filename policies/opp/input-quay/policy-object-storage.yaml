@@ -8,3 +8,21 @@ spec:
   storageClassName: ocs-storagecluster-ceph-rgw
 status:
   phase: Bound
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: quay-registry-quay-postgres-13
+  namespace: openshift-quay
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 50Gi
+  storageClassName: ocs-storagecluster-ceph-rbd
+  volumeMode: Filesystem
+  volumeName: pv-quay-registry-postgresql-data
+status:
+  phase: Bound
+---
