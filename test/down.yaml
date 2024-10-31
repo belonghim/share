@@ -3314,7 +3314,7 @@ spec:
             apiVersion: remediation.medik8s.io/v1alpha1
             kind: NodeHealthCheck
             metadata:
-              name: nodehealthcheck-sample
+              name: nodehealthcheck-sample-worker
             spec:
               minHealthy: 51%
               remediationTemplate:
@@ -3338,7 +3338,7 @@ spec:
             apiVersion: remediation.medik8s.io/v1alpha1
             kind: NodeHealthCheck
             metadata:
-              name: nodehealthcheck-sample
+              name: nodehealthcheck-sample-infra
             spec:
               minHealthy: 51%
               remediationTemplate:

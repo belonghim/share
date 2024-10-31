@@ -1043,7 +1043,7 @@ spec:
       apiVersion: policy.open-cluster-management.io/v1
       kind: ConfigurationPolicy
       metadata:
-        name: policy-observability-operator2
+        name: policy-observability-operator
       spec:
         object-templates:
         - complianceType: musthave
@@ -1066,7 +1066,7 @@ spec:
       apiVersion: policy.open-cluster-management.io/v1
       kind: ConfigurationPolicy
       metadata:
-        name: policy-observability-operator3
+        name: policy-observability-operator2
       spec:
         object-templates:
         - complianceType: musthave
@@ -1094,7 +1094,7 @@ spec:
       apiVersion: policy.open-cluster-management.io/v1
       kind: ConfigurationPolicy
       metadata:
-        name: policy-observability-operator4
+        name: policy-observability-operator3
       spec:
         object-templates:
         - complianceType: musthave
@@ -1788,7 +1788,7 @@ spec:
             apiVersion: remediation.medik8s.io/v1alpha1
             kind: NodeHealthCheck
             metadata:
-              name: nodehealthcheck-sample
+              name: nodehealthcheck-sample-worker
             spec:
               minHealthy: 51%
               remediationTemplate:
@@ -1812,7 +1812,7 @@ spec:
             apiVersion: remediation.medik8s.io/v1alpha1
             kind: NodeHealthCheck
             metadata:
-              name: nodehealthcheck-sample
+              name: nodehealthcheck-sample-infra
             spec:
               minHealthy: 51%
               remediationTemplate:
