@@ -1,37 +1,22 @@
 ---
-apiVersion: local.storage.openshift.io/v1alpha1
-kind: LocalVolumeDiscovery
+apiVersion: local.storage.openshift.io/v1
+kind: LocalVolume
 metadata:
-  name: auto-discover-devices
+  name: local-block-odf
   namespace: openshift-local-storage
 spec:
   nodeSelector:
     nodeSelectorTerms:
     - matchExpressions:
       - key: cluster.ocs.openshift.io/openshift-storage
-        operator: Exists
-  tolerations:
-  - effect: NoSchedule
-    operator: Exists
-    key: node.ocs.openshift.io/storage
----
-apiVersion: local.storage.openshift.io/v1alpha1
-kind: LocalVolumeSet
-metadata:
-  name: odf-localvolumeset
-  namespace: openshift-local-storage
-spec:
-  nodeSelector:
-    nodeSelectorTerms:
-    - matchExpressions:
-      - key: cluster.ocs.openshift.io/openshift-storage
-        operator: Exists
-  storageClassName: odf-localvolumeset
-  volumeMode: Block
-  deviceInclusionSpec:
-    deviceTypes:
-    - disk
-    minSize: 100Gi
+        operator: In
+        values:
+        - ""
+  storageClassDevices:
+  - devicePaths:
+   - /dev/disk/by-path/pci-0000:0b:00.0-scsi-0:0:1:0
+    storageClassName: localblock-odf
+    volumeMode: Block
   tolerations:
   - effect: NoSchedule
     operator: Exists
