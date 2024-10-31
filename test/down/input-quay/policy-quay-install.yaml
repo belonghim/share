@@ -63,7 +63,7 @@ spec:
   components:
   - kind: clair
     managed: false
-  - kind: clairpostgre
+  - kind: clairpostgres
     managed: false
   - kind: mirror
     managed: false

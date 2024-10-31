@@ -83,26 +83,3 @@ spec:
     source: cs-redhat-operator-index
     sourceNamespace: openshift-marketplace
 ---
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: metallb-system
----
-apiVersion: policy.open-cluster-management.io/v1beta1
-kind: OperatorPolicy
-metadata:
-  name: metallb-operator
-spec:
-  remediationAction: enforce
-  severity: high
-  complianceType: musthave
-  upgradeApproval: Manual
-  operatorGroup:
-    name: metallb-system
-    namespace: metallb-system
-  subscription:
-    name: metallb-operator
-    namespace: metallb-system
-    source: cs-redhat-operator-index
-    sourceNamespace: openshift-marketplace
----

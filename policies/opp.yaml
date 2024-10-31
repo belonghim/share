@@ -249,24 +249,6 @@ spec:
           sourceNamespace: openshift-marketplace
         upgradeApproval: Automatic
   - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1beta1
-      kind: OperatorPolicy
-      metadata:
-        name: metallb-operator
-      spec:
-        complianceType: musthave
-        operatorGroup:
-          name: metallb-system
-          namespace: metallb-system
-        remediationAction: enforce
-        severity: high
-        subscription:
-          name: metallb-operator
-          namespace: metallb-system
-          source: cs-redhat-operator-index
-          sourceNamespace: openshift-marketplace
-        upgradeApproval: Automatic
-  - objectDefinition:
       apiVersion: policy.open-cluster-management.io/v1
       kind: ConfigurationPolicy
       metadata:
@@ -291,12 +273,6 @@ spec:
             kind: Namespace
             metadata:
               name: openshift-gitops-operator
-        - complianceType: musthave
-          objectDefinition:
-            apiVersion: v1
-            kind: Namespace
-            metadata:
-              name: metallb-system
         remediationAction: enforce
         severity: medium
   remediationAction: enforce
@@ -694,24 +670,6 @@ spec:
           sourceNamespace: openshift-marketplace
         upgradeApproval: Manual
   - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1beta1
-      kind: OperatorPolicy
-      metadata:
-        name: metallb-operator
-      spec:
-        complianceType: musthave
-        operatorGroup:
-          name: metallb-system
-          namespace: metallb-system
-        remediationAction: enforce
-        severity: high
-        subscription:
-          name: metallb-operator
-          namespace: metallb-system
-          source: cs-redhat-operator-index
-          sourceNamespace: openshift-marketplace
-        upgradeApproval: Manual
-  - objectDefinition:
       apiVersion: policy.open-cluster-management.io/v1
       kind: ConfigurationPolicy
       metadata:
@@ -736,12 +694,6 @@ spec:
             kind: Namespace
             metadata:
               name: openshift-gitops-operator
-        - complianceType: musthave
-          objectDefinition:
-            apiVersion: v1
-            kind: Namespace
-            metadata:
-              name: metallb-system
         remediationAction: enforce
         severity: medium
   remediationAction: enforce
@@ -1570,62 +1522,6 @@ spec:
         - complianceType: musthave
           objectDefinition:
             apiVersion: v1
-            kind: ServiceAccount
-            metadata:
-              name: create-admin-user
-              namespace: quay-enterprise
-        - complianceType: musthave
-          objectDefinition:
-            apiVersion: rbac.authorization.k8s.io/v1
-            kind: Role
-            metadata:
-              name: create-admin-user
-              namespace: quay-enterprise
-            rules:
-            - apiGroups:
-              - ""
-              resources:
-              - secrets
-              verbs:
-              - get
-              - list
-              - create
-              - patch
-              - update
-              - delete
-            - apiGroups:
-              - route.openshift.io
-              resources:
-              - routes
-              verbs:
-              - get
-              - list
-            - apiGroups:
-              - quay.redhat.com
-              resources:
-              - quayregistries
-              verbs:
-              - get
-              - list
-              - watch
-        - complianceType: musthave
-          objectDefinition:
-            apiVersion: rbac.authorization.k8s.io/v1
-            kind: RoleBinding
-            metadata:
-              name: create-admin-user
-              namespace: quay-enterprise
-            roleRef:
-              apiGroup: rbac.authorization.k8s.io
-              kind: Role
-              name: create-admin-user
-            subjects:
-            - kind: ServiceAccount
-              name: create-admin-user
-              namespace: quay-enterprise
-        - complianceType: musthave
-          objectDefinition:
-            apiVersion: v1
             data:
               config.yaml: QVVUSEVOVElDQVRJT05fVFlQRTogT0lEQwpCQU5LX0xPR0lOX0NPTkZJRzoKICBDTElFTlRfSUQ6IHF1YXktZW50ZXJwcmlzZQogIENMSUVOVF9TRUNSRVQ6IHpaVnRGMERuTXpWNWpvR0FZOVBZZXRCeHVqUVNjV3NMCiAgT0lEQ19TRVJWRVI6IGh0dHBzOi8va2V5Y2xvYWsucGFhcy53b29yaWZnLmNvbTo4MTQzL3JlYWxtcy93b29yaS1yZWFsbS8KICBTRVJWSUNFX05BTUU6IFdvb3JpQmFuayBTU08KICBQUkVGRVJSRURfR1JPVVBfQ0xBSU1fTkFNRTogcXVheS1ncm91cAogIExPR0lOX1NDT1BFUzogWyAnb3BlbmlkJyBdCiAgT0lEQ19ESVNBQkxFX1VTRVJfRU5EUE9JTlQ6IGZhbHNlCkNBUkRfTE9HSU5fQ09ORklHOgogIENMSUVOVF9JRDogcXVheS1lbnRlcnByaXNlCiAgQ0xJRU5UX1NFQ1JFVDogUXBJU0w1Qkt2QWkwQmdtYzNJOVRUZWgydDBzQU9HOW0KICBPSURDX1NFUlZFUjogaHR0cHM6Ly9rZXljbG9hay5wYWFzLndvb3JpZmcuY29tOjgxNDMvcmVhbG1zL2NhcmQtcmVhbG0vCiAgU0VSVklDRV9OQU1FOiBXb29yaUNhcmQgU1NPCiAgUFJFRkVSUkVEX0dST1VQX0NMQUlNX05BTUU6IHF1YXktZ3JvdXAKICBMT0dJTl9TQ09QRVM6IFsgJ29wZW5pZCcgXQogIE9JRENfRElTQUJMRV9VU0VSX0VORFBPSU5UOiBmYWxzZQpGRUFUVVJFX1RFQU1fU1lOQ0lORzogdHJ1ZQpGRUFUVVJFX05PTlNVUEVSVVNFUl9URUFNX1NZTkNJTkdfU0VUVVA6IHRydWUKRkVBVFVSRV9VSV9WMjogdHJ1ZQpERUZBVUxUX1RBR19FWFBJUkFUSU9OOiAydwpQUkVGRVJSRURfVVJMX1NDSEVNRTogaHR0cApTRVJWRVJfSE9TVE5BTUU6IHJlZ2lzdHJ5LmFwcHMucGFhcy53b29yaWZnLmNvbQpTRVRVUF9DT01QTEVURTogdHJ1ZQpTVVBFUl9VU0VSUzoKICAtIHF1YXlhZG1pbgpGRUFUVVJFX1VTRVJfQ1JFQVRJT046IHRydWUKRkVBVFVSRV9VU0VSX0lOSVRJQUxJWkU6IGZhbHNlCkZFQVRVUkVfU1VQRVJVU0VSU19PUkdfQ1JFQVRJT05fT05MWTogdHJ1ZQpGRUFUVVJFX1NVUEVSVVNFUlNfRlVMTF9BQ0NFU1M6IHRydWUKRkVBVFVSRV9SRVNUUklDVEVEX1VTRVJTOiBmYWxzZSAKUkVTVFJJQ1RFRF9VU0VSU19XSElURUxJU1Q6CiAgLSBxdWF5YWRtaW4KQlJPV1NFUl9BUElfQ0FMTFNfWEhSX09OTFk6IGZhbHNlClRBR19FWFBJUkFUSU9OX09QVElPTlM6CiAgLSAxZAogIC0gMXcKICAtIDJ3CiAgLSA0dw==
             kind: Secret
@@ -1751,6 +1647,24 @@ spec:
             spec:
               generateBucketName: registry-quay
               storageClassName: ocs-storagecluster-ceph-rgw
+            status:
+              phase: Bound
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: v1
+            kind: PersistentVolumeClaim
+            metadata:
+              name: quay-registry-quay-postgres-13
+              namespace: openshift-quay
+            spec:
+              accessModes:
+              - ReadWriteOnce
+              resources:
+                requests:
+                  storage: 50Gi
+              storageClassName: ocs-storagecluster-ceph-rbd
+              volumeMode: Filesystem
+              volumeName: pv-quay-registry-postgresql-data
             status:
               phase: Bound
         remediationAction: enforce
