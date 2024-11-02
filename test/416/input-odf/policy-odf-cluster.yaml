@@ -37,9 +37,9 @@ spec:
         resources:
           requests:
             storage: 1Gi
-        storageClassName: odf-localvolumeset
+        storageClassName: localblock-odf
         volumeMode: Block
-    name: ocs-deviceset-localvolume
+    name: ocs-deviceset-localblock-odf
     replica: 3
     resources:
       requests:

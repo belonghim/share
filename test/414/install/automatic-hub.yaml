@@ -60,8 +60,9 @@ spec:
       cluster.ocs.openshift.io/openshift-storage: ""
     tolerations:
     - effect: NoSchedule
-      operator: Exists
+      operator: Equal
       key: node.ocs.openshift.io/storage
+      value: "true"
 ---
 apiVersion: v1
 kind: Namespace
@@ -94,8 +95,9 @@ spec:
       cluster.ocs.openshift.io/openshift-storage: ""
     tolerations:
     - effect: NoSchedule
-      operator: Exists
+      operator: Equal
       key: node.ocs.openshift.io/storage
+      value: "true"
 ---
 apiVersion: v1
 kind: Namespace

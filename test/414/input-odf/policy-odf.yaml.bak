@@ -9,33 +9,36 @@ spec:
     nodeSelectorTerms:
     - matchExpressions:
       - key: cluster.ocs.openshift.io/openshift-storage
-        operator: In
-        values:
-        - ""
+        operator: Exists
   storageClassDevices:
   - devicePaths:
-   - /dev/disk/by-path/pci-0000:0b:00.0-scsi-0:0:1:0
+    - /dev/disk/by-path/pci-0000:05:00.0
     storageClassName: localblock-odf
     volumeMode: Block
   tolerations:
   - effect: NoSchedule
-    operator: Exists
+    operator: Equal
     key: node.ocs.openshift.io/storage
+    value: "true"
 status:
   conditions:
     - status: "True"
       type: Available
 ---
-#apiVersion: odf.openshift.io/v1alpha1
-#kind: StorageSystem
-#metadata:
-#  name: ocs-storagecluster-storagesystem
-#  namespace: openshift-storage
-#spec:
-#  kind: storagecluster.ocs.openshift.io/v1
-#  name: ocs-storagecluster
-#  namespace: openshift-storage
-#---
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  namespace: openshift-storage
+spec:
+  config:
+    nodeSelector:
+      cluster.ocs.openshift.io/openshift-storage: ""
+    tolerations:
+    - effect: NoSchedule
+      operator: Equal
+      key: node.ocs.openshift.io/storage
+      value: "true"
+---
 apiVersion: operator.openshift.io/v1
 kind: Console
 metadata:
