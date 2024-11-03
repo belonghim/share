@@ -29,7 +29,7 @@ spec:
         cpu: "500m"
         memory: 1Gi
   storageDeviceSets:
-  - count: 1
+  - count: 3
     dataPVCTemplate:
       spec:
         accessModes:
@@ -40,7 +40,7 @@ spec:
         storageClassName: localblock-odf
         volumeMode: Block
     name: ocs-deviceset-localblock-odf
-    replica: 3
+    replica: 1
     resources:
       requests:
         cpu: "1"

@@ -148,6 +148,14 @@ policies:
     - SI-7 Software Firmware and Information Integrity
   manifests:
     - path: input-odf/policy-odf.yaml
+- name: policy-odf-volume
+  categories:
+    - SI System and Information Integrity
+  controls: 
+    - SI-7 Software Firmware and Information Integrity
+  manifests:
+    - path: input-odf/policy-odf-volume.yaml
+  remediationAction: inform
 - name: policy-odf-cluster
   categories:
     - SI System and Information Integrity
@@ -155,6 +163,7 @@ policies:
     - SI-7 Software Firmware and Information Integrity
   dependencies:
     - name: policy-odf
+    - name: policy-odf-volume
   manifests:
     - path: input-odf/policy-odf-cluster.yaml
 - name: policy-odf-status
@@ -177,7 +186,7 @@ policies:
   dependencies:
     - name: policy-odf-status
   manifests:
-    - path: input-quay/policy-object-storage.yaml
+    - path: input-quay/policy-quay-storage.yaml
 - name: policy-quay-install
   categories:
     - SI System and Information Integrity

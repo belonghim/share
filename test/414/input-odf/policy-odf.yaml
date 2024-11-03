@@ -25,20 +25,6 @@ status:
     - status: "True"
       type: Available
 ---
-apiVersion: operators.coreos.com/v1alpha1
-kind: Subscription
-metadata:
-  namespace: openshift-storage
-spec:
-  config:
-    nodeSelector:
-      cluster.ocs.openshift.io/openshift-storage: ""
-    tolerations:
-    - effect: NoSchedule
-      operator: Equal
-      key: node.ocs.openshift.io/storage
-      value: "true"
----
 apiVersion: policy.open-cluster-management.io/v1
 kind: ConfigurationPolicy
 metadata:

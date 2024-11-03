@@ -469,41 +469,6 @@ spec:
             apiVersion: v1
             kind: Namespace
             metadata:
-              name: open-cluster-management
-        - complianceType: musthave
-          objectDefinition:
-            apiVersion: operators.coreos.com/v1
-            kind: OperatorGroup
-            metadata:
-              name: open-cluster-management
-              namespace: open-cluster-management
-            spec:
-              targetNamespaces:
-              - open-cluster-management
-        - complianceType: musthave
-          objectDefinition:
-            apiVersion: operators.coreos.com/v1alpha1
-            kind: Subscription
-            metadata:
-              name: advanced-cluster-management
-              namespace: open-cluster-management
-            spec:
-              config:
-                nodeSelector:
-                  node-role.kubernetes.io/acm: ""
-                tolerations:
-                - effect: NoSchedule
-                  key: node-role.kubernetes.io/infra
-                  operator: Exists
-              installPlanApproval: Automatic
-              name: advanced-cluster-management
-              source: cs-redhat-operator-index
-              sourceNamespace: openshift-marketplace
-        - complianceType: musthave
-          objectDefinition:
-            apiVersion: v1
-            kind: Namespace
-            metadata:
               name: openshift-local-storage
         - complianceType: musthave
           objectDefinition:
@@ -779,7 +744,7 @@ spec:
       spec:
         object-templates-raw: |
           {{- if ne (lookup "v1" "ConfigMap" "openshift-config" "router-bundle").kind "ConfigMap" -}}
-          - complianceType: mustonlyhave
+          - complianceType: musthave
             objectDefinition:
               apiVersion: v1
               data:
@@ -809,6 +774,15 @@ spec:
             metadata:
               name: router-bundle
               namespace: policies
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: config.openshift.io/v1
+            kind: Proxy
+            metadata:
+              name: cluster
+            spec:
+              trustedCA:
+                name: router-bundle
         remediationAction: enforce
         severity: medium
   remediationAction: enforce
@@ -1112,41 +1086,6 @@ spec:
             apiVersion: v1
             kind: Namespace
             metadata:
-              name: open-cluster-management
-        - complianceType: musthave
-          objectDefinition:
-            apiVersion: operators.coreos.com/v1
-            kind: OperatorGroup
-            metadata:
-              name: open-cluster-management
-              namespace: open-cluster-management
-            spec:
-              targetNamespaces:
-              - open-cluster-management
-        - complianceType: musthave
-          objectDefinition:
-            apiVersion: operators.coreos.com/v1alpha1
-            kind: Subscription
-            metadata:
-              name: advanced-cluster-management
-              namespace: open-cluster-management
-            spec:
-              config:
-                nodeSelector:
-                  node-role.kubernetes.io/acm: ""
-                tolerations:
-                - effect: NoSchedule
-                  key: node-role.kubernetes.io/infra
-                  operator: Exists
-              installPlanApproval: Manual
-              name: advanced-cluster-management
-              source: cs-redhat-operator-index
-              sourceNamespace: openshift-marketplace
-        - complianceType: musthave
-          objectDefinition:
-            apiVersion: v1
-            kind: Namespace
-            metadata:
               name: openshift-local-storage
         - complianceType: musthave
           objectDefinition:
@@ -1172,7 +1111,8 @@ spec:
                 tolerations:
                 - effect: NoSchedule
                   key: node.ocs.openshift.io/storage
-                  operator: Exists
+                  operator: Equal
+                  value: "true"
               installPlanApproval: Manual
               name: local-storage-operator
               source: cs-redhat-operator-index
@@ -1209,7 +1149,8 @@ spec:
                 tolerations:
                 - effect: NoSchedule
                   key: node.ocs.openshift.io/storage
-                  operator: Exists
+                  operator: Equal
+                  value: "true"
               installPlanApproval: Manual
               name: odf-operator
               source: cs-redhat-operator-index
@@ -2739,21 +2680,6 @@ spec:
                 type: Available
         - complianceType: musthave
           objectDefinition:
-            apiVersion: operators.coreos.com/v1alpha1
-            kind: Subscription
-            metadata:
-              namespace: openshift-storage
-            spec:
-              config:
-                nodeSelector:
-                  cluster.ocs.openshift.io/openshift-storage: ""
-                tolerations:
-                - effect: NoSchedule
-                  key: node.ocs.openshift.io/storage
-                  operator: Equal
-                  value: "true"
-        - complianceType: musthave
-          objectDefinition:
             apiVersion: operator.openshift.io/v1
             kind: Console
             metadata:
@@ -2785,6 +2711,11 @@ spec:
     compliance: Compliant
     kind: Policy
     name: policy-odf
+    namespace: policies
+  - apiVersion: policy.open-cluster-management.io/v1
+    compliance: Compliant
+    kind: Policy
+    name: policy-odf-volume
     namespace: policies
   disabled: false
   policy-templates:
@@ -2871,7 +2802,7 @@ spec:
                     cpu: 500m
                     memory: 1Gi
               storageDeviceSets:
-              - count: 1
+              - count: 3
                 dataPVCTemplate:
                   spec:
                     accessModes:
@@ -2882,7 +2813,7 @@ spec:
                     storageClassName: localblock-odf
                     volumeMode: Block
                 name: ocs-deviceset-localblock-odf
-                replica: 3
+                replica: 1
                 resources:
                   requests:
                     cpu: "1"
@@ -2979,6 +2910,59 @@ spec:
               phase: Ready
         remediationAction: inform
         severity: medium
+  remediationAction: inform
+---
+apiVersion: policy.open-cluster-management.io/v1
+kind: Policy
+metadata:
+  annotations:
+    argocd.argoproj.io/compare-options: IgnoreExtraneous
+    policy.open-cluster-management.io/categories: SI System and Information Integrity
+    policy.open-cluster-management.io/controls: SI-7 Software Firmware and Information
+      Integrity
+    policy.open-cluster-management.io/description: ""
+    policy.open-cluster-management.io/standards: NIST SP 800-53
+  labels:
+    open-cluster-management.io/policy-set: opp
+  name: policy-odf-volume
+  namespace: policies
+spec:
+  disabled: false
+  policy-templates:
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: localblock-odf-persistent-volume
+      spec:
+        object-templates-raw: |
+          {{- range $nd := (lookup "v1" "Node" "" "" "cluster.ocs.openshift.io/openshift-storage=").items }}
+          {{- range $pv := (lookup "v1" "PersistentVolume" "" "" ( (cat "kubernetes.io/hostname=" $nd.metadata.name ", storage.openshift.com/local-volume-owner-name=localblock-odf") | replace " " "")).items }}
+          - complianceType: musthave
+            objectDefinition:
+              apiVersion: v1
+              kind: PersistentVolume
+              metadata:
+                name: {{ $pv.metadata.name }}
+              spec:
+                accessModes:
+                - ReadWriteOnce
+                storageClassName: localblock-odf
+                volumeMode: Block
+                nodeAffinity:
+                  required:
+                    nodeSelectorTerms:
+                    - matchExpressions:
+                      - key: kubernetes.io/hostname
+                        operator: In
+                        values:
+                        - {{ $nd.metadata.name }}
+              status:
+                phase: Available
+          {{- end }}
+          {{- end }}
+        remediationAction: inform
+        severity: high
   remediationAction: inform
 ---
 apiVersion: policy.open-cluster-management.io/v1
@@ -3242,17 +3226,37 @@ spec:
         - complianceType: musthave
           objectDefinition:
             apiVersion: v1
+            kind: PersistentVolume
+            metadata:
+              name: pv-quay-registry-postgresql-data
+            spec:
+              accessModes:
+              - ReadWriteOnce
+              capacity:
+                storage: 50Gi
+              claimRef:
+                apiVersion: v1
+                kind: PersistentVolumeClaim
+                name: quay-registry-quay-postgres-13
+                namespace: quay-enterprise
+              nfs:
+                path: /opt/woori/nfs/quay-registry/postgresql/data
+                server: 192.168.10.12
+              persistentVolumeReclaimPolicy: Retain
+              volumeMode: Filesystem
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: v1
             kind: PersistentVolumeClaim
             metadata:
               name: quay-registry-quay-postgres-13
-              namespace: openshift-quay
+              namespace: quay-enterprise
             spec:
               accessModes:
               - ReadWriteOnce
               resources:
                 requests:
                   storage: 50Gi
-              storageClassName: ocs-storagecluster-ceph-rbd
               volumeMode: Filesystem
               volumeName: pv-quay-registry-postgresql-data
             status:
@@ -3440,6 +3444,7 @@ spec:
   - policy-odf
   - policy-odf-cluster
   - policy-odf-status
+  - policy-odf-volume
   - policy-quay-config
   - policy-quay-install
   - policy-quay-status
@@ -3496,6 +3501,7 @@ spec:
   - policy-odf
   - policy-odf-cluster
   - policy-odf-status
+  - policy-odf-volume
   - policy-quay-config
   - policy-quay-install
   - policy-quay-status

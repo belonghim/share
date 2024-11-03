@@ -10,17 +10,36 @@ status:
   phase: Bound
 ---
 apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-quay-registry-postgresql-data
+spec:
+  accessModes:
+  - ReadWriteOnce
+  capacity:
+    storage: 50Gi
+  claimRef:
+    apiVersion: v1
+    kind: PersistentVolumeClaim
+    name: quay-registry-quay-postgres-13
+    namespace: quay-enterprise
+  nfs:
+    path: /opt/woori/nfs/quay-registry/postgresql/data
+    server: 192.168.10.12
+  persistentVolumeReclaimPolicy: Retain
+  volumeMode: Filesystem
+---
+apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: quay-registry-quay-postgres-13
-  namespace: openshift-quay
+  namespace: quay-enterprise
 spec:
   accessModes:
   - ReadWriteOnce
   resources:
     requests:
       storage: 50Gi
-  storageClassName: ocs-storagecluster-ceph-rbd
   volumeMode: Filesystem
   volumeName: pv-quay-registry-postgresql-data
 status:
