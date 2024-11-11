@@ -12,7 +12,6 @@ policyDefaults:
   namespace: policies
   policySets:
     - opp-hub
-    - manual-opp-hub
   remediationAction: enforce
   severity: medium
   standards:
@@ -103,7 +102,6 @@ policies:
     - path: input-sensor/policy-advanced-managed-cluster-security.yaml
   policySets:
     - opp-clusters
-    - manual-opp-clusters
 - name: policy-advanced-managed-cluster-status
   categories:
     - SI System and Information Integrity
@@ -113,9 +111,7 @@ policies:
     - path: input-sensor/policy-advanced-managed-cluster-status.yaml
   policySets:
     - opp-hub
-    - manual-opp-hub
     - opp-clusters
-    - manual-opp-clusters
   remediationAction: inform
 # ACS Policies - end
 # Observability Policy - start
@@ -216,74 +212,50 @@ policies:
     - path: input-quay/policy-quay-status.yaml
   remediationAction: inform
 # Quay Policies - end
-# Hub Automatic Operators Policies - start
-- name: automatic-hub-operators-install
+# Hub Operators Policies - start
+- name: opp-hub-operators-install
   categories:
     - SI System and Information Integrity
   controls:
     - SI-7 Software Firmware and Information Integrity
   manifests:
-    - path: install/automatic-hub.yaml
+    - path: install/opp-hub.yaml
   policySets:
     - opp-hub
-# Hub Automatic Operators Policies - end
-# Clusters Automatic Operators Policies - start
-#- name: automatic-clusters-operators-install
-#  categories:
-#    - SI System and Information Integrity
-#  controls:
-#    - SI-7 Software Firmware and Information Integrity
-#  manifests:
-#    - path: install/automatic-clusters.yaml
-#  policySets:
-#    - opp-clusters
-# Clusters Automatic Operators Policies - end
-# Hub Manual Operators Policies - start
-- name: manual-hub-operators-install
+# Hub Operators Policies - end
+# All Operators Policies - start
+- name: opp-all-operators-install
   categories:
     - SI System and Information Integrity
   controls:
     - SI-7 Software Firmware and Information Integrity
   manifests:
-    - path: install/manual-hub.yaml
-  policySets:
-    - manual-opp-hub
-# Hub Manual Operators Policies - end
-# Clusters Manual Operators Policies - start
-#- name: manual-clusters-operators-install
-#  categories:
-#    - SI System and Information Integrity
-#  controls:
-#    - SI-7 Software Firmware and Information Integrity
-#  manifests:
-#    - path: install/manual-clusters.yaml
-#  policySets:
-#    - manual-opp-clusters
-# Clusters Manual Operators Policies - end
-# All Automatic Operators Policies - start
-- name: automatic-all-operators-install
-  categories:
-    - SI System and Information Integrity
-  controls:
-    - SI-7 Software Firmware and Information Integrity
-  manifests:
-    - path: install/automatic-all.yaml
+    - path: install/opp-all.yaml
   policySets:
     - opp-hub
-    - opp-clusters
-# All Automatic Operators Policies - end
-# All Manual Operators Policies - start
-- name: manual-all-operators-install
+# All Operators Policies - end
+# Manual Subscription Policies - start
+- name: manual-subscription
   categories:
     - SI System and Information Integrity
   controls:
     - SI-7 Software Firmware and Information Integrity
   manifests:
-    - path: install/manual-all.yaml
+    - path: install/manual-sub.yaml
   policySets:
-    - manual-opp-hub
-    - manual-opp-clusters
-# All Manual Operators Policies - end
+    - opp-manual
+# Manual Subscription Policies - end
+# Automatic Subscription Policies - start
+- name: automatic-subscription
+  categories:
+    - SI System and Information Integrity
+  controls:
+    - SI-7 Software Firmware and Information Integrity
+  manifests:
+    - path: install/automatic-sub.yaml
+  policySets:
+    - opp-automatic
+# Automatic Subscription Policies - end
 # All Create Router Bundle Policies - start
 - name: create-router-bundle
   categories:
@@ -294,7 +266,6 @@ policies:
     - path: update/proxy-sync-hub.yaml
   policySets:
     - opp-hub
-    - manual-opp-hub
 # All Create Router Bundle Policies - end
 # All Proxy Router Bundle Policies - start
 - name: update-proxy-sync
@@ -306,7 +277,6 @@ policies:
     - path: update/proxy-sync.yaml
   policySets:
     - opp-clusters
-    - manual-opp-clusters
 # All Proxy Router Bundle Policies - end
 # Remediation config Policies - start
 - name: remediation-config
@@ -320,6 +290,18 @@ policies:
     - opp-hub
     - opp-clusters
 # Remediation config Policies - end
+# CSV check Policies - start
+- name: remediation-config
+  categories:
+    - SI System and Information Integrity
+  controls:
+    - SI-7 Software Firmware and Information Integrity
+  manifests:
+    - path: check/csv-check.yaml
+  policySets:
+    - opp-hub
+    - opp-clusters
+# CSV check Policies - end
 policySets:
   - description: The OpenShift Platform Plus policy set applies several policies
       that will install the OpenShift Platform Plus products using best practices
@@ -335,9 +317,9 @@ policySets:
     name: opp-clusters
     placement:
       placementPath: input/clusters-placement.yaml
-  - name: manual-opp-hub
+  - name: opp-manual
     placement:
-      placementPath: input/manual-hub-placement.yaml
-  - name: manual-opp-clusters
+      placementPath: input/manual-placement.yaml
+  - name: opp-automatic
     placement:
-      placementPath: input/manual-clusters-placement.yaml
+      placementPath: input/automatic-placement.yaml

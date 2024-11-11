@@ -22,7 +22,6 @@ spec:
   name: cluster-logging
   source: cs-redhat-operator-index
   sourceNamespace: openshift-marketplace
-  installPlanApproval: Manual
 ---
 apiVersion: v1
 kind: Namespace
@@ -49,7 +48,6 @@ spec:
   name: rhacs-operator
   source: cs-redhat-operator-index
   sourceNamespace: openshift-marketplace
-  installPlanApproval: Manual
 ---
 apiVersion: v1
 kind: Namespace
@@ -74,7 +72,6 @@ spec:
   name: compliance-operator
   source: cs-redhat-operator-index
   sourceNamespace: openshift-marketplace
-  installPlanApproval: Manual
 ---
 apiVersion: operators.coreos.com/v1alpha1
 kind: Subscription
@@ -85,7 +82,6 @@ spec:
   name: container-security-operator
   source: cs-redhat-operator-index
   sourceNamespace: openshift-marketplace
-  installPlanApproval: Manual
 ---
 apiVersion: v1
 kind: Namespace
@@ -107,7 +103,6 @@ spec:
   name: ingress-node-firewall
   source: cs-redhat-operator-index
   sourceNamespace: openshift-marketplace
-  installPlanApproval: Manual
 ---
 apiVersion: v1
 kind: Namespace
@@ -132,7 +127,6 @@ spec:
   name: kubernetes-nmstate-operator
   source: cs-redhat-operator-index
   sourceNamespace: openshift-marketplace
-  installPlanApproval: Manual
 ---
 apiVersion: v1
 kind: Namespace
@@ -154,7 +148,6 @@ spec:
   name: node-healthcheck-operator
   source: cs-redhat-operator-index
   sourceNamespace: openshift-marketplace
-  installPlanApproval: Manual
 ---
 apiVersion: operators.coreos.com/v1alpha1
 kind: Subscription
@@ -165,7 +158,6 @@ spec:
   name: self-node-remediation
   source: cs-redhat-operator-index
   sourceNamespace: openshift-marketplace
-  installPlanApproval: Manual
 ---
 apiVersion: v1
 kind: Namespace
@@ -187,7 +179,6 @@ spec:
   name: metallb-operator
   source: cs-redhat-operator-index
   sourceNamespace: openshift-marketplace
-  installPlanApproval: Manual
 ---
 apiVersion: v1
 kind: Namespace
@@ -212,5 +203,4 @@ spec:
   name: redhat-oadp-operator
   source: cs-redhat-operator-index
   sourceNamespace: openshift-marketplace
-  installPlanApproval: Manual
 ---

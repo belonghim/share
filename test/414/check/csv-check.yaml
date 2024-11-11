@@ -1,0 +1,26 @@
+---
+apiVersion: policy.open-cluster-management.io/v1
+kind: ConfigurationPolicy
+metadata:
+  name: router-ca-bundle-configmap
+spec:
+  remediationAction: enforce
+  severity: high
+  object-templates-raw: |
+    {{- range $sub := (lookup "operators.coreos.com/v1alpha1" "Subscription" "" "").items }}
+    {{- $pm := lookup "packages.operators.coreos.com/v1" "PackageManifest" "openshift-marketplace" $sub.metadata.name "catalog="$sub.spec.source }}
+    {{- range $ch := $pm.status.channels }}
+    {{- if (eq $ch.name $pm.status.defaultChannel) }}
+    - complianceType: musthave
+      objectDefinition:
+        apiVersion: operators.coreos.com/v1alpha1
+        kind: ClusterServiceVersion
+        metadata:
+          name: {{ $ch.currentCSV }}
+          namespace: {{ $sub.metadata.namespace }}
+        status:
+          phase: Succeeded
+    {{- end }}
+    {{- end }}
+    {{- end }}
+---

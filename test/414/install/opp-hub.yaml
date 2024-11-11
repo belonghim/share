@@ -22,7 +22,6 @@ spec:
   name: local-storage-operator
   source: cs-redhat-operator-index
   sourceNamespace: openshift-marketplace
-  installPlanApproval: Automatic
   config:
     nodeSelector:
       cluster.ocs.openshift.io/openshift-storage: ""
@@ -57,7 +56,6 @@ spec:
   name: odf-operator
   source: cs-redhat-operator-index
   sourceNamespace: openshift-marketplace
-  installPlanApproval: Automatic
   config:
     nodeSelector:
       cluster.ocs.openshift.io/openshift-storage: ""
@@ -89,7 +87,6 @@ spec:
   name: quay-operator
   source: cs-redhat-operator-index
   sourceNamespace: openshift-marketplace
-  installPlanApproval: Automatic
   config:
     nodeSelector:
       node-role.kubernetes.io/quay: ""
@@ -107,7 +104,6 @@ spec:
   name: servicemeshoperator
   source: cs-redhat-operator-index
   sourceNamespace: openshift-marketplace
-  installPlanApproval: Automatic
   config:
     nodeSelector:
       node-role.kubernetes.io/acm: ""
@@ -125,7 +121,6 @@ spec:
   name: kiali-ossm
   source: cs-redhat-operator-index
   sourceNamespace: openshift-marketplace
-  installPlanApproval: Automatic
   config:
     nodeSelector:
       node-role.kubernetes.io/acm: ""
@@ -156,7 +151,6 @@ spec:
   name: tempo-product
   source: cs-redhat-operator-index
   sourceNamespace: openshift-marketplace
-  installPlanApproval: Automatic
   config:
     nodeSelector:
       node-role.kubernetes.io/acm: ""
@@ -187,7 +181,6 @@ spec:
   name: openshift-gitops-operator
   source: cs-redhat-operator-index
   sourceNamespace: openshift-marketplace
-  installPlanApproval: Automatic
   config:
     nodeSelector:
       node-role.kubernetes.io/acm: ""
@@ -221,7 +214,6 @@ spec:
   name: cincinnati-operator
   source: cs-redhat-operator-index
   sourceNamespace: openshift-marketplace
-  installPlanApproval: Automatic
   config:
     nodeSelector:
       node-role.kubernetes.io/acm: ""
