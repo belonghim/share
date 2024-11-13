@@ -375,6 +375,8 @@ metadata:
 data:
   ${Repository%%:*}..$(echo ${Repository%%/*} | cut -d: -f2): |
 $(cat ${additionalTrustBundle})
+  updateservice-registry: |
+$(cat ${additionalTrustBundle})
 EOF
 
 ## image.pulling 을 위한 trust ca 등록
