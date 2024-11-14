@@ -5,52 +5,6 @@ metadata:
     argocd.argoproj.io/compare-options: IgnoreExtraneous
   labels:
     open-cluster-management.io/policy-set: opp
-  name: placement-manual-opp-clusters
-  namespace: policies
-spec:
-  predicates:
-  - requiredClusterSelector:
-      labelSelector:
-        matchExpressions:
-        - key: vendor
-          operator: In
-          values:
-          - OpenShift
-        - key: local-cluster
-          operator: NotIn
-          values:
-          - "true"
-        - key: manual
-          operator: Exists
----
-apiVersion: cluster.open-cluster-management.io/v1beta1
-kind: Placement
-metadata:
-  annotations:
-    argocd.argoproj.io/compare-options: IgnoreExtraneous
-  labels:
-    open-cluster-management.io/policy-set: opp
-  name: placement-manual-opp-hub
-  namespace: policies
-spec:
-  predicates:
-  - requiredClusterSelector:
-      labelSelector:
-        matchExpressions:
-        - key: local-cluster
-          operator: In
-          values:
-          - "true"
-        - key: manual
-          operator: Exists
----
-apiVersion: cluster.open-cluster-management.io/v1beta1
-kind: Placement
-metadata:
-  annotations:
-    argocd.argoproj.io/compare-options: IgnoreExtraneous
-  labels:
-    open-cluster-management.io/policy-set: opp
   name: placement-opp-clusters
   namespace: policies
 spec:
@@ -66,7 +20,7 @@ spec:
           operator: NotIn
           values:
           - "true"
-        - key: manual
+        - key: policies.undeploy
           operator: DoesNotExist
 ---
 apiVersion: cluster.open-cluster-management.io/v1beta1
@@ -87,8 +41,58 @@ spec:
           operator: In
           values:
           - "true"
-        - key: manual
+        - key: policies.undeploy
           operator: DoesNotExist
+---
+apiVersion: cluster.open-cluster-management.io/v1beta1
+kind: Placement
+metadata:
+  annotations:
+    argocd.argoproj.io/compare-options: IgnoreExtraneous
+  labels:
+    open-cluster-management.io/policy-set: opp
+  name: sub-approval-automatic
+  namespace: policies
+spec:
+  predicates:
+  - requiredClusterSelector:
+      labelSelector:
+        matchExpressions:
+        - key: vendor
+          operator: In
+          values:
+          - OpenShift
+        - key: policies.undeploy
+          operator: DoesNotExist
+        - key: policies.sub-approval
+          operator: In
+          values:
+          - automatic
+---
+apiVersion: cluster.open-cluster-management.io/v1beta1
+kind: Placement
+metadata:
+  annotations:
+    argocd.argoproj.io/compare-options: IgnoreExtraneous
+  labels:
+    open-cluster-management.io/policy-set: opp
+  name: sub-approval-manual
+  namespace: policies
+spec:
+  predicates:
+  - requiredClusterSelector:
+      labelSelector:
+        matchExpressions:
+        - key: vendor
+          operator: In
+          values:
+          - OpenShift
+        - key: policies.undeploy
+          operator: DoesNotExist
+        - key: policies.sub-approval
+          operator: In
+          values:
+          - manual
 ---
 apiVersion: policy.open-cluster-management.io/v1
 kind: PlacementBinding
@@ -98,42 +102,6 @@ metadata:
   labels:
     open-cluster-management.io/policy-set: opp
   name: binding-policy-opp-hub
-  namespace: policies
-placementRef:
-  apiGroup: cluster.open-cluster-management.io
-  kind: Placement
-  name: placement-manual-opp-clusters
-subjects:
-- apiGroup: policy.open-cluster-management.io
-  kind: PolicySet
-  name: manual-opp-clusters
----
-apiVersion: policy.open-cluster-management.io/v1
-kind: PlacementBinding
-metadata:
-  annotations:
-    argocd.argoproj.io/compare-options: IgnoreExtraneous
-  labels:
-    open-cluster-management.io/policy-set: opp
-  name: binding-policy-opp-hub2
-  namespace: policies
-placementRef:
-  apiGroup: cluster.open-cluster-management.io
-  kind: Placement
-  name: placement-manual-opp-hub
-subjects:
-- apiGroup: policy.open-cluster-management.io
-  kind: PolicySet
-  name: manual-opp-hub
----
-apiVersion: policy.open-cluster-management.io/v1
-kind: PlacementBinding
-metadata:
-  annotations:
-    argocd.argoproj.io/compare-options: IgnoreExtraneous
-  labels:
-    open-cluster-management.io/policy-set: opp
-  name: binding-policy-opp-hub3
   namespace: policies
 placementRef:
   apiGroup: cluster.open-cluster-management.io
@@ -151,7 +119,7 @@ metadata:
     argocd.argoproj.io/compare-options: IgnoreExtraneous
   labels:
     open-cluster-management.io/policy-set: opp
-  name: binding-policy-opp-hub4
+  name: binding-policy-opp-hub2
   namespace: policies
 placementRef:
   apiGroup: cluster.open-cluster-management.io
@@ -163,119 +131,40 @@ subjects:
   name: opp-hub
 ---
 apiVersion: policy.open-cluster-management.io/v1
-kind: Policy
+kind: PlacementBinding
 metadata:
   annotations:
     argocd.argoproj.io/compare-options: IgnoreExtraneous
-    policy.open-cluster-management.io/categories: SI System and Information Integrity
-    policy.open-cluster-management.io/controls: SI-7 Software Firmware and Information
-      Integrity
-    policy.open-cluster-management.io/description: ""
-    policy.open-cluster-management.io/standards: NIST SP 800-53
   labels:
     open-cluster-management.io/policy-set: opp
-  name: automatic-all-operators-install
+  name: binding-policy-opp-hub3
   namespace: policies
-spec:
-  disabled: false
-  policy-templates:
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1beta1
-      kind: OperatorPolicy
-      metadata:
-        name: node-healthcheck-operator
-      spec:
-        complianceType: musthave
-        operatorGroup:
-          name: openshift-workload-availability
-          namespace: openshift-workload-availability
-        remediationAction: enforce
-        severity: high
-        subscription:
-          name: node-healthcheck-operator
-          namespace: openshift-workload-availability
-          source: cs-redhat-operator-index
-          sourceNamespace: openshift-marketplace
-        upgradeApproval: Automatic
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1beta1
-      kind: OperatorPolicy
-      metadata:
-        name: self-node-remediation
-      spec:
-        complianceType: musthave
-        remediationAction: enforce
-        severity: high
-        subscription:
-          name: self-node-remediation
-          namespace: openshift-workload-availability
-          source: cs-redhat-operator-index
-          sourceNamespace: openshift-marketplace
-        upgradeApproval: Automatic
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1beta1
-      kind: OperatorPolicy
-      metadata:
-        name: cluster-logging
-      spec:
-        complianceType: musthave
-        operatorGroup:
-          name: openshift-logging
-          namespace: openshift-logging
-        remediationAction: enforce
-        severity: high
-        subscription:
-          name: cluster-logging
-          namespace: openshift-logging
-          source: cs-redhat-operator-index
-          sourceNamespace: openshift-marketplace
-        upgradeApproval: Automatic
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1beta1
-      kind: OperatorPolicy
-      metadata:
-        name: openshift-gitops-operator
-      spec:
-        complianceType: musthave
-        operatorGroup:
-          name: openshift-gitops-operator
-          namespace: openshift-gitops-operator
-        remediationAction: enforce
-        severity: high
-        subscription:
-          name: openshift-gitops-operator
-          namespace: openshift-gitops-operator
-          source: cs-redhat-operator-index
-          sourceNamespace: openshift-marketplace
-        upgradeApproval: Automatic
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1
-      kind: ConfigurationPolicy
-      metadata:
-        name: automatic-all-operators-install
-      spec:
-        object-templates:
-        - complianceType: musthave
-          objectDefinition:
-            apiVersion: v1
-            kind: Namespace
-            metadata:
-              name: openshift-workload-availability
-        - complianceType: musthave
-          objectDefinition:
-            apiVersion: v1
-            kind: Namespace
-            metadata:
-              name: openshift-logging
-        - complianceType: musthave
-          objectDefinition:
-            apiVersion: v1
-            kind: Namespace
-            metadata:
-              name: openshift-gitops-operator
-        remediationAction: enforce
-        severity: medium
-  remediationAction: enforce
+placementRef:
+  apiGroup: cluster.open-cluster-management.io
+  kind: Placement
+  name: sub-approval-automatic
+subjects:
+- apiGroup: policy.open-cluster-management.io
+  kind: PolicySet
+  name: sub-approval-automatic
+---
+apiVersion: policy.open-cluster-management.io/v1
+kind: PlacementBinding
+metadata:
+  annotations:
+    argocd.argoproj.io/compare-options: IgnoreExtraneous
+  labels:
+    open-cluster-management.io/policy-set: opp
+  name: binding-policy-opp-hub4
+  namespace: policies
+placementRef:
+  apiGroup: cluster.open-cluster-management.io
+  kind: Placement
+  name: sub-approval-manual
+subjects:
+- apiGroup: policy.open-cluster-management.io
+  kind: PolicySet
+  name: sub-approval-manual
 ---
 apiVersion: policy.open-cluster-management.io/v1
 kind: Policy
@@ -289,239 +178,42 @@ metadata:
     policy.open-cluster-management.io/standards: NIST SP 800-53
   labels:
     open-cluster-management.io/policy-set: opp
-  name: automatic-hub-operators-install
+  name: catalog-source-update
   namespace: policies
 spec:
+  dependencies:
+  - apiVersion: policy.open-cluster-management.io/v1
+    compliance: Compliant
+    kind: Policy
+    name: cv-check
+    namespace: policies
+  - apiVersion: policy.open-cluster-management.io/v1
+    compliance: Compliant
+    kind: Policy
+    name: csv-check
+    namespace: policies
   disabled: false
   policy-templates:
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1beta1
-      kind: OperatorPolicy
-      metadata:
-        name: local-storage-operator
-      spec:
-        complianceType: musthave
-        operatorGroup:
-          name: openshift-local-storage
-          namespace: openshift-local-storage
-          targetNamespaces:
-          - openshift-local-storage
-        remediationAction: enforce
-        severity: high
-        subscription:
-          config:
-            nodeSelector:
-              cluster.ocs.openshift.io/openshift-storage: ""
-            tolerations:
-            - effect: NoSchedule
-              key: node.ocs.openshift.io/storage
-              operator: Exists
-          name: local-storage-operator
-          namespace: openshift-local-storage
-          source: cs-redhat-operator-index
-          sourceNamespace: openshift-marketplace
-        upgradeApproval: Automatic
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1beta1
-      kind: OperatorPolicy
-      metadata:
-        name: odf-operator
-      spec:
-        complianceType: musthave
-        operatorGroup:
-          name: openshift-storage
-          namespace: openshift-storage
-          targetNamespaces:
-          - openshift-storage
-        remediationAction: enforce
-        severity: high
-        subscription:
-          config:
-            nodeSelector:
-              cluster.ocs.openshift.io/openshift-storage: ""
-            tolerations:
-            - effect: NoSchedule
-              key: node.ocs.openshift.io/storage
-              operator: Exists
-          name: odf-operator
-          namespace: openshift-storage
-          source: cs-redhat-operator-index
-          sourceNamespace: openshift-marketplace
-        upgradeApproval: Automatic
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1beta1
-      kind: OperatorPolicy
-      metadata:
-        labels:
-          operators.coreos.com/quay-operator.quay-enterprise: ""
-        name: quay-operator
-      spec:
-        complianceType: musthave
-        operatorGroup:
-          name: quay-enterprise
-          namespace: quay-enterprise
-        remediationAction: enforce
-        severity: high
-        subscription:
-          config:
-            nodeSelector:
-              node-role.kubernetes.io/quay: ""
-            tolerations:
-            - effect: NoSchedule
-              key: node-role.kubernetes.io/infra
-              operator: Exists
-          name: quay-operator
-          namespace: quay-enterprise
-          source: cs-redhat-operator-index
-          sourceNamespace: openshift-marketplace
-        upgradeApproval: Automatic
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1beta1
-      kind: OperatorPolicy
-      metadata:
-        name: cincinnati-operator
-      spec:
-        complianceType: musthave
-        operatorGroup:
-          name: openshift-update-service
-          namespace: openshift-update-service
-          targetNamespaces:
-          - openshift-update-service
-        remediationAction: enforce
-        severity: high
-        subscription:
-          config:
-            nodeSelector:
-              node-role.kubernetes.io/acm: ""
-            tolerations:
-            - effect: NoSchedule
-              key: node-role.kubernetes.io/infra
-              operator: Exists
-          name: cincinnati-operator
-          namespace: openshift-update-service
-          source: cs-redhat-operator-index
-          sourceNamespace: openshift-marketplace
-        upgradeApproval: Automatic
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1beta1
-      kind: OperatorPolicy
-      metadata:
-        name: servicemeshoperator
-      spec:
-        complianceType: musthave
-        remediationAction: enforce
-        severity: high
-        subscription:
-          config:
-            nodeSelector:
-              node-role.kubernetes.io/acm: ""
-            tolerations:
-            - effect: NoSchedule
-              key: node-role.kubernetes.io/infra
-              operator: Exists
-          name: servicemeshoperator
-          namespace: openshift-operators
-          source: cs-redhat-operator-index
-          sourceNamespace: openshift-marketplace
-        upgradeApproval: Automatic
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1beta1
-      kind: OperatorPolicy
-      metadata:
-        name: kiali-ossm
-      spec:
-        complianceType: musthave
-        remediationAction: enforce
-        severity: high
-        subscription:
-          config:
-            nodeSelector:
-              node-role.kubernetes.io/acm: ""
-            tolerations:
-            - effect: NoSchedule
-              key: node-role.kubernetes.io/infra
-              operator: Exists
-          name: kiali-ossm
-          namespace: openshift-operators
-          source: cs-redhat-operator-index
-          sourceNamespace: openshift-marketplace
-        upgradeApproval: Automatic
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1beta1
-      kind: OperatorPolicy
-      metadata:
-        name: tempo-product
-      spec:
-        complianceType: musthave
-        operatorGroup:
-          name: openshift-tempo-operator
-          namespace: openshift-tempo-operator
-        remediationAction: enforce
-        severity: high
-        subscription:
-          config:
-            nodeSelector:
-              node-role.kubernetes.io/acm: ""
-            tolerations:
-            - effect: NoSchedule
-              key: node-role.kubernetes.io/infra
-              operator: Exists
-          name: tempo-product
-          namespace: openshift-tempo-operator
-          source: cs-redhat-operator-index
-          sourceNamespace: openshift-marketplace
-        upgradeApproval: Automatic
   - objectDefinition:
       apiVersion: policy.open-cluster-management.io/v1
       kind: ConfigurationPolicy
       metadata:
-        name: automatic-hub-operators-install
+        name: cs-redhat-operator-update
       spec:
-        object-templates:
-        - complianceType: musthave
-          objectDefinition:
-            apiVersion: v1
-            kind: Namespace
-            metadata:
-              name: openshift-local-storage
-        - complianceType: musthave
-          objectDefinition:
-            apiVersion: v1
-            kind: Namespace
-            metadata:
-              labels:
-                openshift.io/cluster-monitoring: "true"
-              name: openshift-storage
-        - complianceType: musthave
-          objectDefinition:
-            apiVersion: v1
-            kind: Namespace
-            metadata:
-              labels:
-                openshift.io/cluster-monitoring: "true"
-              name: quay-enterprise
-        - complianceType: musthave
-          objectDefinition:
-            apiVersion: v1
-            kind: Namespace
-            metadata:
-              labels:
-                openshift.io/cluster-monitoring: "true"
-              name: openshift-update-service
-        - complianceType: musthave
-          objectDefinition:
-            apiVersion: v1
-            kind: Namespace
-            metadata:
-              name: openshift-operators
-        - complianceType: musthave
-          objectDefinition:
-            apiVersion: v1
-            kind: Namespace
-            metadata:
-              name: openshift-tempo-operator
+        object-templates-raw: |
+          {{- $cs := lookup "operators.coreos.com/v1alpha1" "CatalogSource" "openshift-marketplace" "cs-redhat-operator-index" }}
+          - complianceType: musthave
+            objectDefinition:
+              apiVersion: operators.coreos.com/v1alpha1
+              kind: CatalogSource
+              metadata:
+                name: {{ $cs.metadata.name }}
+                namespace: {{ $cs.metadata.namespace }}
+              spec:
+                image: {{ ( (cat (split ":v4." $cs.spec.image)._0 ":v4." (split "." (lookup "config.openshift.io/v1" "ClusterVersion" "" "version").status.desired.version)._1) | replace " " "" ) }}
+                sourceType: grpc
         remediationAction: enforce
-        severity: medium
+        severity: high
   remediationAction: enforce
 ---
 apiVersion: policy.open-cluster-management.io/v1
@@ -545,11 +237,11 @@ spec:
       apiVersion: policy.open-cluster-management.io/v1
       kind: ConfigurationPolicy
       metadata:
-        name: router-ca-bundle-configmap
+        name: proxy-sync-hub
       spec:
         object-templates-raw: |
           {{- if ne (lookup "v1" "ConfigMap" "openshift-config" "router-bundle").kind "ConfigMap" -}}
-          - complianceType: mustonlyhave
+          - complianceType: musthave
             objectDefinition:
               apiVersion: v1
               data:
@@ -579,6 +271,15 @@ spec:
             metadata:
               name: router-bundle
               namespace: policies
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: config.openshift.io/v1
+            kind: Proxy
+            metadata:
+              name: cluster
+            spec:
+              trustedCA:
+                name: router-bundle
         remediationAction: enforce
         severity: medium
   remediationAction: enforce
@@ -595,93 +296,183 @@ metadata:
     policy.open-cluster-management.io/standards: NIST SP 800-53
   labels:
     open-cluster-management.io/policy-set: opp
-  name: manual-all-operators-install
+  name: csv-check
   namespace: policies
 spec:
   disabled: false
   policy-templates:
   - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1beta1
-      kind: OperatorPolicy
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
       metadata:
-        name: node-healthcheck-operator
+        name: csv-check
       spec:
-        complianceType: musthave
-        operatorGroup:
-          name: openshift-workload-availability
-          namespace: openshift-workload-availability
-        remediationAction: enforce
+        object-templates-raw: |
+          {{- range $sub := (lookup "operators.coreos.com/v1alpha1" "Subscription" "" "!policies.ignore").items }}
+          {{- $pm := lookup "packages.operators.coreos.com/v1" "PackageManifest" "openshift-marketplace" $sub.metadata.name ( (cat "catalog=" $sub.spec.source ) | replace " " "" ) }}
+          {{- range $ch := $pm.status.channels }}
+          {{- if (eq $ch.name $pm.status.defaultChannel) }}
+          - complianceType: musthave
+            objectDefinition:
+              apiVersion: operators.coreos.com/v1alpha1
+              kind: ClusterServiceVersion
+              metadata:
+                name: {{ $ch.currentCSV }}
+                namespace: {{ $sub.metadata.namespace }}
+              status:
+                phase: Succeeded
+          {{- end }}
+          {{- end }}
+          {{- end }}
+        remediationAction: inform
         severity: high
-        subscription:
-          name: node-healthcheck-operator
-          namespace: openshift-workload-availability
-          source: cs-redhat-operator-index
-          sourceNamespace: openshift-marketplace
-        upgradeApproval: Manual
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1beta1
-      kind: OperatorPolicy
-      metadata:
-        name: self-node-remediation
-      spec:
-        complianceType: musthave
-        remediationAction: enforce
-        severity: high
-        subscription:
-          name: self-node-remediation
-          namespace: openshift-workload-availability
-          source: cs-redhat-operator-index
-          sourceNamespace: openshift-marketplace
-        upgradeApproval: Manual
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1beta1
-      kind: OperatorPolicy
-      metadata:
-        name: cluster-logging
-      spec:
-        complianceType: musthave
-        operatorGroup:
-          name: openshift-logging
-          namespace: openshift-logging
-        remediationAction: enforce
-        severity: high
-        subscription:
-          name: cluster-logging
-          namespace: openshift-logging
-          source: cs-redhat-operator-index
-          sourceNamespace: openshift-marketplace
-        upgradeApproval: Manual
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1beta1
-      kind: OperatorPolicy
-      metadata:
-        name: openshift-gitops-operator
-      spec:
-        complianceType: musthave
-        operatorGroup:
-          name: openshift-gitops-operator
-          namespace: openshift-gitops-operator
-        remediationAction: enforce
-        severity: high
-        subscription:
-          name: openshift-gitops-operator
-          namespace: openshift-gitops-operator
-          source: cs-redhat-operator-index
-          sourceNamespace: openshift-marketplace
-        upgradeApproval: Manual
+  remediationAction: inform
+---
+apiVersion: policy.open-cluster-management.io/v1
+kind: Policy
+metadata:
+  annotations:
+    argocd.argoproj.io/compare-options: IgnoreExtraneous
+    policy.open-cluster-management.io/categories: SI System and Information Integrity
+    policy.open-cluster-management.io/controls: SI-7 Software Firmware and Information
+      Integrity
+    policy.open-cluster-management.io/description: ""
+    policy.open-cluster-management.io/standards: NIST SP 800-53
+  labels:
+    open-cluster-management.io/policy-set: opp
+  name: cv-check
+  namespace: policies
+spec:
+  disabled: false
+  policy-templates:
   - objectDefinition:
       apiVersion: policy.open-cluster-management.io/v1
       kind: ConfigurationPolicy
       metadata:
-        name: manual-all-operators-install
+        name: cv-check
       spec:
         object-templates:
-        - complianceType: musthave
+        - complianceType: mustnothave
           objectDefinition:
-            apiVersion: v1
-            kind: Namespace
-            metadata:
-              name: openshift-workload-availability
+            apiVersion: config.openshift.io/v1
+            kind: ClusterOperator
+            status:
+              conditions:
+              - status: "False"
+                type: Available
+        remediationAction: inform
+        severity: medium
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: cv-check2
+      spec:
+        object-templates:
+        - complianceType: mustnothave
+          objectDefinition:
+            apiVersion: config.openshift.io/v1
+            kind: ClusterOperator
+            status:
+              conditions:
+              - status: "True"
+                type: Degraded
+        remediationAction: inform
+        severity: medium
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: cv-check3
+      spec:
+        object-templates:
+        - complianceType: mustnothave
+          objectDefinition:
+            apiVersion: machineconfiguration.openshift.io/v1
+            kind: MachineConfigPool
+            status:
+              conditions:
+              - status: "False"
+                type: Updated
+        remediationAction: inform
+        severity: medium
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: cv-check4
+      spec:
+        object-templates:
+        - complianceType: mustnothave
+          objectDefinition:
+            apiVersion: machineconfiguration.openshift.io/v1
+            kind: MachineConfigPool
+            status:
+              conditions:
+              - status: "True"
+                type: Degraded
+        remediationAction: inform
+        severity: medium
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: cv-check5
+      spec:
+        object-templates:
+        - complianceType: mustnothave
+          objectDefinition:
+            apiVersion: config.openshift.io/v1
+            kind: ClusterVersion
+            status:
+              conditions:
+              - status: "False"
+                type: Available
+        remediationAction: inform
+        severity: medium
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: cv-check6
+      spec:
+        object-templates:
+        - complianceType: mustnothave
+          objectDefinition:
+            apiVersion: config.openshift.io/v1
+            kind: ClusterVersion
+            status:
+              conditions:
+              - status: "True"
+                type: Progressing
+        remediationAction: inform
+        severity: medium
+  remediationAction: inform
+---
+apiVersion: policy.open-cluster-management.io/v1
+kind: Policy
+metadata:
+  annotations:
+    argocd.argoproj.io/compare-options: IgnoreExtraneous
+    policy.open-cluster-management.io/categories: SI System and Information Integrity
+    policy.open-cluster-management.io/controls: SI-7 Software Firmware and Information
+      Integrity
+    policy.open-cluster-management.io/description: ""
+    policy.open-cluster-management.io/standards: NIST SP 800-53
+  labels:
+    open-cluster-management.io/policy-set: opp
+  name: opp-all-operators-install
+  namespace: policies
+spec:
+  disabled: false
+  policy-templates:
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: opp-all-operators-install
+      spec:
+        object-templates:
         - complianceType: musthave
           objectDefinition:
             apiVersion: v1
@@ -690,10 +481,230 @@ spec:
               name: openshift-logging
         - complianceType: musthave
           objectDefinition:
+            apiVersion: operators.coreos.com/v1
+            kind: OperatorGroup
+            metadata:
+              name: openshift-logging
+              namespace: openshift-logging
+            spec:
+              targetNamespaces:
+              - openshift-logging
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: operators.coreos.com/v1alpha1
+            kind: Subscription
+            metadata:
+              name: cluster-logging
+              namespace: openshift-logging
+            spec:
+              name: cluster-logging
+              source: cs-redhat-operator-index
+              sourceNamespace: openshift-marketplace
+        - complianceType: musthave
+          objectDefinition:
             apiVersion: v1
             kind: Namespace
             metadata:
-              name: openshift-gitops-operator
+              name: stackrox
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: v1
+            kind: Namespace
+            metadata:
+              name: rhacs-operator
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: operators.coreos.com/v1
+            kind: OperatorGroup
+            metadata:
+              name: rhacs-operator
+              namespace: rhacs-operator
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: operators.coreos.com/v1alpha1
+            kind: Subscription
+            metadata:
+              name: rhacs-operator
+              namespace: rhacs-operator
+            spec:
+              name: rhacs-operator
+              source: cs-redhat-operator-index
+              sourceNamespace: openshift-marketplace
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: v1
+            kind: Namespace
+            metadata:
+              name: openshift-compliance
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: operators.coreos.com/v1
+            kind: OperatorGroup
+            metadata:
+              name: openshift-compliance
+              namespace: openshift-compliance
+            spec:
+              targetNamespaces:
+              - openshift-compliance
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: operators.coreos.com/v1alpha1
+            kind: Subscription
+            metadata:
+              name: compliance-operator
+              namespace: openshift-compliance
+            spec:
+              name: compliance-operator
+              source: cs-redhat-operator-index
+              sourceNamespace: openshift-marketplace
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: operators.coreos.com/v1alpha1
+            kind: Subscription
+            metadata:
+              name: container-security-operator
+              namespace: openshift-operators
+            spec:
+              name: container-security-operator
+              source: cs-redhat-operator-index
+              sourceNamespace: openshift-marketplace
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: v1
+            kind: Namespace
+            metadata:
+              name: openshift-ingress-node-firewall
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: operators.coreos.com/v1
+            kind: OperatorGroup
+            metadata:
+              name: openshift-ingress-node-firewall
+              namespace: openshift-ingress-node-firewall
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: operators.coreos.com/v1alpha1
+            kind: Subscription
+            metadata:
+              name: ingress-node-firewall
+              namespace: openshift-ingress-node-firewall
+            spec:
+              name: ingress-node-firewall
+              source: cs-redhat-operator-index
+              sourceNamespace: openshift-marketplace
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: v1
+            kind: Namespace
+            metadata:
+              name: openshift-nmstate
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: operators.coreos.com/v1
+            kind: OperatorGroup
+            metadata:
+              name: openshift-nmstate
+              namespace: openshift-nmstate
+            spec:
+              targetNamespaces:
+              - openshift-nmstate
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: operators.coreos.com/v1alpha1
+            kind: Subscription
+            metadata:
+              name: kubernetes-nmstate-operator
+              namespace: openshift-nmstate
+            spec:
+              name: kubernetes-nmstate-operator
+              source: cs-redhat-operator-index
+              sourceNamespace: openshift-marketplace
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: v1
+            kind: Namespace
+            metadata:
+              name: openshift-workload-availability
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: operators.coreos.com/v1
+            kind: OperatorGroup
+            metadata:
+              name: openshift-workload-availability
+              namespace: openshift-workload-availability
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: operators.coreos.com/v1alpha1
+            kind: Subscription
+            metadata:
+              name: node-healthcheck-operator
+              namespace: openshift-workload-availability
+            spec:
+              name: node-healthcheck-operator
+              source: cs-redhat-operator-index
+              sourceNamespace: openshift-marketplace
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: operators.coreos.com/v1alpha1
+            kind: Subscription
+            metadata:
+              name: self-node-remediation
+              namespace: openshift-workload-availability
+            spec:
+              name: self-node-remediation
+              source: cs-redhat-operator-index
+              sourceNamespace: openshift-marketplace
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: v1
+            kind: Namespace
+            metadata:
+              name: metallb-system
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: operators.coreos.com/v1
+            kind: OperatorGroup
+            metadata:
+              name: metallb-system
+              namespace: metallb-system
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: operators.coreos.com/v1alpha1
+            kind: Subscription
+            metadata:
+              name: metallb-operator
+              namespace: metallb-system
+            spec:
+              name: metallb-operator
+              source: cs-redhat-operator-index
+              sourceNamespace: openshift-marketplace
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: v1
+            kind: Namespace
+            metadata:
+              name: openshift-adp
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: operators.coreos.com/v1
+            kind: OperatorGroup
+            metadata:
+              name: openshift-adp
+              namespace: openshift-adp
+            spec:
+              targetNamespaces:
+              - openshift-adp
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: operators.coreos.com/v1alpha1
+            kind: Subscription
+            metadata:
+              name: redhat-oadp-operator
+              namespace: openshift-adp
+            spec:
+              name: redhat-oadp-operator
+              source: cs-redhat-operator-index
+              sourceNamespace: openshift-marketplace
         remediationAction: enforce
         severity: medium
   remediationAction: enforce
@@ -710,193 +721,16 @@ metadata:
     policy.open-cluster-management.io/standards: NIST SP 800-53
   labels:
     open-cluster-management.io/policy-set: opp
-  name: manual-hub-operators-install
+  name: opp-hub-operators-install
   namespace: policies
 spec:
   disabled: false
   policy-templates:
   - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1beta1
-      kind: OperatorPolicy
-      metadata:
-        name: local-storage-operator
-      spec:
-        complianceType: musthave
-        operatorGroup:
-          name: openshift-local-storage
-          namespace: openshift-local-storage
-          targetNamespaces:
-          - openshift-local-storage
-        remediationAction: enforce
-        severity: high
-        subscription:
-          config:
-            nodeSelector:
-              cluster.ocs.openshift.io/openshift-storage: ""
-            tolerations:
-            - effect: NoSchedule
-              key: node.ocs.openshift.io/storage
-              operator: Exists
-          name: local-storage-operator
-          namespace: openshift-local-storage
-          source: cs-redhat-operator-index
-          sourceNamespace: openshift-marketplace
-        upgradeApproval: Manual
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1beta1
-      kind: OperatorPolicy
-      metadata:
-        name: odf-operator
-      spec:
-        complianceType: musthave
-        operatorGroup:
-          name: openshift-storage
-          namespace: openshift-storage
-          targetNamespaces:
-          - openshift-storage
-        remediationAction: enforce
-        severity: high
-        subscription:
-          config:
-            nodeSelector:
-              cluster.ocs.openshift.io/openshift-storage: ""
-            tolerations:
-            - effect: NoSchedule
-              key: node.ocs.openshift.io/storage
-              operator: Exists
-          name: odf-operator
-          namespace: openshift-storage
-          source: cs-redhat-operator-index
-          sourceNamespace: openshift-marketplace
-        upgradeApproval: Manual
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1beta1
-      kind: OperatorPolicy
-      metadata:
-        labels:
-          operators.coreos.com/quay-operator.quay-enterprise: ""
-        name: quay-operator
-      spec:
-        complianceType: musthave
-        operatorGroup:
-          name: quay-enterprise
-          namespace: quay-enterprise
-        remediationAction: enforce
-        severity: high
-        subscription:
-          config:
-            nodeSelector:
-              node-role.kubernetes.io/quay: ""
-            tolerations:
-            - effect: NoSchedule
-              key: node-role.kubernetes.io/infra
-              operator: Exists
-          name: quay-operator
-          namespace: quay-enterprise
-          source: cs-redhat-operator-index
-          sourceNamespace: openshift-marketplace
-        upgradeApproval: Manual
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1beta1
-      kind: OperatorPolicy
-      metadata:
-        name: cincinnati-operator
-      spec:
-        complianceType: musthave
-        operatorGroup:
-          name: openshift-update-service
-          namespace: openshift-update-service
-          targetNamespaces:
-          - openshift-update-service
-        remediationAction: enforce
-        severity: high
-        subscription:
-          config:
-            nodeSelector:
-              node-role.kubernetes.io/acm: ""
-            tolerations:
-            - effect: NoSchedule
-              key: node-role.kubernetes.io/infra
-              operator: Exists
-          name: cincinnati-operator
-          namespace: openshift-update-service
-          source: cs-redhat-operator-index
-          sourceNamespace: openshift-marketplace
-        upgradeApproval: Manual
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1beta1
-      kind: OperatorPolicy
-      metadata:
-        name: servicemeshoperator
-      spec:
-        complianceType: musthave
-        remediationAction: enforce
-        severity: high
-        subscription:
-          config:
-            nodeSelector:
-              node-role.kubernetes.io/acm: ""
-            tolerations:
-            - effect: NoSchedule
-              key: node-role.kubernetes.io/infra
-              operator: Exists
-          name: servicemeshoperator
-          namespace: openshift-operators
-          source: cs-redhat-operator-index
-          sourceNamespace: openshift-marketplace
-        upgradeApproval: Manual
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1beta1
-      kind: OperatorPolicy
-      metadata:
-        name: kiali-ossm
-      spec:
-        complianceType: musthave
-        remediationAction: enforce
-        severity: high
-        subscription:
-          config:
-            nodeSelector:
-              node-role.kubernetes.io/acm: ""
-            tolerations:
-            - effect: NoSchedule
-              key: node-role.kubernetes.io/infra
-              operator: Exists
-          name: kiali-ossm
-          namespace: openshift-operators
-          source: cs-redhat-operator-index
-          sourceNamespace: openshift-marketplace
-        upgradeApproval: Manual
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1beta1
-      kind: OperatorPolicy
-      metadata:
-        name: tempo-product
-      spec:
-        complianceType: musthave
-        operatorGroup:
-          name: openshift-tempo-operator
-          namespace: openshift-tempo-operator
-        remediationAction: enforce
-        severity: high
-        subscription:
-          config:
-            nodeSelector:
-              node-role.kubernetes.io/acm: ""
-            tolerations:
-            - effect: NoSchedule
-              key: node-role.kubernetes.io/infra
-              operator: Exists
-          name: tempo-product
-          namespace: openshift-tempo-operator
-          source: cs-redhat-operator-index
-          sourceNamespace: openshift-marketplace
-        upgradeApproval: Manual
-  - objectDefinition:
       apiVersion: policy.open-cluster-management.io/v1
       kind: ConfigurationPolicy
       metadata:
-        name: manual-hub-operators-install
+        name: opp-hub-operators-install
       spec:
         object-templates:
         - complianceType: musthave
@@ -907,12 +741,70 @@ spec:
               name: openshift-local-storage
         - complianceType: musthave
           objectDefinition:
+            apiVersion: operators.coreos.com/v1
+            kind: OperatorGroup
+            metadata:
+              name: openshift-local-storage
+              namespace: openshift-local-storage
+            spec:
+              targetNamespaces:
+              - openshift-local-storage
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: operators.coreos.com/v1alpha1
+            kind: Subscription
+            metadata:
+              name: local-storage-operator
+              namespace: openshift-local-storage
+            spec:
+              config:
+                nodeSelector:
+                  cluster.ocs.openshift.io/openshift-storage: ""
+                tolerations:
+                - effect: NoSchedule
+                  key: node.ocs.openshift.io/storage
+                  operator: Equal
+                  value: "true"
+              name: local-storage-operator
+              source: cs-redhat-operator-index
+              sourceNamespace: openshift-marketplace
+        - complianceType: musthave
+          objectDefinition:
             apiVersion: v1
             kind: Namespace
             metadata:
               labels:
                 openshift.io/cluster-monitoring: "true"
               name: openshift-storage
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: operators.coreos.com/v1
+            kind: OperatorGroup
+            metadata:
+              name: openshift-storage
+              namespace: openshift-storage
+            spec:
+              targetNamespaces:
+              - openshift-storage
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: operators.coreos.com/v1alpha1
+            kind: Subscription
+            metadata:
+              name: odf-operator
+              namespace: openshift-storage
+            spec:
+              config:
+                nodeSelector:
+                  cluster.ocs.openshift.io/openshift-storage: ""
+                tolerations:
+                - effect: NoSchedule
+                  key: node.ocs.openshift.io/storage
+                  operator: Equal
+                  value: "true"
+              name: odf-operator
+              source: cs-redhat-operator-index
+              sourceNamespace: openshift-marketplace
         - complianceType: musthave
           objectDefinition:
             apiVersion: v1
@@ -923,6 +815,133 @@ spec:
               name: quay-enterprise
         - complianceType: musthave
           objectDefinition:
+            apiVersion: operators.coreos.com/v1
+            kind: OperatorGroup
+            metadata:
+              name: quay-enterprise
+              namespace: quay-enterprise
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: operators.coreos.com/v1alpha1
+            kind: Subscription
+            metadata:
+              name: quay-operator
+              namespace: quay-enterprise
+            spec:
+              config:
+                nodeSelector:
+                  node-role.kubernetes.io/quay: ""
+                tolerations:
+                - effect: NoSchedule
+                  key: node-role.kubernetes.io/infra
+                  operator: Exists
+              name: quay-operator
+              source: cs-redhat-operator-index
+              sourceNamespace: openshift-marketplace
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: operators.coreos.com/v1alpha1
+            kind: Subscription
+            metadata:
+              name: servicemeshoperator
+              namespace: openshift-operators
+            spec:
+              config:
+                nodeSelector:
+                  node-role.kubernetes.io/acm: ""
+                tolerations:
+                - effect: NoSchedule
+                  key: node-role.kubernetes.io/infra
+                  operator: Exists
+              name: servicemeshoperator
+              source: cs-redhat-operator-index
+              sourceNamespace: openshift-marketplace
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: operators.coreos.com/v1alpha1
+            kind: Subscription
+            metadata:
+              name: kiali-ossm
+              namespace: openshift-operators
+            spec:
+              config:
+                nodeSelector:
+                  node-role.kubernetes.io/acm: ""
+                tolerations:
+                - effect: NoSchedule
+                  key: node-role.kubernetes.io/infra
+                  operator: Exists
+              name: kiali-ossm
+              source: cs-redhat-operator-index
+              sourceNamespace: openshift-marketplace
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: v1
+            kind: Namespace
+            metadata:
+              labels:
+                openshift.io/cluster-monitoring: "true"
+              name: openshift-tempo-operator
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: operators.coreos.com/v1
+            kind: OperatorGroup
+            metadata:
+              name: openshift-tempo-operator
+              namespace: openshift-tempo-operator
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: operators.coreos.com/v1alpha1
+            kind: Subscription
+            metadata:
+              name: tempo-product
+              namespace: openshift-tempo-operator
+            spec:
+              config:
+                nodeSelector:
+                  node-role.kubernetes.io/acm: ""
+                tolerations:
+                - effect: NoSchedule
+                  key: node-role.kubernetes.io/infra
+                  operator: Exists
+              name: tempo-product
+              source: cs-redhat-operator-index
+              sourceNamespace: openshift-marketplace
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: v1
+            kind: Namespace
+            metadata:
+              labels:
+                openshift.io/cluster-monitoring: "true"
+              name: openshift-gitops-operator
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: operators.coreos.com/v1
+            kind: OperatorGroup
+            metadata:
+              name: openshift-gitops-operator
+              namespace: openshift-gitops-operator
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: operators.coreos.com/v1alpha1
+            kind: Subscription
+            metadata:
+              name: openshift-gitops-operator
+              namespace: openshift-gitops-operator
+            spec:
+              config:
+                nodeSelector:
+                  node-role.kubernetes.io/acm: ""
+                tolerations:
+                - effect: NoSchedule
+                  key: node-role.kubernetes.io/infra
+                  operator: Exists
+              name: openshift-gitops-operator
+              source: cs-redhat-operator-index
+              sourceNamespace: openshift-marketplace
+        - complianceType: musthave
+          objectDefinition:
             apiVersion: v1
             kind: Namespace
             metadata:
@@ -931,19 +950,1104 @@ spec:
               name: openshift-update-service
         - complianceType: musthave
           objectDefinition:
-            apiVersion: v1
-            kind: Namespace
+            apiVersion: operators.coreos.com/v1
+            kind: OperatorGroup
             metadata:
-              name: openshift-operators
+              name: openshift-update-service
+              namespace: openshift-update-service
+            spec:
+              targetNamespaces:
+              - openshift-update-service
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: operators.coreos.com/v1alpha1
+            kind: Subscription
+            metadata:
+              name: cincinnati-operator
+              namespace: openshift-update-service
+            spec:
+              config:
+                nodeSelector:
+                  node-role.kubernetes.io/acm: ""
+                tolerations:
+                - effect: NoSchedule
+                  key: node-role.kubernetes.io/infra
+                  operator: Exists
+              name: cincinnati-operator
+              source: cs-redhat-operator-index
+              sourceNamespace: openshift-marketplace
+        remediationAction: enforce
+        severity: medium
+  remediationAction: enforce
+---
+apiVersion: policy.open-cluster-management.io/v1
+kind: Policy
+metadata:
+  annotations:
+    argocd.argoproj.io/compare-options: IgnoreExtraneous
+    policy.open-cluster-management.io/categories: SI System and Information Integrity
+    policy.open-cluster-management.io/controls: SI-5 Security Alerts Advisories and
+      Directives
+    policy.open-cluster-management.io/description: ""
+    policy.open-cluster-management.io/standards: NIST SP 800-53
+  labels:
+    open-cluster-management.io/policy-set: opp
+  name: policy-acs-central-ca-bundle
+  namespace: policies
+spec:
+  dependencies:
+  - apiVersion: policy.open-cluster-management.io/v1
+    compliance: Compliant
+    kind: Policy
+    name: policy-acs-central-status
+    namespace: policies
+  disabled: false
+  policy-templates:
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: policy-acs-central-ca-bundle
+      spec:
+        object-templates:
         - complianceType: musthave
           objectDefinition:
             apiVersion: v1
             kind: Namespace
             metadata:
-              name: openshift-tempo-operator
+              name: stackrox
+        remediationAction: enforce
+        severity: medium
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: policy-acs-central-ca-bundle2
+      spec:
+        object-templates:
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: v1
+            kind: ServiceAccount
+            metadata:
+              annotations:
+                argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+              name: create-cluster-init
+              namespace: stackrox
+        remediationAction: enforce
+        severity: medium
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: policy-acs-central-ca-bundle3
+      spec:
+        object-templates:
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: rbac.authorization.k8s.io/v1
+            kind: Role
+            metadata:
+              annotations:
+                argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+                argocd.argoproj.io/sync-wave: "1"
+              name: create-cluster-init
+              namespace: stackrox
+            rules:
+            - apiGroups:
+              - ""
+              resources:
+              - secrets
+              verbs:
+              - get
+              - list
+              - create
+              - patch
+              - update
+            - apiGroups:
+              - platform.stackrox.io
+              resources:
+              - securedclusters
+              verbs:
+              - get
+              - list
+              - patch
+              - update
+            - apiGroups:
+              - route.openshift.io
+              resources:
+              - routes
+              verbs:
+              - get
+              - list
+        remediationAction: enforce
+        severity: medium
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: policy-acs-central-ca-bundle4
+      spec:
+        object-templates:
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: rbac.authorization.k8s.io/v1
+            kind: RoleBinding
+            metadata:
+              annotations:
+                argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+              name: create-cluster-init
+              namespace: stackrox
+            roleRef:
+              apiGroup: rbac.authorization.k8s.io
+              kind: Role
+              name: create-cluster-init
+            subjects:
+            - kind: ServiceAccount
+              name: create-cluster-init
+              namespace: stackrox
+        remediationAction: enforce
+        severity: medium
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: policy-acs-central-ca-bundle5
+      spec:
+        object-templates:
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: imageregistry.operator.openshift.io/v1
+            kind: Config
+            metadata:
+              name: cluster
+            spec:
+              managementState: Managed
+              storage:
+                emptyDir: {}
+            status:
+              conditions:
+              - status: "True"
+                type: Available
+        remediationAction: enforce
+        severity: medium
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: policy-acs-central-ca-bundle6
+      spec:
+        object-templates:
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: batch/v1
+            kind: Job
+            metadata:
+              annotations:
+                argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+                argocd.argoproj.io/sync-wave: "2"
+              labels:
+                init-bundle: central
+              name: create-cluster-init-bundle-v2
+              namespace: stackrox
+            spec:
+              template:
+                metadata:
+                  annotations:
+                    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+                  labels:
+                    init-bundle: central
+                spec:
+                  containers:
+                  - command:
+                    - /bin/bash
+                    - -c
+                    - "#!/usr/bin/env bash\nif kubectl get secret/sensor-tls &> /dev/null;
+                      then\n  echo \"cluster-init bundle has already been configured,
+                      doing nothing\"\n  exit 0\nelse\n\n  # Wait for central to be
+                      ready\n  attempt_counter=0\n  max_attempts=20\n  echo \"Waiting
+                      for central to be available...\"\n  until $(curl -k --output
+                      /dev/null --silent --head --fail https://central); do\n      if
+                      [ ${attempt_counter} -eq ${max_attempts} ];then\n        echo
+                      \"Max attempts reached\"\n        exit 1\n      fi\n\n      printf
+                      '.'\n      attempt_counter=$(($attempt_counter+1))\n      echo
+                      \"Made attempt $attempt_counter, waiting...\"\n      sleep 5\n
+                      \ done\n\n  # attempt to create init-bundle\n  # on failure
+                      attempt to delete the bundle\n  attempt_counter=0\n  max_attempts=5\n
+                      \ echo \"Configuring cluster-init bundle\"\n  \n  # set the
+                      bundle name to include todays date\n  bundle_name=local-cluster-$(date
+                      '+%Y%m%d')\n  export DATA={\\\"name\\\":\\\"$bundle_name\\\"}\n
+                      \ until (curl -k -o /tmp/bundle.json -X POST -u \"admin:$PASSWORD\"
+                      -H \"Content-Type: application/json\" --data $DATA --fail https://central/v1/cluster-init/init-bundles);
+                      do\n      if [ ${attempt_counter} -eq ${max_attempts} ];then\n
+                      \       echo \"Max attempts to create bundle reached\"\n        exit
+                      1\n      fi\n\n      echo \"Check to see if there is an existing
+                      bundle that can be revoked\"\n      curl -o /tmp/find_bundle.json
+                      \ -k -X GET -u \"admin:$PASSWORD\" -H \"Content-Type: application/json\"
+                      https://central/v1/cluster-init/init-bundles\n      bundle_id=$(cat
+                      /tmp/find_bundle.json | python -c \"import sys, json; result
+                      = [x for x in json.load(sys.stdin)[\\\"items\\\"] if x[\\\"name\\\"]==\\\"$bundle_name\\\"];
+                      print(result[0][\\\"id\\\"])\")\n\n      echo \"-------------------------\"\n
+                      \     echo \"bundle name is $bundle_name bundle id $bundle_id\"\n
+                      \     echo \"-------------------------\"\n\n      if [ \"${bundle_id}\"
+                      != \"\" ];then\n      echo \"executing revoke command\"\n        export
+                      REVOKE=\"{\\\"ids\\\":[\\\"$bundle_id\\\"],\\\"confirmImpactedClustersIds\\\":[]}\"\n
+                      \       curl -k -X PATCH -u \"admin:$PASSWORD\" -H \"Content-Type:
+                      application/json\" --data $REVOKE https://central/v1/cluster-init/init-bundles/revoke\n
+                      \     fi\n\n      printf '.'\n      attempt_counter=$(($attempt_counter+1))\n
+                      \     echo \"Made create bundle attempt $attempt_counter, waiting...\"\n
+                      \     sleep 5\n  done\n\n  echo \"Bundle received\"\n\n  if
+                      [[ \"$OSTYPE\" == \"linux-gnu\"* ]]; then\n      BASE='base64
+                      -w 0'\n  elif [[ \"$OSTYPE\" == \"darwin\"* ]]; then\n      BASE='base64'\n
+                      \ fi\n\n  echo \"Applying bundle\"\n  # No jq in container,
+                      python to the rescue\n  cat /tmp/bundle.json | python3 -c \"import
+                      sys, json; print(json.load(sys.stdin)['kubectlBundle'])\" |
+                      ${BASE} -d | oc apply -f -\n  ACS_HOST=\"$(oc get route central
+                      -o custom-columns=HOST:.spec.host --no-headers):443\"\n  oc
+                      patch secret sensor-tls --type='json' -p=\"[{\\\"op\\\" : \\\"add\\\",
+                      \\\"path\\\" : \\\"/data/acs-host\\\", \\\"value\\\" : \\\"$(echo
+                      $ACS_HOST | ${BASE})\\\"}]\"\n  echo \"ACS Cluster init bundle
+                      generated and applied\"\nfi\n"
+                    env:
+                    - name: PASSWORD
+                      valueFrom:
+                        secretKeyRef:
+                          key: password
+                          name: central-htpasswd
+                    image: image-registry.openshift-image-registry.svc:5000/openshift/cli:latest
+                    imagePullPolicy: Always
+                    name: create-cluster-init-bundle
+                  dnsPolicy: ClusterFirst
+                  restartPolicy: Never
+                  serviceAccount: create-cluster-init
+                  serviceAccountName: create-cluster-init
+                  terminationGracePeriodSeconds: 30
+        remediationAction: enforce
+        severity: medium
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: policy-acs-central-ca-bundle7
+      spec:
+        object-templates:
+        - complianceType: mustnothave
+          objectDefinition:
+            apiVersion: batch/v1
+            kind: Job
+            metadata:
+              name: create-cluster-init-bundle
+              namespace: stackrox
         remediationAction: enforce
         severity: medium
   remediationAction: enforce
+---
+apiVersion: policy.open-cluster-management.io/v1
+kind: Policy
+metadata:
+  annotations:
+    argocd.argoproj.io/compare-options: IgnoreExtraneous
+    policy.open-cluster-management.io/categories: SC System and Communications Protection
+    policy.open-cluster-management.io/controls: SC-8 Transmission Confidentiality
+      and Integrity
+    policy.open-cluster-management.io/description: ""
+    policy.open-cluster-management.io/standards: NIST SP 800-53
+  labels:
+    open-cluster-management.io/policy-set: opp
+  name: policy-acs-central-ca-bundle-expired
+  namespace: policies
+spec:
+  dependencies:
+  - apiVersion: policy.open-cluster-management.io/v1
+    compliance: NonCompliant
+    kind: Policy
+    name: policy-acs-monitor-certs
+    namespace: policies
+  disabled: false
+  policy-templates:
+  - ignorePending: true
+    objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: policy-acs-central-ca-bundle-expired
+      spec:
+        evaluationInterval:
+          compliant: 1m
+          noncompliant: 45s
+        object-templates:
+        - complianceType: mustnothave
+          objectDefinition:
+            apiVersion: v1
+            kind: Secret
+            metadata:
+              name: sensor-tls
+              namespace: stackrox
+        remediationAction: enforce
+        severity: medium
+  - ignorePending: true
+    objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: policy-acs-central-ca-bundle-expired2
+      spec:
+        evaluationInterval:
+          compliant: 1m
+          noncompliant: 45s
+        object-templates:
+        - complianceType: mustnothave
+          objectDefinition:
+            apiVersion: v1
+            kind: Secret
+            metadata:
+              name: collector-tls
+              namespace: stackrox
+        remediationAction: enforce
+        severity: medium
+  - ignorePending: true
+    objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: policy-acs-central-ca-bundle-expired3
+      spec:
+        evaluationInterval:
+          compliant: 1m
+          noncompliant: 45s
+        object-templates:
+        - complianceType: mustnothave
+          objectDefinition:
+            apiVersion: v1
+            kind: Secret
+            metadata:
+              name: admission-control-tls
+              namespace: stackrox
+        remediationAction: enforce
+        severity: medium
+  - ignorePending: true
+    objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: policy-acs-central-ca-bundle-expired4
+      spec:
+        evaluationInterval:
+          compliant: 1m
+          noncompliant: 45s
+        object-templates:
+        - complianceType: mustnothave
+          objectDefinition:
+            apiVersion: imageregistry.operator.openshift.io/v1
+            kind: Config
+            metadata:
+              name: cluster
+            spec:
+              managementState: Managed
+              storage:
+                emptyDir: {}
+            status:
+              conditions:
+              - status: "True"
+                type: Available
+        remediationAction: enforce
+        severity: medium
+  - ignorePending: true
+    objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: policy-acs-central-ca-bundle-expired5
+      spec:
+        evaluationInterval:
+          compliant: 1m
+          noncompliant: 45s
+        object-templates:
+        - complianceType: mustnothave
+          objectDefinition:
+            apiVersion: batch/v1
+            kind: Job
+            metadata:
+              annotations:
+                argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+                argocd.argoproj.io/sync-wave: "2"
+              labels:
+                init-bundle: central
+              name: create-cluster-init-bundle-v2
+              namespace: stackrox
+            spec:
+              template:
+                metadata:
+                  annotations:
+                    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+                  labels:
+                    init-bundle: central
+                spec:
+                  containers:
+                  - command:
+                    - /bin/bash
+                    - -c
+                    - "#!/usr/bin/env bash\nif kubectl get secret/sensor-tls &> /dev/null;
+                      then\n  echo \"cluster-init bundle has already been configured,
+                      doing nothing\"\n  exit 0\nelse\n\n  # Wait for central to be
+                      ready\n  attempt_counter=0\n  max_attempts=20\n  echo \"Waiting
+                      for central to be available...\"\n  until $(curl -k --output
+                      /dev/null --silent --head --fail https://central); do\n      if
+                      [ ${attempt_counter} -eq ${max_attempts} ];then\n        echo
+                      \"Max attempts reached\"\n        exit 1\n      fi\n\n      printf
+                      '.'\n      attempt_counter=$(($attempt_counter+1))\n      echo
+                      \"Made attempt $attempt_counter, waiting...\"\n      sleep 5\n
+                      \ done\n\n  # attempt to create init-bundle\n  # on failure
+                      attempt to delete the bundle\n  attempt_counter=0\n  max_attempts=5\n
+                      \ echo \"Configuring cluster-init bundle\"\n  \n  # set the
+                      bundle name to include todays date\n  bundle_name=local-cluster-$(date
+                      '+%Y%m%d')\n  export DATA={\\\"name\\\":\\\"$bundle_name\\\"}\n
+                      \ until (curl -k -o /tmp/bundle.json -X POST -u \"admin:$PASSWORD\"
+                      -H \"Content-Type: application/json\" --data $DATA --fail https://central/v1/cluster-init/init-bundles);
+                      do\n      if [ ${attempt_counter} -eq ${max_attempts} ];then\n
+                      \       echo \"Max attempts to create bundle reached\"\n        exit
+                      1\n      fi\n\n      echo \"Check to see if there is an existing
+                      bundle that can be revoked\"\n      curl -o /tmp/find_bundle.json
+                      \ -k -X GET -u \"admin:$PASSWORD\" -H \"Content-Type: application/json\"
+                      https://central/v1/cluster-init/init-bundles\n      bundle_id=$(cat
+                      /tmp/find_bundle.json | python -c \"import sys, json; result
+                      = [x for x in json.load(sys.stdin)[\\\"items\\\"] if x[\\\"name\\\"]==\\\"$bundle_name\\\"];
+                      print(result[0][\\\"id\\\"])\")\n\n      echo \"-------------------------\"\n
+                      \     echo \"bundle name is $bundle_name bundle id $bundle_id\"\n
+                      \     echo \"-------------------------\"\n\n      if [ \"${bundle_id}\"
+                      != \"\" ];then\n      echo \"executing revoke command\"\n        export
+                      REVOKE=\"{\\\"ids\\\":[\\\"$bundle_id\\\"],\\\"confirmImpactedClustersIds\\\":[]}\"\n
+                      \       curl -k -X PATCH -u \"admin:$PASSWORD\" -H \"Content-Type:
+                      application/json\" --data $REVOKE https://central/v1/cluster-init/init-bundles/revoke\n
+                      \     fi\n\n      printf '.'\n      attempt_counter=$(($attempt_counter+1))\n
+                      \     echo \"Made create bundle attempt $attempt_counter, waiting...\"\n
+                      \     sleep 5\n  done\n\n  echo \"Bundle received\"\n\n  if
+                      [[ \"$OSTYPE\" == \"linux-gnu\"* ]]; then\n      BASE='base64
+                      -w 0'\n  elif [[ \"$OSTYPE\" == \"darwin\"* ]]; then\n      BASE='base64'\n
+                      \ fi\n\n  echo \"Applying bundle\"\n  # No jq in container,
+                      python to the rescue\n  cat /tmp/bundle.json | python3 -c \"import
+                      sys, json; print(json.load(sys.stdin)['kubectlBundle'])\" |
+                      ${BASE} -d | oc apply -f -\n  ACS_HOST=\"$(oc get route central
+                      -o custom-columns=HOST:.spec.host --no-headers):443\"\n  oc
+                      patch secret sensor-tls --type='json' -p=\"[{\\\"op\\\" : \\\"add\\\",
+                      \\\"path\\\" : \\\"/data/acs-host\\\", \\\"value\\\" : \\\"$(echo
+                      $ACS_HOST | ${BASE})\\\"}]\"\n  echo \"ACS Cluster init bundle
+                      generated and applied\"\nfi\n"
+                    env:
+                    - name: PASSWORD
+                      valueFrom:
+                        secretKeyRef:
+                          key: password
+                          name: central-htpasswd
+                    image: image-registry.openshift-image-registry.svc:5000/openshift/cli:latest
+                    imagePullPolicy: Always
+                    name: create-cluster-init-bundle
+                  dnsPolicy: ClusterFirst
+                  restartPolicy: Never
+                  serviceAccount: create-cluster-init
+                  serviceAccountName: create-cluster-init
+                  terminationGracePeriodSeconds: 30
+        remediationAction: enforce
+        severity: medium
+  remediationAction: enforce
+---
+apiVersion: policy.open-cluster-management.io/v1
+kind: Policy
+metadata:
+  annotations:
+    argocd.argoproj.io/compare-options: IgnoreExtraneous
+    policy.open-cluster-management.io/categories: SI System and Information Integrity
+    policy.open-cluster-management.io/controls: SI-5 Security Alerts Advisories and
+      Directives
+    policy.open-cluster-management.io/description: ""
+    policy.open-cluster-management.io/standards: NIST SP 800-53
+  labels:
+    open-cluster-management.io/policy-set: opp
+  name: policy-acs-central-status
+  namespace: policies
+spec:
+  dependencies:
+  - apiVersion: policy.open-cluster-management.io/v1
+    compliance: Compliant
+    kind: Policy
+    name: policy-acs-operator-central
+    namespace: policies
+  disabled: false
+  policy-templates:
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: policy-acs-central-status
+      spec:
+        object-templates:
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: apps/v1
+            kind: Deployment
+            metadata:
+              name: central
+              namespace: stackrox
+            status:
+              conditions:
+              - status: "True"
+                type: Available
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: apps/v1
+            kind: Deployment
+            metadata:
+              name: central-db
+              namespace: stackrox
+            status:
+              conditions:
+              - status: "True"
+                type: Available
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: apps/v1
+            kind: Deployment
+            metadata:
+              name: scanner-db
+              namespace: stackrox
+            status:
+              conditions:
+              - status: "True"
+                type: Available
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: apps/v1
+            kind: Deployment
+            metadata:
+              name: scanner
+              namespace: stackrox
+            status:
+              conditions:
+              - status: "True"
+                type: Available
+        remediationAction: inform
+        severity: medium
+  remediationAction: inform
+---
+apiVersion: policy.open-cluster-management.io/v1
+kind: Policy
+metadata:
+  annotations:
+    argocd.argoproj.io/compare-options: IgnoreExtraneous
+    policy.open-cluster-management.io/categories: SC System and Communications Protection
+    policy.open-cluster-management.io/controls: SC-8 Transmission Confidentiality
+      and Integrity
+    policy.open-cluster-management.io/description: ""
+    policy.open-cluster-management.io/standards: NIST SP 800-53
+  labels:
+    open-cluster-management.io/policy-set: opp
+  name: policy-acs-monitor-certs
+  namespace: policies
+spec:
+  dependencies:
+  - apiVersion: policy.open-cluster-management.io/v1
+    compliance: Compliant
+    kind: Policy
+    name: policy-acs-central-ca-bundle
+    namespace: policies
+  disabled: false
+  policy-templates:
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: CertificatePolicy
+      metadata:
+        name: acs-bundle-certificates
+      spec:
+        minimumDuration: 720h
+        namespaceSelector:
+          include:
+          - policies
+        remediationAction: inform
+        severity: high
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: policy-acs-monitor-certs
+      spec:
+        object-templates:
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: v1
+            kind: Secret
+            metadata:
+              name: sensor-tls
+              namespace: stackrox
+        remediationAction: inform
+        severity: medium
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: policy-acs-monitor-certs2
+      spec:
+        object-templates:
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: v1
+            kind: Secret
+            metadata:
+              name: collector-tls
+              namespace: stackrox
+        remediationAction: inform
+        severity: medium
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: policy-acs-monitor-certs3
+      spec:
+        object-templates:
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: v1
+            kind: Secret
+            metadata:
+              name: admission-control-tls
+              namespace: stackrox
+        remediationAction: inform
+        severity: medium
+  remediationAction: inform
+---
+apiVersion: policy.open-cluster-management.io/v1
+kind: Policy
+metadata:
+  annotations:
+    argocd.argoproj.io/compare-options: IgnoreExtraneous
+    policy.open-cluster-management.io/categories: SC System and Communications Protection
+    policy.open-cluster-management.io/controls: SC-1 Policy and Procedures
+    policy.open-cluster-management.io/description: ""
+    policy.open-cluster-management.io/standards: NIST SP 800-53
+  labels:
+    open-cluster-management.io/policy-set: opp
+  name: policy-acs-operator-central
+  namespace: policies
+spec:
+  dependencies:
+  - apiVersion: policy.open-cluster-management.io/v1
+    compliance: Compliant
+    kind: Policy
+    name: policy-odf-status
+    namespace: policies
+  disabled: false
+  policy-templates:
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: policy-acs-operator-central
+      spec:
+        object-templates:
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: v1
+            kind: Namespace
+            metadata:
+              name: stackrox
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: platform.stackrox.io/v1alpha1
+            kind: Central
+            metadata:
+              name: stackrox-central-services
+              namespace: stackrox
+            spec:
+              central:
+                db:
+                  persistence:
+                    persistentVolumeClaim:
+                      claimName: central-db
+                      storageClassName: ocs-storagecluster-ceph-rbd
+                exposure:
+                  loadBalancer:
+                    enabled: false
+                    port: 443
+                  nodePort:
+                    enabled: false
+                  route:
+                    enabled: true
+              egress:
+                connectivityPolicy: Offline
+              scanner:
+                analyzer:
+                  scaling:
+                    autoScaling: Enabled
+                    maxReplicas: 5
+                    minReplicas: 1
+                    replicas: 1
+                scannerComponent: Enabled
+        remediationAction: enforce
+        severity: medium
+  remediationAction: enforce
+---
+apiVersion: policy.open-cluster-management.io/v1
+kind: Policy
+metadata:
+  annotations:
+    argocd.argoproj.io/compare-options: IgnoreExtraneous
+    policy.open-cluster-management.io/categories: SI System and Information Integrity
+    policy.open-cluster-management.io/controls: SI-5 Security Alerts Advisories and
+      Directives
+    policy.open-cluster-management.io/description: ""
+    policy.open-cluster-management.io/standards: NIST SP 800-53
+  labels:
+    open-cluster-management.io/policy-set: opp
+  name: policy-acs-sync-resources
+  namespace: policies
+spec:
+  dependencies:
+  - apiVersion: policy.open-cluster-management.io/v1
+    compliance: Compliant
+    kind: Policy
+    name: policy-acs-central-ca-bundle
+    namespace: policies
+  disabled: false
+  policy-templates:
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: policy-acs-sync-resources
+      spec:
+        object-templates:
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: platform.stackrox.io/v1alpha1
+            kind: SecuredCluster
+            metadata:
+              name: stackrox-secured-cluster-services
+              namespace: stackrox
+            spec:
+              admissionControl:
+                listenOnCreates: false
+                listenOnEvents: true
+                listenOnUpdates: false
+              auditLogs:
+                collection: Auto
+              centralEndpoint: |
+                {{ fromSecret "stackrox" "sensor-tls" "acs-host" | base64dec }}
+              clusterName: |
+                {{ fromSecret "open-cluster-management-agent" "hub-kubeconfig-secret" "cluster-name" | base64dec }}
+              perNode:
+                collector:
+                  collection: CORE_BPF
+                  imageFlavor: Regular
+                taintToleration: TolerateTaints
+              scanner:
+                scannerComponent: Disabled
+        remediationAction: enforce
+        severity: medium
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: policy-acs-sync-resources2
+      spec:
+        object-templates:
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: v1
+            data:
+              admission-control-cert.pem: '{{ fromSecret "stackrox" "admission-control-tls"
+                "admission-control-cert.pem" }}'
+              admission-control-key.pem: '{{ fromSecret "stackrox" "admission-control-tls"
+                "admission-control-key.pem" }}'
+              ca.pem: '{{ fromSecret "stackrox" "admission-control-tls" "ca.pem" }}'
+            kind: Secret
+            metadata:
+              labels:
+                certificate_key_name: admission-control-cert.pem
+              name: admission-control-tls
+              namespace: policies
+            type: Opaque
+        remediationAction: enforce
+        severity: medium
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: policy-acs-sync-resources3
+      spec:
+        object-templates:
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: v1
+            data:
+              ca.pem: '{{ fromSecret "stackrox" "collector-tls" "ca.pem" }}'
+              collector-cert.pem: '{{ fromSecret "stackrox" "collector-tls" "collector-cert.pem"
+                }}'
+              collector-key.pem: '{{ fromSecret "stackrox" "collector-tls" "collector-key.pem"
+                }}'
+            kind: Secret
+            metadata:
+              labels:
+                certificate_key_name: collector-cert.pem
+              name: collector-tls
+              namespace: policies
+            type: Opaque
+        remediationAction: enforce
+        severity: medium
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: policy-acs-sync-resources4
+      spec:
+        object-templates:
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: v1
+            data:
+              acs-host: '{{ fromSecret "stackrox" "sensor-tls" "acs-host" }}'
+              ca.pem: '{{ fromSecret "stackrox" "sensor-tls" "ca.pem" }}'
+              sensor-cert.pem: '{{ fromSecret "stackrox" "sensor-tls" "sensor-cert.pem"
+                }}'
+              sensor-key.pem: '{{ fromSecret "stackrox" "sensor-tls" "sensor-key.pem"
+                }}'
+            kind: Secret
+            metadata:
+              labels:
+                certificate_key_name: sensor-cert.pem
+              name: sensor-tls
+              namespace: policies
+            type: Opaque
+        remediationAction: enforce
+        severity: medium
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: policy-acs-sync-resources5
+      spec:
+        object-templates:
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: console.openshift.io/v1
+            kind: ConsoleLink
+            metadata:
+              name: acs
+            spec:
+              applicationMenu:
+                section: Red Hat applications
+              href: https://{{ (lookup "route.openshift.io/v1" "Route" "stackrox"
+                "central").spec.host }}
+              location: ApplicationMenu
+              text: Red Hat Advanced Cluster Security for Kubernetes
+        remediationAction: enforce
+        severity: medium
+  remediationAction: enforce
+---
+apiVersion: policy.open-cluster-management.io/v1
+kind: Policy
+metadata:
+  annotations:
+    argocd.argoproj.io/compare-options: IgnoreExtraneous
+    policy.open-cluster-management.io/categories: SI System and Information Integrity
+    policy.open-cluster-management.io/controls: SI-5 Security Alerts Advisories and
+      Directives
+    policy.open-cluster-management.io/description: ""
+    policy.open-cluster-management.io/standards: NIST SP 800-53
+  labels:
+    open-cluster-management.io/policy-set: opp
+  name: policy-advanced-managed-cluster-security
+  namespace: policies
+spec:
+  disabled: false
+  policy-templates:
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: policy-advanced-managed-cluster-security
+      spec:
+        object-templates:
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: v1
+            kind: Namespace
+            metadata:
+              name: stackrox
+        remediationAction: enforce
+        severity: medium
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: policy-advanced-managed-cluster-security2
+      spec:
+        object-templates:
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: v1
+            data:
+              admission-control-cert.pem: '{{hub fromSecret "policies" "admission-control-tls"
+                "admission-control-cert.pem" hub}}'
+              admission-control-key.pem: '{{hub fromSecret "policies" "admission-control-tls"
+                "admission-control-key.pem" hub}}'
+              ca.pem: '{{hub fromSecret "policies" "admission-control-tls" "ca.pem"
+                hub}}'
+            kind: Secret
+            metadata:
+              name: admission-control-tls
+              namespace: stackrox
+            type: Opaque
+        remediationAction: enforce
+        severity: medium
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: policy-advanced-managed-cluster-security3
+      spec:
+        object-templates:
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: v1
+            data:
+              ca.pem: '{{hub fromSecret "policies" "collector-tls" "ca.pem" hub}}'
+              collector-cert.pem: '{{hub fromSecret "policies" "collector-tls" "collector-cert.pem"
+                hub}}'
+              collector-key.pem: '{{hub fromSecret "policies" "collector-tls" "collector-key.pem"
+                hub}}'
+            kind: Secret
+            metadata:
+              name: collector-tls
+              namespace: stackrox
+            type: Opaque
+        remediationAction: enforce
+        severity: medium
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: policy-advanced-managed-cluster-security4
+      spec:
+        object-templates:
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: v1
+            data:
+              acs-host: '{{hub fromSecret "policies" "sensor-tls" "acs-host" hub}}'
+              ca.pem: '{{hub fromSecret "policies" "sensor-tls" "ca.pem" hub}}'
+              sensor-cert.pem: '{{hub fromSecret "policies" "sensor-tls" "sensor-cert.pem"
+                hub}}'
+              sensor-key.pem: '{{hub fromSecret "policies" "sensor-tls" "sensor-key.pem"
+                hub}}'
+            kind: Secret
+            metadata:
+              name: sensor-tls
+              namespace: stackrox
+            type: Opaque
+        remediationAction: enforce
+        severity: medium
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: policy-advanced-managed-cluster-security5
+      spec:
+        object-templates:
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: platform.stackrox.io/v1alpha1
+            kind: SecuredCluster
+            metadata:
+              name: stackrox-secured-cluster-services
+              namespace: stackrox
+            spec:
+              admissionControl:
+                listenOnCreates: false
+                listenOnEvents: true
+                listenOnUpdates: false
+                replicas: 1
+              auditLogs:
+                collection: Auto
+              centralEndpoint: |
+                {{ fromSecret "stackrox" "sensor-tls" "acs-host" | base64dec }}
+              clusterName: |
+                {{ fromSecret "open-cluster-management-agent" "hub-kubeconfig-secret" "cluster-name" | base64dec }}
+              perNode:
+                collector:
+                  collection: CORE_BPF
+                  imageFlavor: Regular
+                taintToleration: TolerateTaints
+              scanner:
+                analyzer:
+                  scaling:
+                    minReplicas: 1
+                    replicas: 1
+              sensor:
+                resources:
+                  requests:
+                    cpu: 500m
+                    memory: 1Gi
+        remediationAction: enforce
+        severity: medium
+  remediationAction: enforce
+---
+apiVersion: policy.open-cluster-management.io/v1
+kind: Policy
+metadata:
+  annotations:
+    argocd.argoproj.io/compare-options: IgnoreExtraneous
+    policy.open-cluster-management.io/categories: SI System and Information Integrity
+    policy.open-cluster-management.io/controls: SI-5 Security Alerts Advisories and
+      Directives
+    policy.open-cluster-management.io/description: ""
+    policy.open-cluster-management.io/standards: NIST SP 800-53
+  labels:
+    open-cluster-management.io/policy-set: opp
+  name: policy-advanced-managed-cluster-status
+  namespace: policies
+spec:
+  disabled: false
+  policy-templates:
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: policy-advanced-managed-cluster-status
+      spec:
+        object-templates:
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: apps/v1
+            kind: Deployment
+            metadata:
+              name: sensor
+              namespace: stackrox
+            status:
+              conditions:
+              - status: "True"
+                type: Available
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: apps/v1
+            kind: DaemonSet
+            metadata:
+              name: collector
+              namespace: stackrox
+            status:
+              numberMisscheduled: 0
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: apps/v1
+            kind: Deployment
+            metadata:
+              name: admission-control
+              namespace: stackrox
+            status:
+              conditions:
+              - status: "True"
+                type: Available
+        remediationAction: inform
+        severity: medium
+  remediationAction: inform
 ---
 apiVersion: policy.open-cluster-management.io/v1
 kind: Policy
@@ -1652,17 +2756,37 @@ spec:
         - complianceType: musthave
           objectDefinition:
             apiVersion: v1
+            kind: PersistentVolume
+            metadata:
+              name: pv-quay-registry-postgresql-data
+            spec:
+              accessModes:
+              - ReadWriteOnce
+              capacity:
+                storage: 50Gi
+              claimRef:
+                apiVersion: v1
+                kind: PersistentVolumeClaim
+                name: quay-registry-quay-postgres-13
+                namespace: quay-enterprise
+              nfs:
+                path: /opt/woori/nfs/quay-registry/postgresql/data
+                server: 192.168.10.12
+              persistentVolumeReclaimPolicy: Retain
+              volumeMode: Filesystem
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: v1
             kind: PersistentVolumeClaim
             metadata:
               name: quay-registry-quay-postgres-13
-              namespace: openshift-quay
+              namespace: quay-enterprise
             spec:
               accessModes:
               - ReadWriteOnce
               resources:
                 requests:
                   storage: 50Gi
-              storageClassName: ocs-storagecluster-ceph-rbd
               volumeMode: Filesystem
               volumeName: pv-quay-registry-postgresql-data
             status:
@@ -1771,6 +2895,88 @@ metadata:
     policy.open-cluster-management.io/standards: NIST SP 800-53
   labels:
     open-cluster-management.io/policy-set: opp
+  name: sub-approval-automatic
+  namespace: policies
+spec:
+  disabled: false
+  policy-templates:
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: sub-approval-automatic
+      spec:
+        object-templates-raw: |
+          {{- range $sub := (lookup "operators.coreos.com/v1alpha1" "Subscription" "" "!policies.ignore").items }}
+          - complianceType: mustonlyhave
+            objectDefinition:
+              apiVersion: operators.coreos.com/v1alpha1
+              kind: Subscription
+              metadata:
+                name: {{ $sub.metadata.name }}
+                namespace: {{ $sub.metadata.namespace }}
+              spec:
+                installPlanApproval: Automatic
+                name: {{ $sub.spec.name }}
+                source: {{ $sub.spec.source }}
+                sourceNamespace: {{ $sub.spec.sourceNamespace }}
+                config: {{  $sub.spec.config | toRawJson | toLiteral }}
+          {{- end }}
+        remediationAction: enforce
+        severity: high
+  remediationAction: enforce
+---
+apiVersion: policy.open-cluster-management.io/v1
+kind: Policy
+metadata:
+  annotations:
+    argocd.argoproj.io/compare-options: IgnoreExtraneous
+    policy.open-cluster-management.io/categories: SI System and Information Integrity
+    policy.open-cluster-management.io/controls: SI-7 Software Firmware and Information
+      Integrity
+    policy.open-cluster-management.io/description: ""
+    policy.open-cluster-management.io/standards: NIST SP 800-53
+  labels:
+    open-cluster-management.io/policy-set: opp
+  name: sub-approval-manual
+  namespace: policies
+spec:
+  disabled: false
+  policy-templates:
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: sub-approval-manual
+      spec:
+        object-templates-raw: |
+          {{- range $sub := (lookup "operators.coreos.com/v1alpha1" "Subscription" "" "!policies.ignore").items }}
+          - complianceType: musthave
+            objectDefinition:
+              apiVersion: operators.coreos.com/v1alpha1
+              kind: Subscription
+              metadata:
+                name: {{ $sub.metadata.name }}
+                namespace: {{ $sub.metadata.namespace }}
+              spec:
+                installPlanApproval: Manual
+          {{- end }}
+        remediationAction: enforce
+        severity: high
+  remediationAction: enforce
+---
+apiVersion: policy.open-cluster-management.io/v1
+kind: Policy
+metadata:
+  annotations:
+    argocd.argoproj.io/compare-options: IgnoreExtraneous
+    policy.open-cluster-management.io/categories: SI System and Information Integrity
+    policy.open-cluster-management.io/controls: SI-7 Software Firmware and Information
+      Integrity
+    policy.open-cluster-management.io/description: ""
+    policy.open-cluster-management.io/standards: NIST SP 800-53
+  labels:
+    open-cluster-management.io/policy-set: opp
   name: update-proxy-sync
   namespace: policies
 spec:
@@ -1813,46 +3019,6 @@ metadata:
     argocd.argoproj.io/compare-options: IgnoreExtraneous
   labels:
     open-cluster-management.io/policy-set: opp
-  name: manual-opp-clusters
-  namespace: policies
-spec:
-  description: ""
-  policies:
-  - manual-all-operators-install
-  - update-proxy-sync
----
-apiVersion: policy.open-cluster-management.io/v1beta1
-kind: PolicySet
-metadata:
-  annotations:
-    argocd.argoproj.io/compare-options: IgnoreExtraneous
-  labels:
-    open-cluster-management.io/policy-set: opp
-  name: manual-opp-hub
-  namespace: policies
-spec:
-  description: ""
-  policies:
-  - create-router-bundle
-  - manual-all-operators-install
-  - manual-hub-operators-install
-  - policy-observability-operator
-  - policy-observability-storage
-  - policy-odf
-  - policy-odf-cluster
-  - policy-odf-status
-  - policy-quay-config
-  - policy-quay-install
-  - policy-quay-status
-  - policy-quay-storage
----
-apiVersion: policy.open-cluster-management.io/v1beta1
-kind: PolicySet
-metadata:
-  annotations:
-    argocd.argoproj.io/compare-options: IgnoreExtraneous
-  labels:
-    open-cluster-management.io/policy-set: opp
   name: opp-clusters
   namespace: policies
 spec:
@@ -1861,7 +3027,10 @@ spec:
     to work well together. This policy set is focused on the components that install
     to every managed cluster.
   policies:
-  - automatic-all-operators-install
+  - csv-check
+  - cv-check
+  - policy-advanced-managed-cluster-security
+  - policy-advanced-managed-cluster-status
   - remediation-config
   - update-proxy-sync
 ---
@@ -1880,9 +3049,18 @@ spec:
     them to work well together. This policy set is focused on the components that
     install to the Advanced Cluster Management hub.
   policies:
-  - automatic-all-operators-install
-  - automatic-hub-operators-install
   - create-router-bundle
+  - csv-check
+  - cv-check
+  - opp-all-operators-install
+  - opp-hub-operators-install
+  - policy-acs-central-ca-bundle
+  - policy-acs-central-ca-bundle-expired
+  - policy-acs-central-status
+  - policy-acs-monitor-certs
+  - policy-acs-operator-central
+  - policy-acs-sync-resources
+  - policy-advanced-managed-cluster-status
   - policy-observability-operator
   - policy-observability-storage
   - policy-odf
@@ -1893,3 +3071,32 @@ spec:
   - policy-quay-status
   - policy-quay-storage
   - remediation-config
+---
+apiVersion: policy.open-cluster-management.io/v1beta1
+kind: PolicySet
+metadata:
+  annotations:
+    argocd.argoproj.io/compare-options: IgnoreExtraneous
+  labels:
+    open-cluster-management.io/policy-set: opp
+  name: sub-approval-automatic
+  namespace: policies
+spec:
+  description: ""
+  policies:
+  - catalog-source-update
+  - sub-approval-automatic
+---
+apiVersion: policy.open-cluster-management.io/v1beta1
+kind: PolicySet
+metadata:
+  annotations:
+    argocd.argoproj.io/compare-options: IgnoreExtraneous
+  labels:
+    open-cluster-management.io/policy-set: opp
+  name: sub-approval-manual
+  namespace: policies
+spec:
+  description: ""
+  policies:
+  - sub-approval-manual

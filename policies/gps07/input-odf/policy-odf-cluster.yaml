@@ -1,0 +1,91 @@
+apiVersion: ocs.openshift.io/v1
+kind: StorageCluster
+metadata:
+  annotations:
+    uninstall.ocs.openshift.io/cleanup-policy: delete
+    uninstall.ocs.openshift.io/mode: graceful
+  name: ocs-storagecluster
+  namespace: openshift-storage
+spec:
+  flexibleScaling: true
+  monDataDirHostPath: /var/lib/rook
+  storageDeviceSets:
+  - count: 1
+    dataPVCTemplate:
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1Gi
+        storageClassName: odf-localvolumeset
+        volumeMode: Block
+    name: ocs-deviceset-localvolume
+    replica: 3
+  placement:
+    all:
+      tolerations:
+      - effect: NoSchedule
+        operator: Exists
+        key: node.ocs.openshift.io/storage
+    mds:
+      tolerations:
+      - effect: NoSchedule
+        operator: Exists
+        key: node.ocs.openshift.io/storage
+      podAntiAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 49
+          podAffinityTerm:
+            labelSelector:
+              matchLabels:
+                app: rook-ceph-mds
+            topologyKey: kubernetes.io/hostname
+        - weight: 48
+          podAffinityTerm:
+            labelSelector:
+              matchLabels:
+                app: rook-ceph-mgr
+            topologyKey: kubernetes.io/hostname
+    rgw:
+      tolerations:
+      - effect: NoSchedule
+        operator: Exists
+        key: node.ocs.openshift.io/storage
+      podAntiAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 47
+          podAffinityTerm:
+            labelSelector:
+              matchLabels:
+                app: rook-ceph-mds
+            topologyKey: kubernetes.io/hostname
+    noobaa-core::
+      tolerations:
+      - effect: NoSchedule
+        operator: Exists
+        key: node.ocs.openshift.io/storage
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  annotations:
+    storageclass.kubernetes.io/is-default-class: "true"
+  name: ocs-storagecluster-ceph-rbd
+---
+apiVersion: v1
+data:
+  CSI_PLUGIN_TOLERATIONS: |
+    - key: node.ocs.openshift.io/storage
+      operator: Exists
+      effect: NoSchedule
+  CSI_PROVISIONER_TOLERATIONS: |
+    - effect: NoSchedule
+      operator: Exists
+      key: node.ocs.openshift.io/storage
+  CSI_PROVISIONER_NODE_AFFINITY: "cluster.ocs.openshift.io/openshift-storage="
+kind: ConfigMap
+metadata:
+  name: rook-ceph-operator-config
+  namespace: openshift-storage
+---

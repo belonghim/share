@@ -18,7 +18,7 @@ policyDefaults:
     - NIST SP 800-53
 policies:
 # ACS Policies - start
-- name: policy-acs-operator-central
+- name: enf-acs-operator-central
   categories:
     - SC System and Communications Protection
   controls: 
@@ -27,7 +27,7 @@ policies:
     - name: policy-odf-status
   manifests:
     - path: input-acs-central/policy-acs-operator-central.yaml
-- name: policy-acs-central-status
+- name: inf-acs-central-status
   categories:
     - SI System and Information Integrity
   controls:
@@ -37,7 +37,7 @@ policies:
   manifests:
     - path: input-acs-central/policy-acs-central-status.yaml
   remediationAction: inform
-- name: policy-acs-central-ca-bundle
+- name: enf-acs-central-ca-bundle
   categories:
     - SI System and Information Integrity
   consolidateManifests: false
@@ -50,7 +50,7 @@ policies:
     - path: input-sensor/policy-acs-central-ca-bundle-v2.yaml
     - path: input-sensor/policy-acs-central-ca-bundle-v1.yaml
       complianceType: mustnothave
-- name: policy-acs-sync-resources
+- name: enf-acs-sync-resources
   categories:
     - SI System and Information Integrity
   consolidateManifests: false
@@ -60,7 +60,7 @@ policies:
     - name: policy-acs-central-ca-bundle
   manifests:
     - path: input-sensor/policy-acs-sync-resources.yaml
-- name: policy-acs-monitor-certs
+- name: inf-acs-monitor-certs
   categories:
     - SC System and Communications Protection
   consolidateManifests: false
@@ -72,7 +72,7 @@ policies:
     - path: input-sensor/acs-check-certificates.yaml
     - path: input-sensor/policy-acs-central-ca-bundle-expired.yaml
       remediationAction: inform
-- name: policy-acs-central-ca-bundle-expired
+- name: enf-acs-central-ca-bundle-expired
   categories:
     - SC System and Communications Protection
   consolidateManifests: false
@@ -92,7 +92,7 @@ policies:
   manifests:
     - path: input-sensor/policy-acs-central-ca-bundle-expired.yaml
     - path: input-sensor/policy-acs-central-ca-bundle-v2.yaml
-- name: policy-advanced-managed-cluster-security
+- name: enf-advanced-managed-cluster-security
   categories:
     - SI System and Information Integrity
   consolidateManifests: false
@@ -102,7 +102,7 @@ policies:
     - path: input-sensor/policy-advanced-managed-cluster-security.yaml
   policySets:
     - opp-clusters
-- name: policy-advanced-managed-cluster-status
+- name: inf-advanced-managed-cluster-status
   categories:
     - SI System and Information Integrity
   controls:
@@ -115,7 +115,7 @@ policies:
   remediationAction: inform
 # ACS Policies - end
 # Observability Policy - start
-- name: policy-observability-storage
+- name: enf-observability-storage
   consolidateManifests: false
   categories:
     - CA Assessment Authorization and Monitoring
@@ -125,7 +125,7 @@ policies:
     - name: policy-odf-status
   manifests:
     - path: input-acm-observability/storage.yaml
-- name: policy-observability-operator
+- name: enf-observability-operator
   consolidateManifests: false
   categories:
     - CA Assessment Authorization and Monitoring
@@ -137,14 +137,14 @@ policies:
     - path: input-acm-observability/operator.yaml
 # Observability Policy - end
 # ODF Policies - start
-- name: policy-odf
+- name: enf-odf
   categories:
     - SI System and Information Integrity
   controls: 
     - SI-7 Software Firmware and Information Integrity
   manifests:
     - path: input-odf/policy-odf.yaml
-- name: policy-odf-volume
+- name: inf-odf-volume
   categories:
     - SI System and Information Integrity
   controls: 
@@ -152,7 +152,7 @@ policies:
   manifests:
     - path: input-odf/policy-odf-volume.yaml
   remediationAction: inform
-- name: policy-odf-cluster
+- name: enf-odf-cluster
   categories:
     - SI System and Information Integrity
   controls: 
@@ -162,7 +162,7 @@ policies:
     - name: policy-odf-volume
   manifests:
     - path: input-odf/policy-odf-cluster.yaml
-- name: policy-odf-status
+- name: inf-odf-status
   categories:
     - SI System and Information Integrity
   controls: 
@@ -174,7 +174,7 @@ policies:
   remediationAction: inform
 # ODF Policies - end
 # Quay Policies - start
-- name: policy-quay-storage
+- name: enf-quay-storage
   categories:
     - SI System and Information Integrity
   controls:
@@ -183,7 +183,7 @@ policies:
     - name: policy-odf-status
   manifests:
     - path: input-quay/policy-quay-storage.yaml
-- name: policy-quay-install
+- name: enf-quay-install
   categories:
     - SI System and Information Integrity
   controls:
@@ -192,7 +192,7 @@ policies:
     - name: policy-quay-storage
   manifests:
     - path: input-quay/policy-quay-install.yaml
-- name: policy-quay-config
+- name: enf-quay-config
   categories:
     - SI System and Information Integrity
   controls: 
@@ -201,7 +201,7 @@ policies:
     - name: policy-quay-install
   manifests:
     - path: input-quay/policy-quay-config.yaml
-- name: policy-quay-status
+- name: inf-quay-status
   categories:
     - SI System and Information Integrity
   controls:
@@ -213,7 +213,7 @@ policies:
   remediationAction: inform
 # Quay Policies - end
 # Hub Operators Policies - start
-- name: opp-hub-operators-install
+- name: enf-hub-operators-install
   categories:
     - SI System and Information Integrity
   controls:
@@ -224,7 +224,7 @@ policies:
     - opp-hub
 # Hub Operators Policies - end
 # All Operators Policies - start
-- name: opp-all-operators-install
+- name: enf-all-operators-install
   categories:
     - SI System and Information Integrity
   controls:
@@ -235,7 +235,7 @@ policies:
     - opp-hub
 # All Operators Policies - end
 # Manual Subscription Policies - start
-- name: sub-approval-manual
+- name: enf-sub-approval-manual
   categories:
     - SI System and Information Integrity
   controls:
@@ -246,7 +246,7 @@ policies:
     - sub-approval-manual
 # Manual Subscription Policies - end
 # Automatic Subscription Policies - start
-- name: sub-approval-automatic
+- name: enf-sub-approval-automatic
   categories:
     - SI System and Information Integrity
   complianceType: mustonlyhave
@@ -257,8 +257,8 @@ policies:
   policySets:
     - sub-approval-automatic
 # Automatic Subscription Policies - end
-# CatalogSource update  Policies - start
-- name: catalog-source-update
+# cs-redhat operator update Policies - start
+- name: enf-cs-redhat-operator-update
   categories:
     - SI System and Information Integrity
   complianceType: musthave
@@ -266,14 +266,13 @@ policies:
     - SI-7 Software Firmware and Information Integrity
   dependencies:
     - name: cv-check
-    - name: csv-check
   manifests:
-    - path: install/catalog-source-update.yaml
+    - path: install/cs-redhat-operator-update.yaml
   policySets:
     - sub-approval-automatic
-# CatalogSource update Policies - end
+# cs-redhat operator update Policies - end
 # All Create Router Bundle Policies - start
-- name: create-router-bundle
+- name: enf-create-router-bundle
   categories:
     - SI System and Information Integrity
   controls:
@@ -284,7 +283,7 @@ policies:
     - opp-hub
 # All Create Router Bundle Policies - end
 # All Proxy Router Bundle Policies - start
-- name: update-proxy-sync
+- name: enf-update-proxy-sync
   categories:
     - SI System and Information Integrity
   controls:
@@ -295,7 +294,7 @@ policies:
     - opp-clusters
 # All Proxy Router Bundle Policies - end
 # Remediation config Policies - start
-- name: remediation-config
+- name: enf-remediation-config
   categories:
     - SI System and Information Integrity
   controls:
@@ -307,7 +306,7 @@ policies:
     - opp-clusters
 # Remediation config Policies - end
 # CV check Policies - start
-- name: cv-check
+- name: inf-cv-check
   categories:
     - SI System and Information Integrity
   complianceType: mustnothave
@@ -322,7 +321,7 @@ policies:
   remediationAction: inform
 # CV check Policies - end
 # CSV check Policies - start
-- name: csv-check
+- name: inf-csv-check
   categories:
     - SI System and Information Integrity
   consolidateManifests: false

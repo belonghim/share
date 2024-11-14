@@ -172,25 +172,20 @@ metadata:
   annotations:
     argocd.argoproj.io/compare-options: IgnoreExtraneous
     policy.open-cluster-management.io/categories: SI System and Information Integrity
-    policy.open-cluster-management.io/controls: SI-7 Software Firmware and Information
-      Integrity
+    policy.open-cluster-management.io/controls: SI-5 Security Alerts Advisories and
+      Directives
     policy.open-cluster-management.io/description: ""
     policy.open-cluster-management.io/standards: NIST SP 800-53
   labels:
     open-cluster-management.io/policy-set: opp
-  name: catalog-source-update
+  name: enf-acs-central-ca-bundle
   namespace: policies
 spec:
   dependencies:
   - apiVersion: policy.open-cluster-management.io/v1
     compliance: Compliant
     kind: Policy
-    name: cv-check
-    namespace: policies
-  - apiVersion: policy.open-cluster-management.io/v1
-    compliance: Compliant
-    kind: Policy
-    name: csv-check
+    name: policy-acs-central-status
     namespace: policies
   disabled: false
   policy-templates:
@@ -198,22 +193,524 @@ spec:
       apiVersion: policy.open-cluster-management.io/v1
       kind: ConfigurationPolicy
       metadata:
-        name: catalog-source-update
+        name: enf-acs-central-ca-bundle
       spec:
-        object-templates-raw: |
-          {{- $cs := lookup "operators.coreos.com/v1alpha1" "CatalogSource" "openshift-marketplace" "cs-redhat-operator-index" }}
-          - complianceType: musthave
-            objectDefinition:
-              apiVersion: operators.coreos.com/v1alpha1
-              kind: CatalogSource
-              metadata:
-                name: {{ $cs.metadata.name }}
-                namespace: {{ $cs.metadata.namespace }}
-              spec:
-                image: {{ ( (cat (split "redhat-operator-index" $cs.spec.image)._0 "redhat-operator-index:v4." (split "." (lookup "config.openshift.io/v1" "ClusterVersion" "" "version").status.desired.version)._1) | replace " " "" ) }}
-                sourceType: grpc
+        object-templates:
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: v1
+            kind: Namespace
+            metadata:
+              name: stackrox
         remediationAction: enforce
-        severity: high
+        severity: medium
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: enf-acs-central-ca-bundle2
+      spec:
+        object-templates:
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: v1
+            kind: ServiceAccount
+            metadata:
+              annotations:
+                argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+              name: create-cluster-init
+              namespace: stackrox
+        remediationAction: enforce
+        severity: medium
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: enf-acs-central-ca-bundle3
+      spec:
+        object-templates:
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: rbac.authorization.k8s.io/v1
+            kind: Role
+            metadata:
+              annotations:
+                argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+                argocd.argoproj.io/sync-wave: "1"
+              name: create-cluster-init
+              namespace: stackrox
+            rules:
+            - apiGroups:
+              - ""
+              resources:
+              - secrets
+              verbs:
+              - get
+              - list
+              - create
+              - patch
+              - update
+            - apiGroups:
+              - platform.stackrox.io
+              resources:
+              - securedclusters
+              verbs:
+              - get
+              - list
+              - patch
+              - update
+            - apiGroups:
+              - route.openshift.io
+              resources:
+              - routes
+              verbs:
+              - get
+              - list
+        remediationAction: enforce
+        severity: medium
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: enf-acs-central-ca-bundle4
+      spec:
+        object-templates:
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: rbac.authorization.k8s.io/v1
+            kind: RoleBinding
+            metadata:
+              annotations:
+                argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+              name: create-cluster-init
+              namespace: stackrox
+            roleRef:
+              apiGroup: rbac.authorization.k8s.io
+              kind: Role
+              name: create-cluster-init
+            subjects:
+            - kind: ServiceAccount
+              name: create-cluster-init
+              namespace: stackrox
+        remediationAction: enforce
+        severity: medium
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: enf-acs-central-ca-bundle5
+      spec:
+        object-templates:
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: imageregistry.operator.openshift.io/v1
+            kind: Config
+            metadata:
+              name: cluster
+            spec:
+              managementState: Managed
+              storage:
+                emptyDir: {}
+            status:
+              conditions:
+              - status: "True"
+                type: Available
+        remediationAction: enforce
+        severity: medium
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: enf-acs-central-ca-bundle6
+      spec:
+        object-templates:
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: batch/v1
+            kind: Job
+            metadata:
+              annotations:
+                argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+                argocd.argoproj.io/sync-wave: "2"
+              labels:
+                init-bundle: central
+              name: create-cluster-init-bundle-v2
+              namespace: stackrox
+            spec:
+              template:
+                metadata:
+                  annotations:
+                    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+                  labels:
+                    init-bundle: central
+                spec:
+                  containers:
+                  - command:
+                    - /bin/bash
+                    - -c
+                    - "#!/usr/bin/env bash\nif kubectl get secret/sensor-tls &> /dev/null;
+                      then\n  echo \"cluster-init bundle has already been configured,
+                      doing nothing\"\n  exit 0\nelse\n\n  # Wait for central to be
+                      ready\n  attempt_counter=0\n  max_attempts=20\n  echo \"Waiting
+                      for central to be available...\"\n  until $(curl -k --output
+                      /dev/null --silent --head --fail https://central); do\n      if
+                      [ ${attempt_counter} -eq ${max_attempts} ];then\n        echo
+                      \"Max attempts reached\"\n        exit 1\n      fi\n\n      printf
+                      '.'\n      attempt_counter=$(($attempt_counter+1))\n      echo
+                      \"Made attempt $attempt_counter, waiting...\"\n      sleep 5\n
+                      \ done\n\n  # attempt to create init-bundle\n  # on failure
+                      attempt to delete the bundle\n  attempt_counter=0\n  max_attempts=5\n
+                      \ echo \"Configuring cluster-init bundle\"\n  \n  # set the
+                      bundle name to include todays date\n  bundle_name=local-cluster-$(date
+                      '+%Y%m%d')\n  export DATA={\\\"name\\\":\\\"$bundle_name\\\"}\n
+                      \ until (curl -k -o /tmp/bundle.json -X POST -u \"admin:$PASSWORD\"
+                      -H \"Content-Type: application/json\" --data $DATA --fail https://central/v1/cluster-init/init-bundles);
+                      do\n      if [ ${attempt_counter} -eq ${max_attempts} ];then\n
+                      \       echo \"Max attempts to create bundle reached\"\n        exit
+                      1\n      fi\n\n      echo \"Check to see if there is an existing
+                      bundle that can be revoked\"\n      curl -o /tmp/find_bundle.json
+                      \ -k -X GET -u \"admin:$PASSWORD\" -H \"Content-Type: application/json\"
+                      https://central/v1/cluster-init/init-bundles\n      bundle_id=$(cat
+                      /tmp/find_bundle.json | python -c \"import sys, json; result
+                      = [x for x in json.load(sys.stdin)[\\\"items\\\"] if x[\\\"name\\\"]==\\\"$bundle_name\\\"];
+                      print(result[0][\\\"id\\\"])\")\n\n      echo \"-------------------------\"\n
+                      \     echo \"bundle name is $bundle_name bundle id $bundle_id\"\n
+                      \     echo \"-------------------------\"\n\n      if [ \"${bundle_id}\"
+                      != \"\" ];then\n      echo \"executing revoke command\"\n        export
+                      REVOKE=\"{\\\"ids\\\":[\\\"$bundle_id\\\"],\\\"confirmImpactedClustersIds\\\":[]}\"\n
+                      \       curl -k -X PATCH -u \"admin:$PASSWORD\" -H \"Content-Type:
+                      application/json\" --data $REVOKE https://central/v1/cluster-init/init-bundles/revoke\n
+                      \     fi\n\n      printf '.'\n      attempt_counter=$(($attempt_counter+1))\n
+                      \     echo \"Made create bundle attempt $attempt_counter, waiting...\"\n
+                      \     sleep 5\n  done\n\n  echo \"Bundle received\"\n\n  if
+                      [[ \"$OSTYPE\" == \"linux-gnu\"* ]]; then\n      BASE='base64
+                      -w 0'\n  elif [[ \"$OSTYPE\" == \"darwin\"* ]]; then\n      BASE='base64'\n
+                      \ fi\n\n  echo \"Applying bundle\"\n  # No jq in container,
+                      python to the rescue\n  cat /tmp/bundle.json | python3 -c \"import
+                      sys, json; print(json.load(sys.stdin)['kubectlBundle'])\" |
+                      ${BASE} -d | oc apply -f -\n  ACS_HOST=\"$(oc get route central
+                      -o custom-columns=HOST:.spec.host --no-headers):443\"\n  oc
+                      patch secret sensor-tls --type='json' -p=\"[{\\\"op\\\" : \\\"add\\\",
+                      \\\"path\\\" : \\\"/data/acs-host\\\", \\\"value\\\" : \\\"$(echo
+                      $ACS_HOST | ${BASE})\\\"}]\"\n  echo \"ACS Cluster init bundle
+                      generated and applied\"\nfi\n"
+                    env:
+                    - name: PASSWORD
+                      valueFrom:
+                        secretKeyRef:
+                          key: password
+                          name: central-htpasswd
+                    image: image-registry.openshift-image-registry.svc:5000/openshift/cli:latest
+                    imagePullPolicy: Always
+                    name: create-cluster-init-bundle
+                  dnsPolicy: ClusterFirst
+                  restartPolicy: Never
+                  serviceAccount: create-cluster-init
+                  serviceAccountName: create-cluster-init
+                  terminationGracePeriodSeconds: 30
+        remediationAction: enforce
+        severity: medium
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: enf-acs-central-ca-bundle7
+      spec:
+        object-templates:
+        - complianceType: mustnothave
+          objectDefinition:
+            apiVersion: batch/v1
+            kind: Job
+            metadata:
+              name: create-cluster-init-bundle
+              namespace: stackrox
+        remediationAction: enforce
+        severity: medium
+  remediationAction: enforce
+---
+apiVersion: policy.open-cluster-management.io/v1
+kind: Policy
+metadata:
+  annotations:
+    argocd.argoproj.io/compare-options: IgnoreExtraneous
+    policy.open-cluster-management.io/categories: SC System and Communications Protection
+    policy.open-cluster-management.io/controls: SC-8 Transmission Confidentiality
+      and Integrity
+    policy.open-cluster-management.io/description: ""
+    policy.open-cluster-management.io/standards: NIST SP 800-53
+  labels:
+    open-cluster-management.io/policy-set: opp
+  name: enf-acs-central-ca-bundle-expired
+  namespace: policies
+spec:
+  dependencies:
+  - apiVersion: policy.open-cluster-management.io/v1
+    compliance: NonCompliant
+    kind: Policy
+    name: policy-acs-monitor-certs
+    namespace: policies
+  disabled: false
+  policy-templates:
+  - ignorePending: true
+    objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: enf-acs-central-ca-bundle-expired
+      spec:
+        evaluationInterval:
+          compliant: 1m
+          noncompliant: 45s
+        object-templates:
+        - complianceType: mustnothave
+          objectDefinition:
+            apiVersion: v1
+            kind: Secret
+            metadata:
+              name: sensor-tls
+              namespace: stackrox
+        remediationAction: enforce
+        severity: medium
+  - ignorePending: true
+    objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: enf-acs-central-ca-bundle-expired2
+      spec:
+        evaluationInterval:
+          compliant: 1m
+          noncompliant: 45s
+        object-templates:
+        - complianceType: mustnothave
+          objectDefinition:
+            apiVersion: v1
+            kind: Secret
+            metadata:
+              name: collector-tls
+              namespace: stackrox
+        remediationAction: enforce
+        severity: medium
+  - ignorePending: true
+    objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: enf-acs-central-ca-bundle-expired3
+      spec:
+        evaluationInterval:
+          compliant: 1m
+          noncompliant: 45s
+        object-templates:
+        - complianceType: mustnothave
+          objectDefinition:
+            apiVersion: v1
+            kind: Secret
+            metadata:
+              name: admission-control-tls
+              namespace: stackrox
+        remediationAction: enforce
+        severity: medium
+  - ignorePending: true
+    objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: enf-acs-central-ca-bundle-expired4
+      spec:
+        evaluationInterval:
+          compliant: 1m
+          noncompliant: 45s
+        object-templates:
+        - complianceType: mustnothave
+          objectDefinition:
+            apiVersion: imageregistry.operator.openshift.io/v1
+            kind: Config
+            metadata:
+              name: cluster
+            spec:
+              managementState: Managed
+              storage:
+                emptyDir: {}
+            status:
+              conditions:
+              - status: "True"
+                type: Available
+        remediationAction: enforce
+        severity: medium
+  - ignorePending: true
+    objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: enf-acs-central-ca-bundle-expired5
+      spec:
+        evaluationInterval:
+          compliant: 1m
+          noncompliant: 45s
+        object-templates:
+        - complianceType: mustnothave
+          objectDefinition:
+            apiVersion: batch/v1
+            kind: Job
+            metadata:
+              annotations:
+                argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+                argocd.argoproj.io/sync-wave: "2"
+              labels:
+                init-bundle: central
+              name: create-cluster-init-bundle-v2
+              namespace: stackrox
+            spec:
+              template:
+                metadata:
+                  annotations:
+                    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+                  labels:
+                    init-bundle: central
+                spec:
+                  containers:
+                  - command:
+                    - /bin/bash
+                    - -c
+                    - "#!/usr/bin/env bash\nif kubectl get secret/sensor-tls &> /dev/null;
+                      then\n  echo \"cluster-init bundle has already been configured,
+                      doing nothing\"\n  exit 0\nelse\n\n  # Wait for central to be
+                      ready\n  attempt_counter=0\n  max_attempts=20\n  echo \"Waiting
+                      for central to be available...\"\n  until $(curl -k --output
+                      /dev/null --silent --head --fail https://central); do\n      if
+                      [ ${attempt_counter} -eq ${max_attempts} ];then\n        echo
+                      \"Max attempts reached\"\n        exit 1\n      fi\n\n      printf
+                      '.'\n      attempt_counter=$(($attempt_counter+1))\n      echo
+                      \"Made attempt $attempt_counter, waiting...\"\n      sleep 5\n
+                      \ done\n\n  # attempt to create init-bundle\n  # on failure
+                      attempt to delete the bundle\n  attempt_counter=0\n  max_attempts=5\n
+                      \ echo \"Configuring cluster-init bundle\"\n  \n  # set the
+                      bundle name to include todays date\n  bundle_name=local-cluster-$(date
+                      '+%Y%m%d')\n  export DATA={\\\"name\\\":\\\"$bundle_name\\\"}\n
+                      \ until (curl -k -o /tmp/bundle.json -X POST -u \"admin:$PASSWORD\"
+                      -H \"Content-Type: application/json\" --data $DATA --fail https://central/v1/cluster-init/init-bundles);
+                      do\n      if [ ${attempt_counter} -eq ${max_attempts} ];then\n
+                      \       echo \"Max attempts to create bundle reached\"\n        exit
+                      1\n      fi\n\n      echo \"Check to see if there is an existing
+                      bundle that can be revoked\"\n      curl -o /tmp/find_bundle.json
+                      \ -k -X GET -u \"admin:$PASSWORD\" -H \"Content-Type: application/json\"
+                      https://central/v1/cluster-init/init-bundles\n      bundle_id=$(cat
+                      /tmp/find_bundle.json | python -c \"import sys, json; result
+                      = [x for x in json.load(sys.stdin)[\\\"items\\\"] if x[\\\"name\\\"]==\\\"$bundle_name\\\"];
+                      print(result[0][\\\"id\\\"])\")\n\n      echo \"-------------------------\"\n
+                      \     echo \"bundle name is $bundle_name bundle id $bundle_id\"\n
+                      \     echo \"-------------------------\"\n\n      if [ \"${bundle_id}\"
+                      != \"\" ];then\n      echo \"executing revoke command\"\n        export
+                      REVOKE=\"{\\\"ids\\\":[\\\"$bundle_id\\\"],\\\"confirmImpactedClustersIds\\\":[]}\"\n
+                      \       curl -k -X PATCH -u \"admin:$PASSWORD\" -H \"Content-Type:
+                      application/json\" --data $REVOKE https://central/v1/cluster-init/init-bundles/revoke\n
+                      \     fi\n\n      printf '.'\n      attempt_counter=$(($attempt_counter+1))\n
+                      \     echo \"Made create bundle attempt $attempt_counter, waiting...\"\n
+                      \     sleep 5\n  done\n\n  echo \"Bundle received\"\n\n  if
+                      [[ \"$OSTYPE\" == \"linux-gnu\"* ]]; then\n      BASE='base64
+                      -w 0'\n  elif [[ \"$OSTYPE\" == \"darwin\"* ]]; then\n      BASE='base64'\n
+                      \ fi\n\n  echo \"Applying bundle\"\n  # No jq in container,
+                      python to the rescue\n  cat /tmp/bundle.json | python3 -c \"import
+                      sys, json; print(json.load(sys.stdin)['kubectlBundle'])\" |
+                      ${BASE} -d | oc apply -f -\n  ACS_HOST=\"$(oc get route central
+                      -o custom-columns=HOST:.spec.host --no-headers):443\"\n  oc
+                      patch secret sensor-tls --type='json' -p=\"[{\\\"op\\\" : \\\"add\\\",
+                      \\\"path\\\" : \\\"/data/acs-host\\\", \\\"value\\\" : \\\"$(echo
+                      $ACS_HOST | ${BASE})\\\"}]\"\n  echo \"ACS Cluster init bundle
+                      generated and applied\"\nfi\n"
+                    env:
+                    - name: PASSWORD
+                      valueFrom:
+                        secretKeyRef:
+                          key: password
+                          name: central-htpasswd
+                    image: image-registry.openshift-image-registry.svc:5000/openshift/cli:latest
+                    imagePullPolicy: Always
+                    name: create-cluster-init-bundle
+                  dnsPolicy: ClusterFirst
+                  restartPolicy: Never
+                  serviceAccount: create-cluster-init
+                  serviceAccountName: create-cluster-init
+                  terminationGracePeriodSeconds: 30
+        remediationAction: enforce
+        severity: medium
+  remediationAction: enforce
+---
+apiVersion: policy.open-cluster-management.io/v1
+kind: Policy
+metadata:
+  annotations:
+    argocd.argoproj.io/compare-options: IgnoreExtraneous
+    policy.open-cluster-management.io/categories: SC System and Communications Protection
+    policy.open-cluster-management.io/controls: SC-1 Policy and Procedures
+    policy.open-cluster-management.io/description: ""
+    policy.open-cluster-management.io/standards: NIST SP 800-53
+  labels:
+    open-cluster-management.io/policy-set: opp
+  name: enf-acs-operator-central
+  namespace: policies
+spec:
+  dependencies:
+  - apiVersion: policy.open-cluster-management.io/v1
+    compliance: Compliant
+    kind: Policy
+    name: policy-odf-status
+    namespace: policies
+  disabled: false
+  policy-templates:
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: enf-acs-operator-central
+      spec:
+        object-templates:
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: v1
+            kind: Namespace
+            metadata:
+              name: stackrox
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: platform.stackrox.io/v1alpha1
+            kind: Central
+            metadata:
+              name: stackrox-central-services
+              namespace: stackrox
+            spec:
+              central:
+                db:
+                  persistence:
+                    persistentVolumeClaim:
+                      claimName: central-db
+                      size: 10Gi
+                      storageClassName: ocs-storagecluster-ceph-rbd
+                  resources:
+                    requests:
+                      cpu: 2
+                      memory: 4Gi
+                exposure:
+                  loadBalancer:
+                    enabled: false
+                    port: 443
+                  nodePort:
+                    enabled: false
+                  route:
+                    enabled: true
+              egress:
+                connectivityPolicy: Offline
+              scanner:
+                analyzer:
+                  scaling:
+                    autoScaling: Enabled
+                    maxReplicas: 5
+                    minReplicas: 1
+                    replicas: 1
+                scannerComponent: Enabled
+        remediationAction: enforce
+        severity: medium
   remediationAction: enforce
 ---
 apiVersion: policy.open-cluster-management.io/v1
@@ -222,64 +719,301 @@ metadata:
   annotations:
     argocd.argoproj.io/compare-options: IgnoreExtraneous
     policy.open-cluster-management.io/categories: SI System and Information Integrity
-    policy.open-cluster-management.io/controls: SI-7 Software Firmware and Information
-      Integrity
+    policy.open-cluster-management.io/controls: SI-5 Security Alerts Advisories and
+      Directives
     policy.open-cluster-management.io/description: ""
     policy.open-cluster-management.io/standards: NIST SP 800-53
   labels:
     open-cluster-management.io/policy-set: opp
-  name: create-router-bundle
+  name: enf-acs-sync-resources
   namespace: policies
 spec:
+  dependencies:
+  - apiVersion: policy.open-cluster-management.io/v1
+    compliance: Compliant
+    kind: Policy
+    name: policy-acs-central-ca-bundle
+    namespace: policies
   disabled: false
   policy-templates:
   - objectDefinition:
       apiVersion: policy.open-cluster-management.io/v1
       kind: ConfigurationPolicy
       metadata:
-        name: proxy-sync-hub
+        name: enf-acs-sync-resources
       spec:
-        object-templates-raw: |
-          {{- if ne (lookup "v1" "ConfigMap" "openshift-config" "router-bundle").kind "ConfigMap" -}}
-          - complianceType: musthave
-            objectDefinition:
-              apiVersion: v1
-              data:
-                ca-bundle.crt: |
-                  {{ ( fromSecret "openshift-ingress-operator" "router-ca" "tls.crt" ) | base64dec | autoindent }}
-              kind: ConfigMap
-              metadata:
-                name: router-bundle
-                namespace: openshift-config
-          {{- end -}}
+        object-templates:
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: platform.stackrox.io/v1alpha1
+            kind: SecuredCluster
+            metadata:
+              name: stackrox-secured-cluster-services
+              namespace: stackrox
+            spec:
+              admissionControl:
+                listenOnCreates: false
+                listenOnEvents: true
+                listenOnUpdates: false
+              auditLogs:
+                collection: Auto
+              centralEndpoint: |
+                {{ fromSecret "stackrox" "sensor-tls" "acs-host" | base64dec }}
+              clusterName: |
+                {{ fromSecret "open-cluster-management-agent" "hub-kubeconfig-secret" "cluster-name" | base64dec }}
+              perNode:
+                collector:
+                  collection: CORE_BPF
+                  imageFlavor: Regular
+                taintToleration: TolerateTaints
+              scanner:
+                scannerComponent: Disabled
         remediationAction: enforce
-        severity: high
+        severity: medium
   - objectDefinition:
       apiVersion: policy.open-cluster-management.io/v1
       kind: ConfigurationPolicy
       metadata:
-        name: create-router-bundle
+        name: enf-acs-sync-resources2
       spec:
         object-templates:
         - complianceType: musthave
           objectDefinition:
             apiVersion: v1
             data:
-              ca-bundle.crt: |
-                {{ ( fromConfigMap "openshift-config" "router-bundle" "ca-bundle.crt" ) | autoindent }}
-            kind: ConfigMap
+              admission-control-cert.pem: '{{ fromSecret "stackrox" "admission-control-tls"
+                "admission-control-cert.pem" }}'
+              admission-control-key.pem: '{{ fromSecret "stackrox" "admission-control-tls"
+                "admission-control-key.pem" }}'
+              ca.pem: '{{ fromSecret "stackrox" "admission-control-tls" "ca.pem" }}'
+            kind: Secret
             metadata:
-              name: router-bundle
+              labels:
+                certificate_key_name: admission-control-cert.pem
+              name: admission-control-tls
               namespace: policies
+            type: Opaque
+        remediationAction: enforce
+        severity: medium
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: enf-acs-sync-resources3
+      spec:
+        object-templates:
         - complianceType: musthave
           objectDefinition:
-            apiVersion: config.openshift.io/v1
-            kind: Proxy
+            apiVersion: v1
+            data:
+              ca.pem: '{{ fromSecret "stackrox" "collector-tls" "ca.pem" }}'
+              collector-cert.pem: '{{ fromSecret "stackrox" "collector-tls" "collector-cert.pem"
+                }}'
+              collector-key.pem: '{{ fromSecret "stackrox" "collector-tls" "collector-key.pem"
+                }}'
+            kind: Secret
             metadata:
-              name: cluster
+              labels:
+                certificate_key_name: collector-cert.pem
+              name: collector-tls
+              namespace: policies
+            type: Opaque
+        remediationAction: enforce
+        severity: medium
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: enf-acs-sync-resources4
+      spec:
+        object-templates:
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: v1
+            data:
+              acs-host: '{{ fromSecret "stackrox" "sensor-tls" "acs-host" }}'
+              ca.pem: '{{ fromSecret "stackrox" "sensor-tls" "ca.pem" }}'
+              sensor-cert.pem: '{{ fromSecret "stackrox" "sensor-tls" "sensor-cert.pem"
+                }}'
+              sensor-key.pem: '{{ fromSecret "stackrox" "sensor-tls" "sensor-key.pem"
+                }}'
+            kind: Secret
+            metadata:
+              labels:
+                certificate_key_name: sensor-cert.pem
+              name: sensor-tls
+              namespace: policies
+            type: Opaque
+        remediationAction: enforce
+        severity: medium
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: enf-acs-sync-resources5
+      spec:
+        object-templates:
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: console.openshift.io/v1
+            kind: ConsoleLink
+            metadata:
+              name: acs
             spec:
-              trustedCA:
-                name: router-bundle
+              applicationMenu:
+                section: Red Hat applications
+              href: https://{{ (lookup "route.openshift.io/v1" "Route" "stackrox"
+                "central").spec.host }}
+              location: ApplicationMenu
+              text: Red Hat Advanced Cluster Security for Kubernetes
+        remediationAction: enforce
+        severity: medium
+  remediationAction: enforce
+---
+apiVersion: policy.open-cluster-management.io/v1
+kind: Policy
+metadata:
+  annotations:
+    argocd.argoproj.io/compare-options: IgnoreExtraneous
+    policy.open-cluster-management.io/categories: SI System and Information Integrity
+    policy.open-cluster-management.io/controls: SI-5 Security Alerts Advisories and
+      Directives
+    policy.open-cluster-management.io/description: ""
+    policy.open-cluster-management.io/standards: NIST SP 800-53
+  labels:
+    open-cluster-management.io/policy-set: opp
+  name: enf-advanced-managed-cluster-security
+  namespace: policies
+spec:
+  disabled: false
+  policy-templates:
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: enf-advanced-managed-cluster-security
+      spec:
+        object-templates:
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: v1
+            kind: Namespace
+            metadata:
+              name: stackrox
+        remediationAction: enforce
+        severity: medium
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: enf-advanced-managed-cluster-security2
+      spec:
+        object-templates:
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: v1
+            data:
+              admission-control-cert.pem: '{{hub fromSecret "policies" "admission-control-tls"
+                "admission-control-cert.pem" hub}}'
+              admission-control-key.pem: '{{hub fromSecret "policies" "admission-control-tls"
+                "admission-control-key.pem" hub}}'
+              ca.pem: '{{hub fromSecret "policies" "admission-control-tls" "ca.pem"
+                hub}}'
+            kind: Secret
+            metadata:
+              name: admission-control-tls
+              namespace: stackrox
+            type: Opaque
+        remediationAction: enforce
+        severity: medium
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: enf-advanced-managed-cluster-security3
+      spec:
+        object-templates:
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: v1
+            data:
+              ca.pem: '{{hub fromSecret "policies" "collector-tls" "ca.pem" hub}}'
+              collector-cert.pem: '{{hub fromSecret "policies" "collector-tls" "collector-cert.pem"
+                hub}}'
+              collector-key.pem: '{{hub fromSecret "policies" "collector-tls" "collector-key.pem"
+                hub}}'
+            kind: Secret
+            metadata:
+              name: collector-tls
+              namespace: stackrox
+            type: Opaque
+        remediationAction: enforce
+        severity: medium
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: enf-advanced-managed-cluster-security4
+      spec:
+        object-templates:
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: v1
+            data:
+              acs-host: '{{hub fromSecret "policies" "sensor-tls" "acs-host" hub}}'
+              ca.pem: '{{hub fromSecret "policies" "sensor-tls" "ca.pem" hub}}'
+              sensor-cert.pem: '{{hub fromSecret "policies" "sensor-tls" "sensor-cert.pem"
+                hub}}'
+              sensor-key.pem: '{{hub fromSecret "policies" "sensor-tls" "sensor-key.pem"
+                hub}}'
+            kind: Secret
+            metadata:
+              name: sensor-tls
+              namespace: stackrox
+            type: Opaque
+        remediationAction: enforce
+        severity: medium
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: enf-advanced-managed-cluster-security5
+      spec:
+        object-templates:
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: platform.stackrox.io/v1alpha1
+            kind: SecuredCluster
+            metadata:
+              name: stackrox-secured-cluster-services
+              namespace: stackrox
+            spec:
+              admissionControl:
+                listenOnCreates: false
+                listenOnEvents: true
+                listenOnUpdates: false
+                replicas: 1
+              auditLogs:
+                collection: Auto
+              centralEndpoint: |
+                {{ fromSecret "stackrox" "sensor-tls" "acs-host" | base64dec }}
+              clusterName: |
+                {{ fromSecret "open-cluster-management-agent" "hub-kubeconfig-secret" "cluster-name" | base64dec }}
+              perNode:
+                collector:
+                  collection: CORE_BPF
+                  imageFlavor: Regular
+                taintToleration: TolerateTaints
+              scanner:
+                analyzer:
+                  scaling:
+                    minReplicas: 1
+                    replicas: 1
+              sensor:
+                resources:
+                  requests:
+                    cpu: 500m
+                    memory: 1Gi
         remediationAction: enforce
         severity: medium
   remediationAction: enforce
@@ -296,7 +1030,7 @@ metadata:
     policy.open-cluster-management.io/standards: NIST SP 800-53
   labels:
     open-cluster-management.io/policy-set: opp
-  name: csv-check
+  name: enf-all-operators-install
   namespace: policies
 spec:
   disabled: false
@@ -305,172 +1039,7 @@ spec:
       apiVersion: policy.open-cluster-management.io/v1
       kind: ConfigurationPolicy
       metadata:
-        name: csv-check
-      spec:
-        object-templates-raw: |
-          {{- range $sub := (lookup "operators.coreos.com/v1alpha1" "Subscription" "" "").items }}
-          {{- $pm := lookup "packages.operators.coreos.com/v1" "PackageManifest" "openshift-marketplace" $sub.metadata.name ( (cat "catalog=" $sub.spec.source ) | replace " " "" ) }}
-          {{- range $ch := $pm.status.channels }}
-          {{- if (eq $ch.name $pm.status.defaultChannel) }}
-          - complianceType: musthave
-            objectDefinition:
-              apiVersion: operators.coreos.com/v1alpha1
-              kind: ClusterServiceVersion
-              metadata:
-                name: {{ $ch.currentCSV }}
-                namespace: {{ $sub.metadata.namespace }}
-              status:
-                phase: Succeeded
-          {{- end }}
-          {{- end }}
-          {{- end }}
-        remediationAction: inform
-        severity: high
-  remediationAction: inform
----
-apiVersion: policy.open-cluster-management.io/v1
-kind: Policy
-metadata:
-  annotations:
-    argocd.argoproj.io/compare-options: IgnoreExtraneous
-    policy.open-cluster-management.io/categories: SI System and Information Integrity
-    policy.open-cluster-management.io/controls: SI-7 Software Firmware and Information
-      Integrity
-    policy.open-cluster-management.io/description: ""
-    policy.open-cluster-management.io/standards: NIST SP 800-53
-  labels:
-    open-cluster-management.io/policy-set: opp
-  name: cv-check
-  namespace: policies
-spec:
-  disabled: false
-  policy-templates:
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1
-      kind: ConfigurationPolicy
-      metadata:
-        name: cv-check
-      spec:
-        object-templates:
-        - complianceType: mustnothave
-          objectDefinition:
-            apiVersion: config.openshift.io/v1
-            kind: ClusterOperator
-            status:
-              conditions:
-              - status: "False"
-                type: Available
-        remediationAction: inform
-        severity: medium
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1
-      kind: ConfigurationPolicy
-      metadata:
-        name: cv-check2
-      spec:
-        object-templates:
-        - complianceType: mustnothave
-          objectDefinition:
-            apiVersion: config.openshift.io/v1
-            kind: ClusterOperator
-            status:
-              conditions:
-              - status: "True"
-                type: Degraded
-        remediationAction: inform
-        severity: medium
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1
-      kind: ConfigurationPolicy
-      metadata:
-        name: cv-check3
-      spec:
-        object-templates:
-        - complianceType: mustnothave
-          objectDefinition:
-            apiVersion: machineconfiguration.openshift.io/v1
-            kind: MachineConfigPool
-            status:
-              conditions:
-              - status: "False"
-                type: Updated
-        remediationAction: inform
-        severity: medium
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1
-      kind: ConfigurationPolicy
-      metadata:
-        name: cv-check4
-      spec:
-        object-templates:
-        - complianceType: mustnothave
-          objectDefinition:
-            apiVersion: machineconfiguration.openshift.io/v1
-            kind: MachineConfigPool
-            status:
-              conditions:
-              - status: "True"
-                type: Degraded
-        remediationAction: inform
-        severity: medium
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1
-      kind: ConfigurationPolicy
-      metadata:
-        name: cv-check5
-      spec:
-        object-templates:
-        - complianceType: mustnothave
-          objectDefinition:
-            apiVersion: config.openshift.io/v1
-            kind: ClusterVersion
-            status:
-              conditions:
-              - status: "False"
-                type: Available
-        remediationAction: inform
-        severity: medium
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1
-      kind: ConfigurationPolicy
-      metadata:
-        name: cv-check6
-      spec:
-        object-templates:
-        - complianceType: mustnothave
-          objectDefinition:
-            apiVersion: config.openshift.io/v1
-            kind: ClusterVersion
-            status:
-              conditions:
-              - status: "True"
-                type: Progressing
-        remediationAction: inform
-        severity: medium
-  remediationAction: inform
----
-apiVersion: policy.open-cluster-management.io/v1
-kind: Policy
-metadata:
-  annotations:
-    argocd.argoproj.io/compare-options: IgnoreExtraneous
-    policy.open-cluster-management.io/categories: SI System and Information Integrity
-    policy.open-cluster-management.io/controls: SI-7 Software Firmware and Information
-      Integrity
-    policy.open-cluster-management.io/description: ""
-    policy.open-cluster-management.io/standards: NIST SP 800-53
-  labels:
-    open-cluster-management.io/policy-set: opp
-  name: opp-all-operators-install
-  namespace: policies
-spec:
-  disabled: false
-  policy-templates:
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1
-      kind: ConfigurationPolicy
-      metadata:
-        name: opp-all-operators-install
+        name: enf-all-operators-install
       spec:
         object-templates:
         - complianceType: musthave
@@ -721,7 +1290,7 @@ metadata:
     policy.open-cluster-management.io/standards: NIST SP 800-53
   labels:
     open-cluster-management.io/policy-set: opp
-  name: opp-hub-operators-install
+  name: enf-create-router-bundle
   namespace: policies
 spec:
   disabled: false
@@ -730,7 +1299,120 @@ spec:
       apiVersion: policy.open-cluster-management.io/v1
       kind: ConfigurationPolicy
       metadata:
-        name: opp-hub-operators-install
+        name: proxy-sync-hub
+      spec:
+        object-templates-raw: |
+          {{- if ne (lookup "v1" "ConfigMap" "openshift-config" "router-bundle").kind "ConfigMap" -}}
+          - complianceType: musthave
+            objectDefinition:
+              apiVersion: v1
+              data:
+                ca-bundle.crt: |
+                  {{ ( fromSecret "openshift-ingress-operator" "router-ca" "tls.crt" ) | base64dec | autoindent }}
+              kind: ConfigMap
+              metadata:
+                name: router-bundle
+                namespace: openshift-config
+          {{- end -}}
+        remediationAction: enforce
+        severity: high
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: enf-create-router-bundle
+      spec:
+        object-templates:
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: v1
+            data:
+              ca-bundle.crt: |
+                {{ ( fromConfigMap "openshift-config" "router-bundle" "ca-bundle.crt" ) | autoindent }}
+            kind: ConfigMap
+            metadata:
+              name: router-bundle
+              namespace: policies
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: config.openshift.io/v1
+            kind: Proxy
+            metadata:
+              name: cluster
+            spec:
+              trustedCA:
+                name: router-bundle
+        remediationAction: enforce
+        severity: medium
+  remediationAction: enforce
+---
+apiVersion: policy.open-cluster-management.io/v1
+kind: Policy
+metadata:
+  annotations:
+    argocd.argoproj.io/compare-options: IgnoreExtraneous
+    policy.open-cluster-management.io/categories: SI System and Information Integrity
+    policy.open-cluster-management.io/controls: SI-7 Software Firmware and Information
+      Integrity
+    policy.open-cluster-management.io/description: ""
+    policy.open-cluster-management.io/standards: NIST SP 800-53
+  labels:
+    open-cluster-management.io/policy-set: opp
+  name: enf-cs-redhat-operator-update
+  namespace: policies
+spec:
+  dependencies:
+  - apiVersion: policy.open-cluster-management.io/v1
+    compliance: Compliant
+    kind: Policy
+    name: cv-check
+    namespace: policies
+  disabled: false
+  policy-templates:
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: cs-redhat-operator-update
+      spec:
+        object-templates-raw: |
+          {{- $cs := lookup "operators.coreos.com/v1alpha1" "CatalogSource" "openshift-marketplace" "cs-redhat-operator-index" }}
+          - complianceType: musthave
+            objectDefinition:
+              apiVersion: operators.coreos.com/v1alpha1
+              kind: CatalogSource
+              metadata:
+                name: {{ $cs.metadata.name }}
+                namespace: {{ $cs.metadata.namespace }}
+              spec:
+                image: {{ ( (cat (split ":v4." $cs.spec.image)._0 ":v4." (split "." (lookup "config.openshift.io/v1" "ClusterVersion" "" "version").status.desired.version)._1) | replace " " "" ) }}
+                sourceType: grpc
+        remediationAction: enforce
+        severity: high
+  remediationAction: enforce
+---
+apiVersion: policy.open-cluster-management.io/v1
+kind: Policy
+metadata:
+  annotations:
+    argocd.argoproj.io/compare-options: IgnoreExtraneous
+    policy.open-cluster-management.io/categories: SI System and Information Integrity
+    policy.open-cluster-management.io/controls: SI-7 Software Firmware and Information
+      Integrity
+    policy.open-cluster-management.io/description: ""
+    policy.open-cluster-management.io/standards: NIST SP 800-53
+  labels:
+    open-cluster-management.io/policy-set: opp
+  name: enf-hub-operators-install
+  namespace: policies
+spec:
+  disabled: false
+  policy-templates:
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: enf-hub-operators-install
       spec:
         object-templates:
         - complianceType: musthave
@@ -985,1080 +1667,6 @@ kind: Policy
 metadata:
   annotations:
     argocd.argoproj.io/compare-options: IgnoreExtraneous
-    policy.open-cluster-management.io/categories: SI System and Information Integrity
-    policy.open-cluster-management.io/controls: SI-5 Security Alerts Advisories and
-      Directives
-    policy.open-cluster-management.io/description: ""
-    policy.open-cluster-management.io/standards: NIST SP 800-53
-  labels:
-    open-cluster-management.io/policy-set: opp
-  name: policy-acs-central-ca-bundle
-  namespace: policies
-spec:
-  dependencies:
-  - apiVersion: policy.open-cluster-management.io/v1
-    compliance: Compliant
-    kind: Policy
-    name: policy-acs-central-status
-    namespace: policies
-  disabled: false
-  policy-templates:
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1
-      kind: ConfigurationPolicy
-      metadata:
-        name: policy-acs-central-ca-bundle
-      spec:
-        object-templates:
-        - complianceType: musthave
-          objectDefinition:
-            apiVersion: v1
-            kind: Namespace
-            metadata:
-              name: stackrox
-        remediationAction: enforce
-        severity: medium
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1
-      kind: ConfigurationPolicy
-      metadata:
-        name: policy-acs-central-ca-bundle2
-      spec:
-        object-templates:
-        - complianceType: musthave
-          objectDefinition:
-            apiVersion: v1
-            kind: ServiceAccount
-            metadata:
-              annotations:
-                argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
-              name: create-cluster-init
-              namespace: stackrox
-        remediationAction: enforce
-        severity: medium
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1
-      kind: ConfigurationPolicy
-      metadata:
-        name: policy-acs-central-ca-bundle3
-      spec:
-        object-templates:
-        - complianceType: musthave
-          objectDefinition:
-            apiVersion: rbac.authorization.k8s.io/v1
-            kind: Role
-            metadata:
-              annotations:
-                argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
-                argocd.argoproj.io/sync-wave: "1"
-              name: create-cluster-init
-              namespace: stackrox
-            rules:
-            - apiGroups:
-              - ""
-              resources:
-              - secrets
-              verbs:
-              - get
-              - list
-              - create
-              - patch
-              - update
-            - apiGroups:
-              - platform.stackrox.io
-              resources:
-              - securedclusters
-              verbs:
-              - get
-              - list
-              - patch
-              - update
-            - apiGroups:
-              - route.openshift.io
-              resources:
-              - routes
-              verbs:
-              - get
-              - list
-        remediationAction: enforce
-        severity: medium
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1
-      kind: ConfigurationPolicy
-      metadata:
-        name: policy-acs-central-ca-bundle4
-      spec:
-        object-templates:
-        - complianceType: musthave
-          objectDefinition:
-            apiVersion: rbac.authorization.k8s.io/v1
-            kind: RoleBinding
-            metadata:
-              annotations:
-                argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
-              name: create-cluster-init
-              namespace: stackrox
-            roleRef:
-              apiGroup: rbac.authorization.k8s.io
-              kind: Role
-              name: create-cluster-init
-            subjects:
-            - kind: ServiceAccount
-              name: create-cluster-init
-              namespace: stackrox
-        remediationAction: enforce
-        severity: medium
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1
-      kind: ConfigurationPolicy
-      metadata:
-        name: policy-acs-central-ca-bundle5
-      spec:
-        object-templates:
-        - complianceType: musthave
-          objectDefinition:
-            apiVersion: imageregistry.operator.openshift.io/v1
-            kind: Config
-            metadata:
-              name: cluster
-            spec:
-              managementState: Managed
-              storage:
-                emptyDir: {}
-            status:
-              conditions:
-              - status: "True"
-                type: Available
-        remediationAction: enforce
-        severity: medium
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1
-      kind: ConfigurationPolicy
-      metadata:
-        name: policy-acs-central-ca-bundle6
-      spec:
-        object-templates:
-        - complianceType: musthave
-          objectDefinition:
-            apiVersion: batch/v1
-            kind: Job
-            metadata:
-              annotations:
-                argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
-                argocd.argoproj.io/sync-wave: "2"
-              labels:
-                init-bundle: central
-              name: create-cluster-init-bundle-v2
-              namespace: stackrox
-            spec:
-              template:
-                metadata:
-                  annotations:
-                    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
-                  labels:
-                    init-bundle: central
-                spec:
-                  containers:
-                  - command:
-                    - /bin/bash
-                    - -c
-                    - "#!/usr/bin/env bash\nif kubectl get secret/sensor-tls &> /dev/null;
-                      then\n  echo \"cluster-init bundle has already been configured,
-                      doing nothing\"\n  exit 0\nelse\n\n  # Wait for central to be
-                      ready\n  attempt_counter=0\n  max_attempts=20\n  echo \"Waiting
-                      for central to be available...\"\n  until $(curl -k --output
-                      /dev/null --silent --head --fail https://central); do\n      if
-                      [ ${attempt_counter} -eq ${max_attempts} ];then\n        echo
-                      \"Max attempts reached\"\n        exit 1\n      fi\n\n      printf
-                      '.'\n      attempt_counter=$(($attempt_counter+1))\n      echo
-                      \"Made attempt $attempt_counter, waiting...\"\n      sleep 5\n
-                      \ done\n\n  # attempt to create init-bundle\n  # on failure
-                      attempt to delete the bundle\n  attempt_counter=0\n  max_attempts=5\n
-                      \ echo \"Configuring cluster-init bundle\"\n  \n  # set the
-                      bundle name to include todays date\n  bundle_name=local-cluster-$(date
-                      '+%Y%m%d')\n  export DATA={\\\"name\\\":\\\"$bundle_name\\\"}\n
-                      \ until (curl -k -o /tmp/bundle.json -X POST -u \"admin:$PASSWORD\"
-                      -H \"Content-Type: application/json\" --data $DATA --fail https://central/v1/cluster-init/init-bundles);
-                      do\n      if [ ${attempt_counter} -eq ${max_attempts} ];then\n
-                      \       echo \"Max attempts to create bundle reached\"\n        exit
-                      1\n      fi\n\n      echo \"Check to see if there is an existing
-                      bundle that can be revoked\"\n      curl -o /tmp/find_bundle.json
-                      \ -k -X GET -u \"admin:$PASSWORD\" -H \"Content-Type: application/json\"
-                      https://central/v1/cluster-init/init-bundles\n      bundle_id=$(cat
-                      /tmp/find_bundle.json | python -c \"import sys, json; result
-                      = [x for x in json.load(sys.stdin)[\\\"items\\\"] if x[\\\"name\\\"]==\\\"$bundle_name\\\"];
-                      print(result[0][\\\"id\\\"])\")\n\n      echo \"-------------------------\"\n
-                      \     echo \"bundle name is $bundle_name bundle id $bundle_id\"\n
-                      \     echo \"-------------------------\"\n\n      if [ \"${bundle_id}\"
-                      != \"\" ];then\n      echo \"executing revoke command\"\n        export
-                      REVOKE=\"{\\\"ids\\\":[\\\"$bundle_id\\\"],\\\"confirmImpactedClustersIds\\\":[]}\"\n
-                      \       curl -k -X PATCH -u \"admin:$PASSWORD\" -H \"Content-Type:
-                      application/json\" --data $REVOKE https://central/v1/cluster-init/init-bundles/revoke\n
-                      \     fi\n\n      printf '.'\n      attempt_counter=$(($attempt_counter+1))\n
-                      \     echo \"Made create bundle attempt $attempt_counter, waiting...\"\n
-                      \     sleep 5\n  done\n\n  echo \"Bundle received\"\n\n  if
-                      [[ \"$OSTYPE\" == \"linux-gnu\"* ]]; then\n      BASE='base64
-                      -w 0'\n  elif [[ \"$OSTYPE\" == \"darwin\"* ]]; then\n      BASE='base64'\n
-                      \ fi\n\n  echo \"Applying bundle\"\n  # No jq in container,
-                      python to the rescue\n  cat /tmp/bundle.json | python3 -c \"import
-                      sys, json; print(json.load(sys.stdin)['kubectlBundle'])\" |
-                      ${BASE} -d | oc apply -f -\n  ACS_HOST=\"$(oc get route central
-                      -o custom-columns=HOST:.spec.host --no-headers):443\"\n  oc
-                      patch secret sensor-tls --type='json' -p=\"[{\\\"op\\\" : \\\"add\\\",
-                      \\\"path\\\" : \\\"/data/acs-host\\\", \\\"value\\\" : \\\"$(echo
-                      $ACS_HOST | ${BASE})\\\"}]\"\n  echo \"ACS Cluster init bundle
-                      generated and applied\"\nfi\n"
-                    env:
-                    - name: PASSWORD
-                      valueFrom:
-                        secretKeyRef:
-                          key: password
-                          name: central-htpasswd
-                    image: image-registry.openshift-image-registry.svc:5000/openshift/cli:latest
-                    imagePullPolicy: Always
-                    name: create-cluster-init-bundle
-                  dnsPolicy: ClusterFirst
-                  restartPolicy: Never
-                  serviceAccount: create-cluster-init
-                  serviceAccountName: create-cluster-init
-                  terminationGracePeriodSeconds: 30
-        remediationAction: enforce
-        severity: medium
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1
-      kind: ConfigurationPolicy
-      metadata:
-        name: policy-acs-central-ca-bundle7
-      spec:
-        object-templates:
-        - complianceType: mustnothave
-          objectDefinition:
-            apiVersion: batch/v1
-            kind: Job
-            metadata:
-              name: create-cluster-init-bundle
-              namespace: stackrox
-        remediationAction: enforce
-        severity: medium
-  remediationAction: enforce
----
-apiVersion: policy.open-cluster-management.io/v1
-kind: Policy
-metadata:
-  annotations:
-    argocd.argoproj.io/compare-options: IgnoreExtraneous
-    policy.open-cluster-management.io/categories: SC System and Communications Protection
-    policy.open-cluster-management.io/controls: SC-8 Transmission Confidentiality
-      and Integrity
-    policy.open-cluster-management.io/description: ""
-    policy.open-cluster-management.io/standards: NIST SP 800-53
-  labels:
-    open-cluster-management.io/policy-set: opp
-  name: policy-acs-central-ca-bundle-expired
-  namespace: policies
-spec:
-  dependencies:
-  - apiVersion: policy.open-cluster-management.io/v1
-    compliance: NonCompliant
-    kind: Policy
-    name: policy-acs-monitor-certs
-    namespace: policies
-  disabled: false
-  policy-templates:
-  - ignorePending: true
-    objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1
-      kind: ConfigurationPolicy
-      metadata:
-        name: policy-acs-central-ca-bundle-expired
-      spec:
-        evaluationInterval:
-          compliant: 1m
-          noncompliant: 45s
-        object-templates:
-        - complianceType: mustnothave
-          objectDefinition:
-            apiVersion: v1
-            kind: Secret
-            metadata:
-              name: sensor-tls
-              namespace: stackrox
-        remediationAction: enforce
-        severity: medium
-  - ignorePending: true
-    objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1
-      kind: ConfigurationPolicy
-      metadata:
-        name: policy-acs-central-ca-bundle-expired2
-      spec:
-        evaluationInterval:
-          compliant: 1m
-          noncompliant: 45s
-        object-templates:
-        - complianceType: mustnothave
-          objectDefinition:
-            apiVersion: v1
-            kind: Secret
-            metadata:
-              name: collector-tls
-              namespace: stackrox
-        remediationAction: enforce
-        severity: medium
-  - ignorePending: true
-    objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1
-      kind: ConfigurationPolicy
-      metadata:
-        name: policy-acs-central-ca-bundle-expired3
-      spec:
-        evaluationInterval:
-          compliant: 1m
-          noncompliant: 45s
-        object-templates:
-        - complianceType: mustnothave
-          objectDefinition:
-            apiVersion: v1
-            kind: Secret
-            metadata:
-              name: admission-control-tls
-              namespace: stackrox
-        remediationAction: enforce
-        severity: medium
-  - ignorePending: true
-    objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1
-      kind: ConfigurationPolicy
-      metadata:
-        name: policy-acs-central-ca-bundle-expired4
-      spec:
-        evaluationInterval:
-          compliant: 1m
-          noncompliant: 45s
-        object-templates:
-        - complianceType: mustnothave
-          objectDefinition:
-            apiVersion: imageregistry.operator.openshift.io/v1
-            kind: Config
-            metadata:
-              name: cluster
-            spec:
-              managementState: Managed
-              storage:
-                emptyDir: {}
-            status:
-              conditions:
-              - status: "True"
-                type: Available
-        remediationAction: enforce
-        severity: medium
-  - ignorePending: true
-    objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1
-      kind: ConfigurationPolicy
-      metadata:
-        name: policy-acs-central-ca-bundle-expired5
-      spec:
-        evaluationInterval:
-          compliant: 1m
-          noncompliant: 45s
-        object-templates:
-        - complianceType: mustnothave
-          objectDefinition:
-            apiVersion: batch/v1
-            kind: Job
-            metadata:
-              annotations:
-                argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
-                argocd.argoproj.io/sync-wave: "2"
-              labels:
-                init-bundle: central
-              name: create-cluster-init-bundle-v2
-              namespace: stackrox
-            spec:
-              template:
-                metadata:
-                  annotations:
-                    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
-                  labels:
-                    init-bundle: central
-                spec:
-                  containers:
-                  - command:
-                    - /bin/bash
-                    - -c
-                    - "#!/usr/bin/env bash\nif kubectl get secret/sensor-tls &> /dev/null;
-                      then\n  echo \"cluster-init bundle has already been configured,
-                      doing nothing\"\n  exit 0\nelse\n\n  # Wait for central to be
-                      ready\n  attempt_counter=0\n  max_attempts=20\n  echo \"Waiting
-                      for central to be available...\"\n  until $(curl -k --output
-                      /dev/null --silent --head --fail https://central); do\n      if
-                      [ ${attempt_counter} -eq ${max_attempts} ];then\n        echo
-                      \"Max attempts reached\"\n        exit 1\n      fi\n\n      printf
-                      '.'\n      attempt_counter=$(($attempt_counter+1))\n      echo
-                      \"Made attempt $attempt_counter, waiting...\"\n      sleep 5\n
-                      \ done\n\n  # attempt to create init-bundle\n  # on failure
-                      attempt to delete the bundle\n  attempt_counter=0\n  max_attempts=5\n
-                      \ echo \"Configuring cluster-init bundle\"\n  \n  # set the
-                      bundle name to include todays date\n  bundle_name=local-cluster-$(date
-                      '+%Y%m%d')\n  export DATA={\\\"name\\\":\\\"$bundle_name\\\"}\n
-                      \ until (curl -k -o /tmp/bundle.json -X POST -u \"admin:$PASSWORD\"
-                      -H \"Content-Type: application/json\" --data $DATA --fail https://central/v1/cluster-init/init-bundles);
-                      do\n      if [ ${attempt_counter} -eq ${max_attempts} ];then\n
-                      \       echo \"Max attempts to create bundle reached\"\n        exit
-                      1\n      fi\n\n      echo \"Check to see if there is an existing
-                      bundle that can be revoked\"\n      curl -o /tmp/find_bundle.json
-                      \ -k -X GET -u \"admin:$PASSWORD\" -H \"Content-Type: application/json\"
-                      https://central/v1/cluster-init/init-bundles\n      bundle_id=$(cat
-                      /tmp/find_bundle.json | python -c \"import sys, json; result
-                      = [x for x in json.load(sys.stdin)[\\\"items\\\"] if x[\\\"name\\\"]==\\\"$bundle_name\\\"];
-                      print(result[0][\\\"id\\\"])\")\n\n      echo \"-------------------------\"\n
-                      \     echo \"bundle name is $bundle_name bundle id $bundle_id\"\n
-                      \     echo \"-------------------------\"\n\n      if [ \"${bundle_id}\"
-                      != \"\" ];then\n      echo \"executing revoke command\"\n        export
-                      REVOKE=\"{\\\"ids\\\":[\\\"$bundle_id\\\"],\\\"confirmImpactedClustersIds\\\":[]}\"\n
-                      \       curl -k -X PATCH -u \"admin:$PASSWORD\" -H \"Content-Type:
-                      application/json\" --data $REVOKE https://central/v1/cluster-init/init-bundles/revoke\n
-                      \     fi\n\n      printf '.'\n      attempt_counter=$(($attempt_counter+1))\n
-                      \     echo \"Made create bundle attempt $attempt_counter, waiting...\"\n
-                      \     sleep 5\n  done\n\n  echo \"Bundle received\"\n\n  if
-                      [[ \"$OSTYPE\" == \"linux-gnu\"* ]]; then\n      BASE='base64
-                      -w 0'\n  elif [[ \"$OSTYPE\" == \"darwin\"* ]]; then\n      BASE='base64'\n
-                      \ fi\n\n  echo \"Applying bundle\"\n  # No jq in container,
-                      python to the rescue\n  cat /tmp/bundle.json | python3 -c \"import
-                      sys, json; print(json.load(sys.stdin)['kubectlBundle'])\" |
-                      ${BASE} -d | oc apply -f -\n  ACS_HOST=\"$(oc get route central
-                      -o custom-columns=HOST:.spec.host --no-headers):443\"\n  oc
-                      patch secret sensor-tls --type='json' -p=\"[{\\\"op\\\" : \\\"add\\\",
-                      \\\"path\\\" : \\\"/data/acs-host\\\", \\\"value\\\" : \\\"$(echo
-                      $ACS_HOST | ${BASE})\\\"}]\"\n  echo \"ACS Cluster init bundle
-                      generated and applied\"\nfi\n"
-                    env:
-                    - name: PASSWORD
-                      valueFrom:
-                        secretKeyRef:
-                          key: password
-                          name: central-htpasswd
-                    image: image-registry.openshift-image-registry.svc:5000/openshift/cli:latest
-                    imagePullPolicy: Always
-                    name: create-cluster-init-bundle
-                  dnsPolicy: ClusterFirst
-                  restartPolicy: Never
-                  serviceAccount: create-cluster-init
-                  serviceAccountName: create-cluster-init
-                  terminationGracePeriodSeconds: 30
-        remediationAction: enforce
-        severity: medium
-  remediationAction: enforce
----
-apiVersion: policy.open-cluster-management.io/v1
-kind: Policy
-metadata:
-  annotations:
-    argocd.argoproj.io/compare-options: IgnoreExtraneous
-    policy.open-cluster-management.io/categories: SI System and Information Integrity
-    policy.open-cluster-management.io/controls: SI-5 Security Alerts Advisories and
-      Directives
-    policy.open-cluster-management.io/description: ""
-    policy.open-cluster-management.io/standards: NIST SP 800-53
-  labels:
-    open-cluster-management.io/policy-set: opp
-  name: policy-acs-central-status
-  namespace: policies
-spec:
-  dependencies:
-  - apiVersion: policy.open-cluster-management.io/v1
-    compliance: Compliant
-    kind: Policy
-    name: policy-acs-operator-central
-    namespace: policies
-  disabled: false
-  policy-templates:
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1
-      kind: ConfigurationPolicy
-      metadata:
-        name: policy-acs-central-status
-      spec:
-        object-templates:
-        - complianceType: musthave
-          objectDefinition:
-            apiVersion: apps/v1
-            kind: Deployment
-            metadata:
-              name: central
-              namespace: stackrox
-            status:
-              conditions:
-              - status: "True"
-                type: Available
-        - complianceType: musthave
-          objectDefinition:
-            apiVersion: apps/v1
-            kind: Deployment
-            metadata:
-              name: central-db
-              namespace: stackrox
-            status:
-              conditions:
-              - status: "True"
-                type: Available
-        - complianceType: musthave
-          objectDefinition:
-            apiVersion: apps/v1
-            kind: Deployment
-            metadata:
-              name: scanner-db
-              namespace: stackrox
-            status:
-              conditions:
-              - status: "True"
-                type: Available
-        - complianceType: musthave
-          objectDefinition:
-            apiVersion: apps/v1
-            kind: Deployment
-            metadata:
-              name: scanner
-              namespace: stackrox
-            status:
-              conditions:
-              - status: "True"
-                type: Available
-        remediationAction: inform
-        severity: medium
-  remediationAction: inform
----
-apiVersion: policy.open-cluster-management.io/v1
-kind: Policy
-metadata:
-  annotations:
-    argocd.argoproj.io/compare-options: IgnoreExtraneous
-    policy.open-cluster-management.io/categories: SC System and Communications Protection
-    policy.open-cluster-management.io/controls: SC-8 Transmission Confidentiality
-      and Integrity
-    policy.open-cluster-management.io/description: ""
-    policy.open-cluster-management.io/standards: NIST SP 800-53
-  labels:
-    open-cluster-management.io/policy-set: opp
-  name: policy-acs-monitor-certs
-  namespace: policies
-spec:
-  dependencies:
-  - apiVersion: policy.open-cluster-management.io/v1
-    compliance: Compliant
-    kind: Policy
-    name: policy-acs-central-ca-bundle
-    namespace: policies
-  disabled: false
-  policy-templates:
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1
-      kind: CertificatePolicy
-      metadata:
-        name: acs-bundle-certificates
-      spec:
-        minimumDuration: 720h
-        namespaceSelector:
-          include:
-          - policies
-        remediationAction: inform
-        severity: high
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1
-      kind: ConfigurationPolicy
-      metadata:
-        name: policy-acs-monitor-certs
-      spec:
-        object-templates:
-        - complianceType: musthave
-          objectDefinition:
-            apiVersion: v1
-            kind: Secret
-            metadata:
-              name: sensor-tls
-              namespace: stackrox
-        remediationAction: inform
-        severity: medium
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1
-      kind: ConfigurationPolicy
-      metadata:
-        name: policy-acs-monitor-certs2
-      spec:
-        object-templates:
-        - complianceType: musthave
-          objectDefinition:
-            apiVersion: v1
-            kind: Secret
-            metadata:
-              name: collector-tls
-              namespace: stackrox
-        remediationAction: inform
-        severity: medium
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1
-      kind: ConfigurationPolicy
-      metadata:
-        name: policy-acs-monitor-certs3
-      spec:
-        object-templates:
-        - complianceType: musthave
-          objectDefinition:
-            apiVersion: v1
-            kind: Secret
-            metadata:
-              name: admission-control-tls
-              namespace: stackrox
-        remediationAction: inform
-        severity: medium
-  remediationAction: inform
----
-apiVersion: policy.open-cluster-management.io/v1
-kind: Policy
-metadata:
-  annotations:
-    argocd.argoproj.io/compare-options: IgnoreExtraneous
-    policy.open-cluster-management.io/categories: SC System and Communications Protection
-    policy.open-cluster-management.io/controls: SC-1 Policy and Procedures
-    policy.open-cluster-management.io/description: ""
-    policy.open-cluster-management.io/standards: NIST SP 800-53
-  labels:
-    open-cluster-management.io/policy-set: opp
-  name: policy-acs-operator-central
-  namespace: policies
-spec:
-  dependencies:
-  - apiVersion: policy.open-cluster-management.io/v1
-    compliance: Compliant
-    kind: Policy
-    name: policy-odf-status
-    namespace: policies
-  disabled: false
-  policy-templates:
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1
-      kind: ConfigurationPolicy
-      metadata:
-        name: policy-acs-operator-central
-      spec:
-        object-templates:
-        - complianceType: musthave
-          objectDefinition:
-            apiVersion: v1
-            kind: Namespace
-            metadata:
-              name: stackrox
-        - complianceType: musthave
-          objectDefinition:
-            apiVersion: platform.stackrox.io/v1alpha1
-            kind: Central
-            metadata:
-              name: stackrox-central-services
-              namespace: stackrox
-            spec:
-              central:
-                db:
-                  persistence:
-                    persistentVolumeClaim:
-                      claimName: central-db
-                      size: 10Gi
-                      storageClassName: ocs-storagecluster-ceph-rbd
-                  resources:
-                    requests:
-                      cpu: 2
-                      memory: 4Gi
-                exposure:
-                  loadBalancer:
-                    enabled: false
-                    port: 443
-                  nodePort:
-                    enabled: false
-                  route:
-                    enabled: true
-              egress:
-                connectivityPolicy: Offline
-              scanner:
-                analyzer:
-                  scaling:
-                    autoScaling: Enabled
-                    maxReplicas: 5
-                    minReplicas: 1
-                    replicas: 1
-                scannerComponent: Enabled
-        remediationAction: enforce
-        severity: medium
-  remediationAction: enforce
----
-apiVersion: policy.open-cluster-management.io/v1
-kind: Policy
-metadata:
-  annotations:
-    argocd.argoproj.io/compare-options: IgnoreExtraneous
-    policy.open-cluster-management.io/categories: SI System and Information Integrity
-    policy.open-cluster-management.io/controls: SI-5 Security Alerts Advisories and
-      Directives
-    policy.open-cluster-management.io/description: ""
-    policy.open-cluster-management.io/standards: NIST SP 800-53
-  labels:
-    open-cluster-management.io/policy-set: opp
-  name: policy-acs-sync-resources
-  namespace: policies
-spec:
-  dependencies:
-  - apiVersion: policy.open-cluster-management.io/v1
-    compliance: Compliant
-    kind: Policy
-    name: policy-acs-central-ca-bundle
-    namespace: policies
-  disabled: false
-  policy-templates:
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1
-      kind: ConfigurationPolicy
-      metadata:
-        name: policy-acs-sync-resources
-      spec:
-        object-templates:
-        - complianceType: musthave
-          objectDefinition:
-            apiVersion: platform.stackrox.io/v1alpha1
-            kind: SecuredCluster
-            metadata:
-              name: stackrox-secured-cluster-services
-              namespace: stackrox
-            spec:
-              admissionControl:
-                listenOnCreates: false
-                listenOnEvents: true
-                listenOnUpdates: false
-              auditLogs:
-                collection: Auto
-              centralEndpoint: |
-                {{ fromSecret "stackrox" "sensor-tls" "acs-host" | base64dec }}
-              clusterName: |
-                {{ fromSecret "open-cluster-management-agent" "hub-kubeconfig-secret" "cluster-name" | base64dec }}
-              perNode:
-                collector:
-                  collection: CORE_BPF
-                  imageFlavor: Regular
-                taintToleration: TolerateTaints
-              scanner:
-                scannerComponent: Disabled
-        remediationAction: enforce
-        severity: medium
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1
-      kind: ConfigurationPolicy
-      metadata:
-        name: policy-acs-sync-resources2
-      spec:
-        object-templates:
-        - complianceType: musthave
-          objectDefinition:
-            apiVersion: v1
-            data:
-              admission-control-cert.pem: '{{ fromSecret "stackrox" "admission-control-tls"
-                "admission-control-cert.pem" }}'
-              admission-control-key.pem: '{{ fromSecret "stackrox" "admission-control-tls"
-                "admission-control-key.pem" }}'
-              ca.pem: '{{ fromSecret "stackrox" "admission-control-tls" "ca.pem" }}'
-            kind: Secret
-            metadata:
-              labels:
-                certificate_key_name: admission-control-cert.pem
-              name: admission-control-tls
-              namespace: policies
-            type: Opaque
-        remediationAction: enforce
-        severity: medium
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1
-      kind: ConfigurationPolicy
-      metadata:
-        name: policy-acs-sync-resources3
-      spec:
-        object-templates:
-        - complianceType: musthave
-          objectDefinition:
-            apiVersion: v1
-            data:
-              ca.pem: '{{ fromSecret "stackrox" "collector-tls" "ca.pem" }}'
-              collector-cert.pem: '{{ fromSecret "stackrox" "collector-tls" "collector-cert.pem"
-                }}'
-              collector-key.pem: '{{ fromSecret "stackrox" "collector-tls" "collector-key.pem"
-                }}'
-            kind: Secret
-            metadata:
-              labels:
-                certificate_key_name: collector-cert.pem
-              name: collector-tls
-              namespace: policies
-            type: Opaque
-        remediationAction: enforce
-        severity: medium
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1
-      kind: ConfigurationPolicy
-      metadata:
-        name: policy-acs-sync-resources4
-      spec:
-        object-templates:
-        - complianceType: musthave
-          objectDefinition:
-            apiVersion: v1
-            data:
-              acs-host: '{{ fromSecret "stackrox" "sensor-tls" "acs-host" }}'
-              ca.pem: '{{ fromSecret "stackrox" "sensor-tls" "ca.pem" }}'
-              sensor-cert.pem: '{{ fromSecret "stackrox" "sensor-tls" "sensor-cert.pem"
-                }}'
-              sensor-key.pem: '{{ fromSecret "stackrox" "sensor-tls" "sensor-key.pem"
-                }}'
-            kind: Secret
-            metadata:
-              labels:
-                certificate_key_name: sensor-cert.pem
-              name: sensor-tls
-              namespace: policies
-            type: Opaque
-        remediationAction: enforce
-        severity: medium
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1
-      kind: ConfigurationPolicy
-      metadata:
-        name: policy-acs-sync-resources5
-      spec:
-        object-templates:
-        - complianceType: musthave
-          objectDefinition:
-            apiVersion: console.openshift.io/v1
-            kind: ConsoleLink
-            metadata:
-              name: acs
-            spec:
-              applicationMenu:
-                section: Red Hat applications
-              href: https://{{ (lookup "route.openshift.io/v1" "Route" "stackrox"
-                "central").spec.host }}
-              location: ApplicationMenu
-              text: Red Hat Advanced Cluster Security for Kubernetes
-        remediationAction: enforce
-        severity: medium
-  remediationAction: enforce
----
-apiVersion: policy.open-cluster-management.io/v1
-kind: Policy
-metadata:
-  annotations:
-    argocd.argoproj.io/compare-options: IgnoreExtraneous
-    policy.open-cluster-management.io/categories: SI System and Information Integrity
-    policy.open-cluster-management.io/controls: SI-5 Security Alerts Advisories and
-      Directives
-    policy.open-cluster-management.io/description: ""
-    policy.open-cluster-management.io/standards: NIST SP 800-53
-  labels:
-    open-cluster-management.io/policy-set: opp
-  name: policy-advanced-managed-cluster-security
-  namespace: policies
-spec:
-  disabled: false
-  policy-templates:
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1
-      kind: ConfigurationPolicy
-      metadata:
-        name: policy-advanced-managed-cluster-security
-      spec:
-        object-templates:
-        - complianceType: musthave
-          objectDefinition:
-            apiVersion: v1
-            kind: Namespace
-            metadata:
-              name: stackrox
-        remediationAction: enforce
-        severity: medium
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1
-      kind: ConfigurationPolicy
-      metadata:
-        name: policy-advanced-managed-cluster-security2
-      spec:
-        object-templates:
-        - complianceType: musthave
-          objectDefinition:
-            apiVersion: v1
-            data:
-              admission-control-cert.pem: '{{hub fromSecret "policies" "admission-control-tls"
-                "admission-control-cert.pem" hub}}'
-              admission-control-key.pem: '{{hub fromSecret "policies" "admission-control-tls"
-                "admission-control-key.pem" hub}}'
-              ca.pem: '{{hub fromSecret "policies" "admission-control-tls" "ca.pem"
-                hub}}'
-            kind: Secret
-            metadata:
-              name: admission-control-tls
-              namespace: stackrox
-            type: Opaque
-        remediationAction: enforce
-        severity: medium
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1
-      kind: ConfigurationPolicy
-      metadata:
-        name: policy-advanced-managed-cluster-security3
-      spec:
-        object-templates:
-        - complianceType: musthave
-          objectDefinition:
-            apiVersion: v1
-            data:
-              ca.pem: '{{hub fromSecret "policies" "collector-tls" "ca.pem" hub}}'
-              collector-cert.pem: '{{hub fromSecret "policies" "collector-tls" "collector-cert.pem"
-                hub}}'
-              collector-key.pem: '{{hub fromSecret "policies" "collector-tls" "collector-key.pem"
-                hub}}'
-            kind: Secret
-            metadata:
-              name: collector-tls
-              namespace: stackrox
-            type: Opaque
-        remediationAction: enforce
-        severity: medium
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1
-      kind: ConfigurationPolicy
-      metadata:
-        name: policy-advanced-managed-cluster-security4
-      spec:
-        object-templates:
-        - complianceType: musthave
-          objectDefinition:
-            apiVersion: v1
-            data:
-              acs-host: '{{hub fromSecret "policies" "sensor-tls" "acs-host" hub}}'
-              ca.pem: '{{hub fromSecret "policies" "sensor-tls" "ca.pem" hub}}'
-              sensor-cert.pem: '{{hub fromSecret "policies" "sensor-tls" "sensor-cert.pem"
-                hub}}'
-              sensor-key.pem: '{{hub fromSecret "policies" "sensor-tls" "sensor-key.pem"
-                hub}}'
-            kind: Secret
-            metadata:
-              name: sensor-tls
-              namespace: stackrox
-            type: Opaque
-        remediationAction: enforce
-        severity: medium
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1
-      kind: ConfigurationPolicy
-      metadata:
-        name: policy-advanced-managed-cluster-security5
-      spec:
-        object-templates:
-        - complianceType: musthave
-          objectDefinition:
-            apiVersion: platform.stackrox.io/v1alpha1
-            kind: SecuredCluster
-            metadata:
-              name: stackrox-secured-cluster-services
-              namespace: stackrox
-            spec:
-              admissionControl:
-                listenOnCreates: false
-                listenOnEvents: true
-                listenOnUpdates: false
-                replicas: 1
-              auditLogs:
-                collection: Auto
-              centralEndpoint: |
-                {{ fromSecret "stackrox" "sensor-tls" "acs-host" | base64dec }}
-              clusterName: |
-                {{ fromSecret "open-cluster-management-agent" "hub-kubeconfig-secret" "cluster-name" | base64dec }}
-              perNode:
-                collector:
-                  collection: CORE_BPF
-                  imageFlavor: Regular
-                taintToleration: TolerateTaints
-              scanner:
-                analyzer:
-                  scaling:
-                    minReplicas: 1
-                    replicas: 1
-              sensor:
-                resources:
-                  requests:
-                    cpu: 500m
-                    memory: 1Gi
-        remediationAction: enforce
-        severity: medium
-  remediationAction: enforce
----
-apiVersion: policy.open-cluster-management.io/v1
-kind: Policy
-metadata:
-  annotations:
-    argocd.argoproj.io/compare-options: IgnoreExtraneous
-    policy.open-cluster-management.io/categories: SI System and Information Integrity
-    policy.open-cluster-management.io/controls: SI-5 Security Alerts Advisories and
-      Directives
-    policy.open-cluster-management.io/description: ""
-    policy.open-cluster-management.io/standards: NIST SP 800-53
-  labels:
-    open-cluster-management.io/policy-set: opp
-  name: policy-advanced-managed-cluster-status
-  namespace: policies
-spec:
-  disabled: false
-  policy-templates:
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1
-      kind: ConfigurationPolicy
-      metadata:
-        name: policy-advanced-managed-cluster-status
-      spec:
-        object-templates:
-        - complianceType: musthave
-          objectDefinition:
-            apiVersion: apps/v1
-            kind: Deployment
-            metadata:
-              name: sensor
-              namespace: stackrox
-            status:
-              conditions:
-              - status: "True"
-                type: Available
-        - complianceType: musthave
-          objectDefinition:
-            apiVersion: apps/v1
-            kind: DaemonSet
-            metadata:
-              name: collector
-              namespace: stackrox
-            status:
-              numberMisscheduled: 0
-        - complianceType: musthave
-          objectDefinition:
-            apiVersion: apps/v1
-            kind: Deployment
-            metadata:
-              name: admission-control
-              namespace: stackrox
-            status:
-              conditions:
-              - status: "True"
-                type: Available
-        remediationAction: inform
-        severity: medium
-  remediationAction: inform
----
-apiVersion: policy.open-cluster-management.io/v1
-kind: Policy
-metadata:
-  annotations:
-    argocd.argoproj.io/compare-options: IgnoreExtraneous
     policy.open-cluster-management.io/categories: CA Assessment Authorization and
       Monitoring
     policy.open-cluster-management.io/controls: CA-7 Continuous Monitoring
@@ -2066,7 +1674,7 @@ metadata:
     policy.open-cluster-management.io/standards: NIST SP 800-53
   labels:
     open-cluster-management.io/policy-set: opp
-  name: policy-observability-operator
+  name: enf-observability-operator
   namespace: policies
 spec:
   dependencies:
@@ -2104,7 +1712,7 @@ spec:
       apiVersion: policy.open-cluster-management.io/v1
       kind: ConfigurationPolicy
       metadata:
-        name: policy-observability-operator
+        name: enf-observability-operator
       spec:
         object-templates:
         - complianceType: musthave
@@ -2127,7 +1735,7 @@ spec:
       apiVersion: policy.open-cluster-management.io/v1
       kind: ConfigurationPolicy
       metadata:
-        name: policy-observability-operator2
+        name: enf-observability-operator2
       spec:
         object-templates:
         - complianceType: musthave
@@ -2178,7 +1786,7 @@ spec:
       apiVersion: policy.open-cluster-management.io/v1
       kind: ConfigurationPolicy
       metadata:
-        name: policy-observability-operator3
+        name: enf-observability-operator3
       spec:
         object-templates:
         - complianceType: musthave
@@ -2210,7 +1818,7 @@ metadata:
     policy.open-cluster-management.io/standards: NIST SP 800-53
   labels:
     open-cluster-management.io/policy-set: opp
-  name: policy-observability-storage
+  name: enf-observability-storage
   namespace: policies
 spec:
   dependencies:
@@ -2225,7 +1833,7 @@ spec:
       apiVersion: policy.open-cluster-management.io/v1
       kind: ConfigurationPolicy
       metadata:
-        name: policy-observability-storage
+        name: enf-observability-storage
       spec:
         object-templates:
         - complianceType: musthave
@@ -2256,7 +1864,7 @@ metadata:
     policy.open-cluster-management.io/standards: NIST SP 800-53
   labels:
     open-cluster-management.io/policy-set: opp
-  name: policy-odf
+  name: enf-odf
   namespace: policies
 spec:
   disabled: false
@@ -2268,13 +1876,13 @@ spec:
         name: openshift-storage-subscripions
       spec:
         object-templates-raw: |
-          {{- range $sb := (lookup "operators.coreos.com/v1alpha1" "Subscription" "openshift-storage" "").items }}
+          {{- range $sub := (lookup "operators.coreos.com/v1alpha1" "Subscription" "openshift-storage" "").items }}
           - complianceType: musthave
             objectDefinition:
               apiVersion: operators.coreos.com/v1alpha1
               kind: Subscription
               metadata:
-                name: {{ $sb.metadata.name }}
+                name: {{ $sub.metadata.name }}
                 namespace: openshift-storage
               spec:
                 config:
@@ -2292,7 +1900,7 @@ spec:
       apiVersion: policy.open-cluster-management.io/v1
       kind: ConfigurationPolicy
       metadata:
-        name: policy-odf
+        name: enf-odf
       spec:
         object-templates:
         - complianceType: musthave
@@ -2347,7 +1955,7 @@ metadata:
     policy.open-cluster-management.io/standards: NIST SP 800-53
   labels:
     open-cluster-management.io/policy-set: opp
-  name: policy-odf-cluster
+  name: enf-odf-cluster
   namespace: policies
 spec:
   dependencies:
@@ -2367,7 +1975,7 @@ spec:
       apiVersion: policy.open-cluster-management.io/v1
       kind: ConfigurationPolicy
       metadata:
-        name: policy-odf-cluster
+        name: enf-odf-cluster
       spec:
         object-templates:
         - complianceType: musthave
@@ -2503,125 +2111,7 @@ metadata:
     policy.open-cluster-management.io/standards: NIST SP 800-53
   labels:
     open-cluster-management.io/policy-set: opp
-  name: policy-odf-status
-  namespace: policies
-spec:
-  dependencies:
-  - apiVersion: policy.open-cluster-management.io/v1
-    compliance: Compliant
-    kind: Policy
-    name: policy-odf
-    namespace: policies
-  disabled: false
-  policy-templates:
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1
-      kind: ConfigurationPolicy
-      metadata:
-        name: policy-odf-status
-      spec:
-        object-templates:
-        - complianceType: musthave
-          objectDefinition:
-            apiVersion: apps/v1
-            kind: Deployment
-            metadata:
-              name: ocs-operator
-              namespace: openshift-storage
-            status:
-              conditions:
-              - status: "True"
-                type: Available
-        - complianceType: musthave
-          objectDefinition:
-            apiVersion: apps/v1
-            kind: Deployment
-            metadata:
-              name: rook-ceph-rgw-ocs-storagecluster-cephobjectstore-a
-              namespace: openshift-storage
-            status:
-              conditions:
-              - status: "True"
-                type: Available
-        - complianceType: musthave
-          objectDefinition:
-            apiVersion: ocs.openshift.io/v1
-            kind: StorageCluster
-            metadata:
-              name: ocs-storagecluster
-              namespace: openshift-storage
-            status:
-              phase: Ready
-        remediationAction: inform
-        severity: medium
-  remediationAction: inform
----
-apiVersion: policy.open-cluster-management.io/v1
-kind: Policy
-metadata:
-  annotations:
-    argocd.argoproj.io/compare-options: IgnoreExtraneous
-    policy.open-cluster-management.io/categories: SI System and Information Integrity
-    policy.open-cluster-management.io/controls: SI-7 Software Firmware and Information
-      Integrity
-    policy.open-cluster-management.io/description: ""
-    policy.open-cluster-management.io/standards: NIST SP 800-53
-  labels:
-    open-cluster-management.io/policy-set: opp
-  name: policy-odf-volume
-  namespace: policies
-spec:
-  disabled: false
-  policy-templates:
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1
-      kind: ConfigurationPolicy
-      metadata:
-        name: localblock-odf-persistent-volume
-      spec:
-        object-templates-raw: |
-          {{- range $nd := (lookup "v1" "Node" "" "" "cluster.ocs.openshift.io/openshift-storage=").items }}
-          {{- range $pv := (lookup "v1" "PersistentVolume" "" "" ( (cat "kubernetes.io/hostname=" $nd.metadata.name ", storage.openshift.com/local-volume-owner-name=localblock-odf") | replace " " "")).items }}
-          - complianceType: musthave
-            objectDefinition:
-              apiVersion: v1
-              kind: PersistentVolume
-              metadata:
-                name: {{ $pv.metadata.name }}
-              spec:
-                accessModes:
-                - ReadWriteOnce
-                storageClassName: localblock-odf
-                volumeMode: Block
-                nodeAffinity:
-                  required:
-                    nodeSelectorTerms:
-                    - matchExpressions:
-                      - key: kubernetes.io/hostname
-                        operator: In
-                        values:
-                        - {{ $nd.metadata.name }}
-              status:
-                phase: Available
-          {{- end }}
-          {{- end }}
-        remediationAction: inform
-        severity: high
-  remediationAction: inform
----
-apiVersion: policy.open-cluster-management.io/v1
-kind: Policy
-metadata:
-  annotations:
-    argocd.argoproj.io/compare-options: IgnoreExtraneous
-    policy.open-cluster-management.io/categories: SI System and Information Integrity
-    policy.open-cluster-management.io/controls: SI-7 Software Firmware and Information
-      Integrity
-    policy.open-cluster-management.io/description: ""
-    policy.open-cluster-management.io/standards: NIST SP 800-53
-  labels:
-    open-cluster-management.io/policy-set: opp
-  name: policy-quay-config
+  name: enf-quay-config
   namespace: policies
 spec:
   dependencies:
@@ -2636,7 +2126,7 @@ spec:
       apiVersion: policy.open-cluster-management.io/v1
       kind: ConfigurationPolicy
       metadata:
-        name: policy-quay-config
+        name: enf-quay-config
       spec:
         object-templates:
         - complianceType: musthave
@@ -2678,7 +2168,7 @@ metadata:
     policy.open-cluster-management.io/standards: NIST SP 800-53
   labels:
     open-cluster-management.io/policy-set: opp
-  name: policy-quay-install
+  name: enf-quay-install
   namespace: policies
 spec:
   dependencies:
@@ -2739,7 +2229,7 @@ spec:
       apiVersion: policy.open-cluster-management.io/v1
       kind: ConfigurationPolicy
       metadata:
-        name: policy-quay-install
+        name: enf-quay-install
       spec:
         object-templates:
         - complianceType: musthave
@@ -2792,52 +2282,7 @@ metadata:
     policy.open-cluster-management.io/standards: NIST SP 800-53
   labels:
     open-cluster-management.io/policy-set: opp
-  name: policy-quay-status
-  namespace: policies
-spec:
-  dependencies:
-  - apiVersion: policy.open-cluster-management.io/v1
-    compliance: Compliant
-    kind: Policy
-    name: policy-quay-install
-    namespace: policies
-  disabled: false
-  policy-templates:
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1
-      kind: ConfigurationPolicy
-      metadata:
-        name: policy-quay-status
-      spec:
-        object-templates:
-        - complianceType: musthave
-          objectDefinition:
-            apiVersion: apps/v1
-            kind: Deployment
-            metadata:
-              name: quay-registry-quay-app
-              namespace: quay-enterprise
-            status:
-              conditions:
-              - status: "True"
-                type: Available
-        remediationAction: inform
-        severity: medium
-  remediationAction: inform
----
-apiVersion: policy.open-cluster-management.io/v1
-kind: Policy
-metadata:
-  annotations:
-    argocd.argoproj.io/compare-options: IgnoreExtraneous
-    policy.open-cluster-management.io/categories: SI System and Information Integrity
-    policy.open-cluster-management.io/controls: SI-7 Software Firmware and Information
-      Integrity
-    policy.open-cluster-management.io/description: ""
-    policy.open-cluster-management.io/standards: NIST SP 800-53
-  labels:
-    open-cluster-management.io/policy-set: opp
-  name: policy-quay-storage
+  name: enf-quay-storage
   namespace: policies
 spec:
   dependencies:
@@ -2852,7 +2297,7 @@ spec:
       apiVersion: policy.open-cluster-management.io/v1
       kind: ConfigurationPolicy
       metadata:
-        name: policy-quay-storage
+        name: enf-quay-storage
       spec:
         object-templates:
         - complianceType: musthave
@@ -2921,7 +2366,7 @@ metadata:
     policy.open-cluster-management.io/standards: NIST SP 800-53
   labels:
     open-cluster-management.io/policy-set: opp
-  name: remediation-config
+  name: enf-remediation-config
   namespace: policies
 spec:
   disabled: false
@@ -2930,7 +2375,7 @@ spec:
       apiVersion: policy.open-cluster-management.io/v1
       kind: ConfigurationPolicy
       metadata:
-        name: remediation-config
+        name: enf-remediation-config
       spec:
         object-templates:
         - complianceType: musthave
@@ -3009,7 +2454,7 @@ metadata:
     policy.open-cluster-management.io/standards: NIST SP 800-53
   labels:
     open-cluster-management.io/policy-set: opp
-  name: sub-approval-automatic
+  name: enf-sub-approval-automatic
   namespace: policies
 spec:
   disabled: false
@@ -3021,7 +2466,7 @@ spec:
         name: sub-approval-automatic
       spec:
         object-templates-raw: |
-          {{- range $sub := (lookup "operators.coreos.com/v1alpha1" "Subscription" "" "").items }}
+          {{- range $sub := (lookup "operators.coreos.com/v1alpha1" "Subscription" "" "!policies.ignore").items }}
           - complianceType: mustonlyhave
             objectDefinition:
               apiVersion: operators.coreos.com/v1alpha1
@@ -3052,7 +2497,7 @@ metadata:
     policy.open-cluster-management.io/standards: NIST SP 800-53
   labels:
     open-cluster-management.io/policy-set: opp
-  name: sub-approval-manual
+  name: enf-sub-approval-manual
   namespace: policies
 spec:
   disabled: false
@@ -3064,7 +2509,7 @@ spec:
         name: sub-approval-manual
       spec:
         object-templates-raw: |
-          {{- range $sub := (lookup "operators.coreos.com/v1alpha1" "Subscription" "" "").items }}
+          {{- range $sub := (lookup "operators.coreos.com/v1alpha1" "Subscription" "" "!policies.ignore").items }}
           - complianceType: musthave
             objectDefinition:
               apiVersion: operators.coreos.com/v1alpha1
@@ -3091,7 +2536,7 @@ metadata:
     policy.open-cluster-management.io/standards: NIST SP 800-53
   labels:
     open-cluster-management.io/policy-set: opp
-  name: update-proxy-sync
+  name: enf-update-proxy-sync
   namespace: policies
 spec:
   disabled: false
@@ -3100,7 +2545,7 @@ spec:
       apiVersion: policy.open-cluster-management.io/v1
       kind: ConfigurationPolicy
       metadata:
-        name: update-proxy-sync
+        name: enf-update-proxy-sync
       spec:
         object-templates:
         - complianceType: musthave
@@ -3126,6 +2571,556 @@ spec:
         severity: medium
   remediationAction: enforce
 ---
+apiVersion: policy.open-cluster-management.io/v1
+kind: Policy
+metadata:
+  annotations:
+    argocd.argoproj.io/compare-options: IgnoreExtraneous
+    policy.open-cluster-management.io/categories: SI System and Information Integrity
+    policy.open-cluster-management.io/controls: SI-5 Security Alerts Advisories and
+      Directives
+    policy.open-cluster-management.io/description: ""
+    policy.open-cluster-management.io/standards: NIST SP 800-53
+  labels:
+    open-cluster-management.io/policy-set: opp
+  name: inf-acs-central-status
+  namespace: policies
+spec:
+  dependencies:
+  - apiVersion: policy.open-cluster-management.io/v1
+    compliance: Compliant
+    kind: Policy
+    name: policy-acs-operator-central
+    namespace: policies
+  disabled: false
+  policy-templates:
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: inf-acs-central-status
+      spec:
+        object-templates:
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: apps/v1
+            kind: Deployment
+            metadata:
+              name: central
+              namespace: stackrox
+            status:
+              conditions:
+              - status: "True"
+                type: Available
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: apps/v1
+            kind: Deployment
+            metadata:
+              name: central-db
+              namespace: stackrox
+            status:
+              conditions:
+              - status: "True"
+                type: Available
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: apps/v1
+            kind: Deployment
+            metadata:
+              name: scanner-db
+              namespace: stackrox
+            status:
+              conditions:
+              - status: "True"
+                type: Available
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: apps/v1
+            kind: Deployment
+            metadata:
+              name: scanner
+              namespace: stackrox
+            status:
+              conditions:
+              - status: "True"
+                type: Available
+        remediationAction: inform
+        severity: medium
+  remediationAction: inform
+---
+apiVersion: policy.open-cluster-management.io/v1
+kind: Policy
+metadata:
+  annotations:
+    argocd.argoproj.io/compare-options: IgnoreExtraneous
+    policy.open-cluster-management.io/categories: SC System and Communications Protection
+    policy.open-cluster-management.io/controls: SC-8 Transmission Confidentiality
+      and Integrity
+    policy.open-cluster-management.io/description: ""
+    policy.open-cluster-management.io/standards: NIST SP 800-53
+  labels:
+    open-cluster-management.io/policy-set: opp
+  name: inf-acs-monitor-certs
+  namespace: policies
+spec:
+  dependencies:
+  - apiVersion: policy.open-cluster-management.io/v1
+    compliance: Compliant
+    kind: Policy
+    name: policy-acs-central-ca-bundle
+    namespace: policies
+  disabled: false
+  policy-templates:
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: CertificatePolicy
+      metadata:
+        name: acs-bundle-certificates
+      spec:
+        minimumDuration: 720h
+        namespaceSelector:
+          include:
+          - policies
+        remediationAction: inform
+        severity: high
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: inf-acs-monitor-certs
+      spec:
+        object-templates:
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: v1
+            kind: Secret
+            metadata:
+              name: sensor-tls
+              namespace: stackrox
+        remediationAction: inform
+        severity: medium
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: inf-acs-monitor-certs2
+      spec:
+        object-templates:
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: v1
+            kind: Secret
+            metadata:
+              name: collector-tls
+              namespace: stackrox
+        remediationAction: inform
+        severity: medium
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: inf-acs-monitor-certs3
+      spec:
+        object-templates:
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: v1
+            kind: Secret
+            metadata:
+              name: admission-control-tls
+              namespace: stackrox
+        remediationAction: inform
+        severity: medium
+  remediationAction: inform
+---
+apiVersion: policy.open-cluster-management.io/v1
+kind: Policy
+metadata:
+  annotations:
+    argocd.argoproj.io/compare-options: IgnoreExtraneous
+    policy.open-cluster-management.io/categories: SI System and Information Integrity
+    policy.open-cluster-management.io/controls: SI-5 Security Alerts Advisories and
+      Directives
+    policy.open-cluster-management.io/description: ""
+    policy.open-cluster-management.io/standards: NIST SP 800-53
+  labels:
+    open-cluster-management.io/policy-set: opp
+  name: inf-advanced-managed-cluster-status
+  namespace: policies
+spec:
+  disabled: false
+  policy-templates:
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: inf-advanced-managed-cluster-status
+      spec:
+        object-templates:
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: apps/v1
+            kind: Deployment
+            metadata:
+              name: sensor
+              namespace: stackrox
+            status:
+              conditions:
+              - status: "True"
+                type: Available
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: apps/v1
+            kind: DaemonSet
+            metadata:
+              name: collector
+              namespace: stackrox
+            status:
+              numberMisscheduled: 0
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: apps/v1
+            kind: Deployment
+            metadata:
+              name: admission-control
+              namespace: stackrox
+            status:
+              conditions:
+              - status: "True"
+                type: Available
+        remediationAction: inform
+        severity: medium
+  remediationAction: inform
+---
+apiVersion: policy.open-cluster-management.io/v1
+kind: Policy
+metadata:
+  annotations:
+    argocd.argoproj.io/compare-options: IgnoreExtraneous
+    policy.open-cluster-management.io/categories: SI System and Information Integrity
+    policy.open-cluster-management.io/controls: SI-7 Software Firmware and Information
+      Integrity
+    policy.open-cluster-management.io/description: ""
+    policy.open-cluster-management.io/standards: NIST SP 800-53
+  labels:
+    open-cluster-management.io/policy-set: opp
+  name: inf-csv-check
+  namespace: policies
+spec:
+  disabled: false
+  policy-templates:
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: csv-check
+      spec:
+        object-templates-raw: |
+          {{- range $sub := (lookup "operators.coreos.com/v1alpha1" "Subscription" "" "!policies.ignore").items }}
+          {{- $pm := lookup "packages.operators.coreos.com/v1" "PackageManifest" "openshift-marketplace" $sub.metadata.name ( (cat "catalog=" $sub.spec.source ) | replace " " "" ) }}
+          {{- range $ch := $pm.status.channels }}
+          {{- if (eq $ch.name $pm.status.defaultChannel) }}
+          - complianceType: musthave
+            objectDefinition:
+              apiVersion: operators.coreos.com/v1alpha1
+              kind: ClusterServiceVersion
+              metadata:
+                name: {{ $ch.currentCSV }}
+                namespace: {{ $sub.metadata.namespace }}
+              status:
+                phase: Succeeded
+          {{- end }}
+          {{- end }}
+          {{- end }}
+        remediationAction: inform
+        severity: high
+  remediationAction: inform
+---
+apiVersion: policy.open-cluster-management.io/v1
+kind: Policy
+metadata:
+  annotations:
+    argocd.argoproj.io/compare-options: IgnoreExtraneous
+    policy.open-cluster-management.io/categories: SI System and Information Integrity
+    policy.open-cluster-management.io/controls: SI-7 Software Firmware and Information
+      Integrity
+    policy.open-cluster-management.io/description: ""
+    policy.open-cluster-management.io/standards: NIST SP 800-53
+  labels:
+    open-cluster-management.io/policy-set: opp
+  name: inf-cv-check
+  namespace: policies
+spec:
+  disabled: false
+  policy-templates:
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: inf-cv-check
+      spec:
+        object-templates:
+        - complianceType: mustnothave
+          objectDefinition:
+            apiVersion: config.openshift.io/v1
+            kind: ClusterOperator
+            status:
+              conditions:
+              - status: "False"
+                type: Available
+        remediationAction: inform
+        severity: medium
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: inf-cv-check2
+      spec:
+        object-templates:
+        - complianceType: mustnothave
+          objectDefinition:
+            apiVersion: config.openshift.io/v1
+            kind: ClusterOperator
+            status:
+              conditions:
+              - status: "True"
+                type: Degraded
+        remediationAction: inform
+        severity: medium
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: inf-cv-check3
+      spec:
+        object-templates:
+        - complianceType: mustnothave
+          objectDefinition:
+            apiVersion: machineconfiguration.openshift.io/v1
+            kind: MachineConfigPool
+            status:
+              conditions:
+              - status: "False"
+                type: Updated
+        remediationAction: inform
+        severity: medium
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: inf-cv-check4
+      spec:
+        object-templates:
+        - complianceType: mustnothave
+          objectDefinition:
+            apiVersion: machineconfiguration.openshift.io/v1
+            kind: MachineConfigPool
+            status:
+              conditions:
+              - status: "True"
+                type: Degraded
+        remediationAction: inform
+        severity: medium
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: inf-cv-check5
+      spec:
+        object-templates:
+        - complianceType: mustnothave
+          objectDefinition:
+            apiVersion: config.openshift.io/v1
+            kind: ClusterVersion
+            status:
+              conditions:
+              - status: "False"
+                type: Available
+        remediationAction: inform
+        severity: medium
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: inf-cv-check6
+      spec:
+        object-templates:
+        - complianceType: mustnothave
+          objectDefinition:
+            apiVersion: config.openshift.io/v1
+            kind: ClusterVersion
+            status:
+              conditions:
+              - status: "True"
+                type: Progressing
+        remediationAction: inform
+        severity: medium
+  remediationAction: inform
+---
+apiVersion: policy.open-cluster-management.io/v1
+kind: Policy
+metadata:
+  annotations:
+    argocd.argoproj.io/compare-options: IgnoreExtraneous
+    policy.open-cluster-management.io/categories: SI System and Information Integrity
+    policy.open-cluster-management.io/controls: SI-7 Software Firmware and Information
+      Integrity
+    policy.open-cluster-management.io/description: ""
+    policy.open-cluster-management.io/standards: NIST SP 800-53
+  labels:
+    open-cluster-management.io/policy-set: opp
+  name: inf-odf-status
+  namespace: policies
+spec:
+  dependencies:
+  - apiVersion: policy.open-cluster-management.io/v1
+    compliance: Compliant
+    kind: Policy
+    name: policy-odf
+    namespace: policies
+  disabled: false
+  policy-templates:
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: inf-odf-status
+      spec:
+        object-templates:
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: apps/v1
+            kind: Deployment
+            metadata:
+              name: ocs-operator
+              namespace: openshift-storage
+            status:
+              conditions:
+              - status: "True"
+                type: Available
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: apps/v1
+            kind: Deployment
+            metadata:
+              name: rook-ceph-rgw-ocs-storagecluster-cephobjectstore-a
+              namespace: openshift-storage
+            status:
+              conditions:
+              - status: "True"
+                type: Available
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: ocs.openshift.io/v1
+            kind: StorageCluster
+            metadata:
+              name: ocs-storagecluster
+              namespace: openshift-storage
+            status:
+              phase: Ready
+        remediationAction: inform
+        severity: medium
+  remediationAction: inform
+---
+apiVersion: policy.open-cluster-management.io/v1
+kind: Policy
+metadata:
+  annotations:
+    argocd.argoproj.io/compare-options: IgnoreExtraneous
+    policy.open-cluster-management.io/categories: SI System and Information Integrity
+    policy.open-cluster-management.io/controls: SI-7 Software Firmware and Information
+      Integrity
+    policy.open-cluster-management.io/description: ""
+    policy.open-cluster-management.io/standards: NIST SP 800-53
+  labels:
+    open-cluster-management.io/policy-set: opp
+  name: inf-odf-volume
+  namespace: policies
+spec:
+  disabled: false
+  policy-templates:
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: localblock-odf-persistent-volume
+      spec:
+        object-templates-raw: |
+          {{- range $nd := (lookup "v1" "Node" "" "" "cluster.ocs.openshift.io/openshift-storage=").items }}
+          {{- range $pv := (lookup "v1" "PersistentVolume" "" "" ( (cat "kubernetes.io/hostname=" $nd.metadata.name ", storage.openshift.com/local-volume-owner-name=localblock-odf") | replace " " "")).items }}
+          - complianceType: musthave
+            objectDefinition:
+              apiVersion: v1
+              kind: PersistentVolume
+              metadata:
+                name: {{ $pv.metadata.name }}
+              spec:
+                accessModes:
+                - ReadWriteOnce
+                storageClassName: localblock-odf
+                volumeMode: Block
+                nodeAffinity:
+                  required:
+                    nodeSelectorTerms:
+                    - matchExpressions:
+                      - key: kubernetes.io/hostname
+                        operator: In
+                        values:
+                        - {{ $nd.metadata.name }}
+              status:
+                phase: Available
+          {{- end }}
+          {{- end }}
+        remediationAction: inform
+        severity: high
+  remediationAction: inform
+---
+apiVersion: policy.open-cluster-management.io/v1
+kind: Policy
+metadata:
+  annotations:
+    argocd.argoproj.io/compare-options: IgnoreExtraneous
+    policy.open-cluster-management.io/categories: SI System and Information Integrity
+    policy.open-cluster-management.io/controls: SI-7 Software Firmware and Information
+      Integrity
+    policy.open-cluster-management.io/description: ""
+    policy.open-cluster-management.io/standards: NIST SP 800-53
+  labels:
+    open-cluster-management.io/policy-set: opp
+  name: inf-quay-status
+  namespace: policies
+spec:
+  dependencies:
+  - apiVersion: policy.open-cluster-management.io/v1
+    compliance: Compliant
+    kind: Policy
+    name: policy-quay-install
+    namespace: policies
+  disabled: false
+  policy-templates:
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: inf-quay-status
+      spec:
+        object-templates:
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: apps/v1
+            kind: Deployment
+            metadata:
+              name: quay-registry-quay-app
+              namespace: quay-enterprise
+            status:
+              conditions:
+              - status: "True"
+                type: Available
+        remediationAction: inform
+        severity: medium
+  remediationAction: inform
+---
 apiVersion: policy.open-cluster-management.io/v1beta1
 kind: PolicySet
 metadata:
@@ -3141,12 +3136,12 @@ spec:
     to work well together. This policy set is focused on the components that install
     to every managed cluster.
   policies:
-  - csv-check
-  - cv-check
-  - policy-advanced-managed-cluster-security
-  - policy-advanced-managed-cluster-status
-  - remediation-config
-  - update-proxy-sync
+  - enf-advanced-managed-cluster-security
+  - enf-remediation-config
+  - enf-update-proxy-sync
+  - inf-advanced-managed-cluster-status
+  - inf-csv-check
+  - inf-cv-check
 ---
 apiVersion: policy.open-cluster-management.io/v1beta1
 kind: PolicySet
@@ -3163,29 +3158,29 @@ spec:
     them to work well together. This policy set is focused on the components that
     install to the Advanced Cluster Management hub.
   policies:
-  - create-router-bundle
-  - csv-check
-  - cv-check
-  - opp-all-operators-install
-  - opp-hub-operators-install
-  - policy-acs-central-ca-bundle
-  - policy-acs-central-ca-bundle-expired
-  - policy-acs-central-status
-  - policy-acs-monitor-certs
-  - policy-acs-operator-central
-  - policy-acs-sync-resources
-  - policy-advanced-managed-cluster-status
-  - policy-observability-operator
-  - policy-observability-storage
-  - policy-odf
-  - policy-odf-cluster
-  - policy-odf-status
-  - policy-odf-volume
-  - policy-quay-config
-  - policy-quay-install
-  - policy-quay-status
-  - policy-quay-storage
-  - remediation-config
+  - enf-acs-central-ca-bundle
+  - enf-acs-central-ca-bundle-expired
+  - enf-acs-operator-central
+  - enf-acs-sync-resources
+  - enf-all-operators-install
+  - enf-create-router-bundle
+  - enf-hub-operators-install
+  - enf-observability-operator
+  - enf-observability-storage
+  - enf-odf
+  - enf-odf-cluster
+  - enf-quay-config
+  - enf-quay-install
+  - enf-quay-storage
+  - enf-remediation-config
+  - inf-acs-central-status
+  - inf-acs-monitor-certs
+  - inf-advanced-managed-cluster-status
+  - inf-csv-check
+  - inf-cv-check
+  - inf-odf-status
+  - inf-odf-volume
+  - inf-quay-status
 ---
 apiVersion: policy.open-cluster-management.io/v1beta1
 kind: PolicySet
@@ -3199,8 +3194,8 @@ metadata:
 spec:
   description: ""
   policies:
-  - catalog-source-update
-  - sub-approval-automatic
+  - enf-cs-redhat-operator-update
+  - enf-sub-approval-automatic
 ---
 apiVersion: policy.open-cluster-management.io/v1beta1
 kind: PolicySet
@@ -3214,4 +3209,4 @@ metadata:
 spec:
   description: ""
   policies:
-  - sub-approval-manual
+  - enf-sub-approval-manual

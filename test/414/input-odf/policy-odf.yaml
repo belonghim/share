@@ -33,13 +33,13 @@ spec:
   remediationAction: enforce
   severity: high
   object-templates-raw: |
-    {{- range $sb := (lookup "operators.coreos.com/v1alpha1" "Subscription" "openshift-storage" "").items }}
+    {{- range $sub := (lookup "operators.coreos.com/v1alpha1" "Subscription" "openshift-storage" "").items }}
     - complianceType: musthave
       objectDefinition:
         apiVersion: operators.coreos.com/v1alpha1
         kind: Subscription
         metadata:
-          name: {{ $sb.metadata.name }}
+          name: {{ $sub.metadata.name }}
           namespace: openshift-storage
         spec:
           config:
