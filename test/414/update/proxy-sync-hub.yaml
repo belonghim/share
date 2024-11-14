@@ -11,7 +11,7 @@
 apiVersion: policy.open-cluster-management.io/v1
 kind: ConfigurationPolicy
 metadata:
-  name: router-ca-bundle-configmap
+  name: proxy-sync-hub
 spec:
   remediationAction: enforce
   severity: high

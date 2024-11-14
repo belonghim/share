@@ -1,7 +1,7 @@
 apiVersion: cluster.open-cluster-management.io/v1beta1
 kind: Placement
 metadata:
-  name: placement-manual-opp-clusters
+  name: sub-approval-automatic
   namespace: policies
 spec:
   predicates:
@@ -10,4 +10,4 @@ spec:
         matchExpressions:
           - {key: vendor, operator: In, values: ["OpenShift"]}
           - {key: "policies.undeploy", operator: DoesNotExist}
-          - {key: "policies.manual", operator: Exists}
+          - {key: "policies.sub-approval", operator: In, values: ["automatic"]}

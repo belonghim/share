@@ -1,0 +1,21 @@
+---
+apiVersion: policy.open-cluster-management.io/v1
+kind: ConfigurationPolicy
+metadata:
+  name: catalog-source-update
+spec:
+  remediationAction: enforce
+  severity: high
+  object-templates-raw: |
+    {{- $cs := lookup "operators.coreos.com/v1alpha1" "CatalogSource" "openshift-marketplace" "cs-redhat-operator-index" }}
+    - complianceType: musthave
+      objectDefinition:
+        apiVersion: operators.coreos.com/v1alpha1
+        kind: CatalogSource
+        metadata:
+          name: {{ $cs.metadata.name }}
+          namespace: {{ $cs.metadata.namespace }}
+        spec:
+          image: {{ ( (cat (split "redhat-operator-index" $cs.spec.image)._0 "redhat-operator-index:v4." (split "." (lookup "config.openshift.io/v1" "ClusterVersion" "" "version").status.desired.version)._1) | replace " " "" ) }}
+          sourceType: grpc
+---

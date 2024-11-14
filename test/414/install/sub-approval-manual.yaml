@@ -2,7 +2,7 @@
 apiVersion: policy.open-cluster-management.io/v1
 kind: ConfigurationPolicy
 metadata:
-  name: router-ca-bundle-configmap
+  name: sub-approval-manual
 spec:
   remediationAction: enforce
   severity: high
@@ -13,9 +13,9 @@ spec:
         apiVersion: operators.coreos.com/v1alpha1
         kind: Subscription
         metadata:
-          name: $sub.metadata.name
-          namespace: $sub.metadata.namespace
+          name: {{ $sub.metadata.name }}
+          namespace: {{ $sub.metadata.namespace }}
         spec:
           installPlanApproval: Manual
-    {{- end -}}
+    {{- end }}
 ---

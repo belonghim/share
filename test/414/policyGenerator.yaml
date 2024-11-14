@@ -235,27 +235,43 @@ policies:
     - opp-hub
 # All Operators Policies - end
 # Manual Subscription Policies - start
-- name: manual-subscription
+- name: sub-approval-manual
   categories:
     - SI System and Information Integrity
   controls:
     - SI-7 Software Firmware and Information Integrity
   manifests:
-    - path: install/manual-sub.yaml
+    - path: install/sub-approval-manual.yaml
   policySets:
-    - opp-manual
+    - sub-approval-manual
 # Manual Subscription Policies - end
 # Automatic Subscription Policies - start
-- name: automatic-subscription
+- name: sub-approval-automatic
   categories:
     - SI System and Information Integrity
+  complianceType: mustonlyhave
   controls:
     - SI-7 Software Firmware and Information Integrity
   manifests:
-    - path: install/automatic-sub.yaml
+    - path: install/sub-approval-automatic.yaml
   policySets:
-    - opp-automatic
+    - sub-approval-automatic
 # Automatic Subscription Policies - end
+# CatalogSource update  Policies - start
+- name: catalog-source-update
+  categories:
+    - SI System and Information Integrity
+  complianceType: musthave
+  controls:
+    - SI-7 Software Firmware and Information Integrity
+  dependencies:
+    - name: cv-check
+    - name: csv-check
+  manifests:
+    - path: install/catalog-source-update.yaml
+  policySets:
+    - sub-approval-automatic
+# CatalogSource update Policies - end
 # All Create Router Bundle Policies - start
 - name: create-router-bundle
   categories:
@@ -290,10 +306,26 @@ policies:
     - opp-hub
     - opp-clusters
 # Remediation config Policies - end
-# CSV check Policies - start
-- name: remediation-config
+# CV check Policies - start
+- name: cv-check
   categories:
     - SI System and Information Integrity
+  complianceType: mustnothave
+  consolidateManifests: false
+  controls:
+    - SI-7 Software Firmware and Information Integrity
+  manifests:
+    - path: check/cv-check.yaml
+  policySets:
+    - opp-hub
+    - opp-clusters
+  remediationAction: inform
+# CV check Policies - end
+# CSV check Policies - start
+- name: csv-check
+  categories:
+    - SI System and Information Integrity
+  consolidateManifests: false
   controls:
     - SI-7 Software Firmware and Information Integrity
   manifests:
@@ -301,6 +333,7 @@ policies:
   policySets:
     - opp-hub
     - opp-clusters
+  remediationAction: inform
 # CSV check Policies - end
 policySets:
   - description: The OpenShift Platform Plus policy set applies several policies
@@ -317,9 +350,9 @@ policySets:
     name: opp-clusters
     placement:
       placementPath: input/clusters-placement.yaml
-  - name: opp-manual
+  - name: sub-approval-manual
     placement:
-      placementPath: input/manual-placement.yaml
-  - name: opp-automatic
+      placementPath: input/sub-approval-manual.yaml
+  - name: sub-approval-automatic
     placement:
-      placementPath: input/automatic-placement.yaml
+      placementPath: input/sub-approval-automatic.yaml
