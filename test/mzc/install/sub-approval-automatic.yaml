@@ -1,0 +1,25 @@
+---
+apiVersion: policy.open-cluster-management.io/v1
+kind: ConfigurationPolicy
+metadata:
+  name: sub-approval-automatic
+spec:
+  remediationAction: enforce
+  severity: high
+  object-templates-raw: |
+    {{- range $sub := (lookup "operators.coreos.com/v1alpha1" "Subscription" "" "!policies.ignore").items }}
+    - complianceType: mustonlyhave
+      objectDefinition:
+        apiVersion: operators.coreos.com/v1alpha1
+        kind: Subscription
+        metadata:
+          name: {{ $sub.metadata.name }}
+          namespace: {{ $sub.metadata.namespace }}
+        spec:
+          installPlanApproval: Automatic
+          name: {{ $sub.spec.name }}
+          source: {{ $sub.spec.source }}
+          sourceNamespace: {{ $sub.spec.sourceNamespace }}
+          config: {{  $sub.spec.config | toRawJson | toLiteral }}
+    {{- end }}
+---

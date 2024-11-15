@@ -1,0 +1,79 @@
+---
+apiVersion: policy.open-cluster-management.io/v1
+kind: ConfigurationPolicy
+metadata:
+  name: init-config-bundle-secret
+spec:
+  remediationAction: enforce
+  severity: high
+  object-templates-raw: |
+    {{- /* read the bucket data and endpoint access data */ -}}
+    {{- $objBucket := (lookup "objectbucket.io/v1alpha1" "ObjectBucket" "" "obc-quay-enterprise-registry-quay") }}
+    {{- $awsAccess := (lookup "v1" "Secret" "quay-enterprise" "registry-quay") }}
+    {{- /* create the quay config file as a template */ -}}
+    {{- $quayConfig := `
+    DISTRIBUTED_STORAGE_CONFIG:
+      default:
+        - RadosGWStorage
+        - access_key: %[1]s
+          bucket_name: %[2]s
+          hostname: rook-ceph-rgw-ocs-storagecluster-cephobjectstore.openshift-storage.svc
+          is_secure: true
+          port: 443
+          secret_key: %[3]s
+          storage_path: /datastorage/registry-quay
+    DISTRIBUTED_STORAGE_DEFAULT_LOCATIONS: []
+    DISTRIBUTED_STORAGE_PREFERENCE:
+      - default
+    FEATURE_USER_INITIALIZE: true
+    BROWSER_API_CALLS_XHR_ONLY: false
+    SUPER_USERS:
+    - quayadmin
+    FEATURE_USER_CREATION: true
+    FEATURE_SUPERUSERS_FULL_ACCESS: true`
+    }}
+
+    {{- /* create the secret using the quay configuration template created above. */ -}}
+    - complianceType: mustonlyhave
+      objectDefinition:
+        apiVersion: v1
+        kind: Secret
+        metadata:
+          name: init-config-bundle-secret
+          namespace: quay-enterprise
+        type: Opaque
+        data:
+          config.yaml: {{ (printf $quayConfig ($awsAccess.data.AWS_ACCESS_KEY_ID | base64dec) $objBucket.spec.endpoint.bucketName ($awsAccess.data.AWS_SECRET_ACCESS_KEY | base64dec)) | base64enc }}
+---
+apiVersion: v1
+data:
+  config.yaml: QVVUSEVOVElDQVRJT05fVFlQRTogT0lEQwpCQU5LX0xPR0lOX0NPTkZJRzoKICBDTElFTlRfSUQ6IHF1YXktZW50ZXJwcmlzZQogIENMSUVOVF9TRUNSRVQ6IHpaVnRGMERuTXpWNWpvR0FZOVBZZXRCeHVqUVNjV3NMCiAgT0lEQ19TRVJWRVI6IGh0dHBzOi8va2V5Y2xvYWsucGFhcy53b29yaWZnLmNvbTo4MTQzL3JlYWxtcy93b29yaS1yZWFsbS8KICBTRVJWSUNFX05BTUU6IFdvb3JpQmFuayBTU08KICBQUkVGRVJSRURfR1JPVVBfQ0xBSU1fTkFNRTogcXVheS1ncm91cAogIExPR0lOX1NDT1BFUzogWyAnb3BlbmlkJyBdCiAgT0lEQ19ESVNBQkxFX1VTRVJfRU5EUE9JTlQ6IGZhbHNlCkNBUkRfTE9HSU5fQ09ORklHOgogIENMSUVOVF9JRDogcXVheS1lbnRlcnByaXNlCiAgQ0xJRU5UX1NFQ1JFVDogUXBJU0w1Qkt2QWkwQmdtYzNJOVRUZWgydDBzQU9HOW0KICBPSURDX1NFUlZFUjogaHR0cHM6Ly9rZXljbG9hay5wYWFzLndvb3JpZmcuY29tOjgxNDMvcmVhbG1zL2NhcmQtcmVhbG0vCiAgU0VSVklDRV9OQU1FOiBXb29yaUNhcmQgU1NPCiAgUFJFRkVSUkVEX0dST1VQX0NMQUlNX05BTUU6IHF1YXktZ3JvdXAKICBMT0dJTl9TQ09QRVM6IFsgJ29wZW5pZCcgXQogIE9JRENfRElTQUJMRV9VU0VSX0VORFBPSU5UOiBmYWxzZQpGRUFUVVJFX1RFQU1fU1lOQ0lORzogdHJ1ZQpGRUFUVVJFX05PTlNVUEVSVVNFUl9URUFNX1NZTkNJTkdfU0VUVVA6IHRydWUKRkVBVFVSRV9VSV9WMjogdHJ1ZQpERUZBVUxUX1RBR19FWFBJUkFUSU9OOiAydwpQUkVGRVJSRURfVVJMX1NDSEVNRTogaHR0cApTRVJWRVJfSE9TVE5BTUU6IHJlZ2lzdHJ5LmFwcHMucGFhcy53b29yaWZnLmNvbQpTRVRVUF9DT01QTEVURTogdHJ1ZQpTVVBFUl9VU0VSUzoKICAtIHF1YXlhZG1pbgpGRUFUVVJFX1VTRVJfQ1JFQVRJT046IHRydWUKRkVBVFVSRV9VU0VSX0lOSVRJQUxJWkU6IGZhbHNlCkZFQVRVUkVfU1VQRVJVU0VSU19PUkdfQ1JFQVRJT05fT05MWTogdHJ1ZQpGRUFUVVJFX1NVUEVSVVNFUlNfRlVMTF9BQ0NFU1M6IHRydWUKRkVBVFVSRV9SRVNUUklDVEVEX1VTRVJTOiBmYWxzZSAKUkVTVFJJQ1RFRF9VU0VSU19XSElURUxJU1Q6CiAgLSBxdWF5YWRtaW4KQlJPV1NFUl9BUElfQ0FMTFNfWEhSX09OTFk6IGZhbHNlClRBR19FWFBJUkFUSU9OX09QVElPTlM6CiAgLSAxZAogIC0gMXcKICAtIDJ3CiAgLSA0dw==
+kind: Secret
+metadata:
+  name: quay-config-bundle
+  namespace: quay-enterprise
+type: Opaque
+---
+apiVersion: quay.redhat.com/v1
+kind: QuayRegistry
+metadata:
+  name: quay-registry
+  namespace: quay-enterprise
+spec:
+  components:
+  - kind: clair
+    managed: false
+  - kind: clairpostgres
+    managed: false
+  - kind: mirror
+    managed: false
+  - kind: horizontalpodautoscaler
+    managed: false
+  - kind: objectstorage 
+    managed: false
+  - kind: quay
+    managed: true
+    overrides:
+      replicas: 1
+  configBundleSecret: init-config-bundle-secret
+
