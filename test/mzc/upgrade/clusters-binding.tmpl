@@ -10,7 +10,7 @@ spec:
   - requiredClusterSelector:
       labelSelector:
         matchExpressions:
-        - {key: release-update, operator: In, values: ["$MRR"]}
+        - {key: policies.release-update, operator: In, values: ["$MRR"]}
 ---
 apiVersion: policy.open-cluster-management.io/v1
 kind: PlacementBinding
