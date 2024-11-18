@@ -1,0 +1,16 @@
+cat <<EOF
+---
+apiVersion: policy.open-cluster-management.io/v1
+kind: PlacementBinding
+metadata:
+  name: update-service-$MRR
+  namespace: policies
+placementRef:
+  name: placement-opp-hub
+  kind: Placement
+  apiGroup: cluster.open-cluster-management.io
+subjects:
+- name: update-service-$MRR
+  kind: Policy
+  apiGroup: policy.open-cluster-management.io
+EOF

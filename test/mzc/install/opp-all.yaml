@@ -26,87 +26,6 @@ spec:
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: stackrox
----
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: rhacs-operator
----
-apiVersion: operators.coreos.com/v1
-kind: OperatorGroup
-metadata:
-  name: rhacs-operator
-  namespace: rhacs-operator
----
-apiVersion: operators.coreos.com/v1alpha1
-kind: Subscription
-metadata:
-  name: rhacs-operator
-  namespace: rhacs-operator
-spec:
-  name: rhacs-operator
-  source: cs-redhat-operator-index
-  sourceNamespace: openshift-marketplace
----
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: openshift-compliance
----
-apiVersion: operators.coreos.com/v1
-kind: OperatorGroup
-metadata:
-  name: openshift-compliance
-  namespace: openshift-compliance
-spec:
-  targetNamespaces:
-  - openshift-compliance
----
-apiVersion: operators.coreos.com/v1alpha1
-kind: Subscription
-metadata:
-  name: compliance-operator
-  namespace: openshift-compliance
-spec:
-  name: compliance-operator
-  source: cs-redhat-operator-index
-  sourceNamespace: openshift-marketplace
----
-apiVersion: operators.coreos.com/v1alpha1
-kind: Subscription
-metadata:
-  name: container-security-operator
-  namespace: openshift-operators
-spec:
-  name: container-security-operator
-  source: cs-redhat-operator-index
-  sourceNamespace: openshift-marketplace
----
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: openshift-ingress-node-firewall
----
-apiVersion: operators.coreos.com/v1
-kind: OperatorGroup
-metadata:
-  name: openshift-ingress-node-firewall
-  namespace: openshift-ingress-node-firewall
----
-apiVersion: operators.coreos.com/v1alpha1
-kind: Subscription
-metadata:
-  name: ingress-node-firewall
-  namespace: openshift-ingress-node-firewall
-spec:
-  name: ingress-node-firewall
-  source: cs-redhat-operator-index
-  sourceNamespace: openshift-marketplace
----
-apiVersion: v1
-kind: Namespace
-metadata:
   name: openshift-nmstate
 ---
 apiVersion: operators.coreos.com/v1
@@ -146,6 +65,16 @@ metadata:
   namespace: openshift-workload-availability
 spec:
   name: node-healthcheck-operator
+  source: cs-redhat-operator-index
+  sourceNamespace: openshift-marketplace
+---
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  name: node-maintenance-operator
+  namespace: openshift-workload-availability
+spec:
+  name: node-maintenance-operator
   source: cs-redhat-operator-index
   sourceNamespace: openshift-marketplace
 ---

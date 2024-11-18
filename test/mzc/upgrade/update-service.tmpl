@@ -1,0 +1,43 @@
+cat <<EOF
+---
+apiVersion: policy.open-cluster-management.io/v1
+kind: Policy
+metadata:
+  name: update-service-$MRR
+  namespace: policies
+spec:
+  disabled: false
+  remediationAction: enforce
+  policy-templates:
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: update-service-$MRR
+      spec:
+        object-templates:
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: updateservice.operator.openshift.io/v1
+            kind: UpdateService
+            metadata:
+              name: $MRR
+              namespace: openshift-update-service
+            spec:
+              replicas: 2
+              releases: $REGISTRY/$MRR/openshift/release-images
+              graphDataImage: $REGISTRY/$MRR/openshift/graph-image:latest
+            status:
+              conditions:
+              - status: "True"
+                type: ReconcileCompleted
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: v1
+            kind: ConfigMap
+            metadata:
+              name: $MRR
+              namespace: policies
+            data:
+              graphUrl: '{{ ( (cat (lookup "updateservice.operator.openshift.io/v1" "UpdateService" "openshift-update-service" "$MRR").status.policyEngineURI "/api/upgrades_info/v1/graph") | replace " " "") }}'
+EOF

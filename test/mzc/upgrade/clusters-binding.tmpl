@@ -1,0 +1,31 @@
+cat <<EOF
+---
+apiVersion: cluster.open-cluster-management.io/v1beta1
+kind: Placement
+metadata:
+  name: $MRR
+  namespace: policies
+spec:
+  predicates:
+  - requiredClusterSelector:
+      labelSelector:
+        matchExpressions:
+        - {key: release-update, operator: In, values: ["$MRR"]}
+---
+apiVersion: policy.open-cluster-management.io/v1
+kind: PlacementBinding
+metadata:
+  name: $MRR
+  namespace: policies
+placementRef:
+  name: $MRR
+  kind: Placement
+  apiGroup: cluster.open-cluster-management.io
+subjects:
+- name: cluster-version-$MRR
+  kind: Policy
+  apiGroup: policy.open-cluster-management.io
+- name: signature-$MRR
+  kind: Policy
+  apiGroup: policy.open-cluster-management.io
+EOF

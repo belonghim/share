@@ -1,0 +1,22 @@
+cat <<EOF
+---
+apiVersion: policy.open-cluster-management.io/v1
+kind: Policy
+metadata:
+  name: signature-$MRR
+  namespace: policies
+spec:
+  disabled: false
+  remediationAction: enforce
+  policy-templates:
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: signature-$MRR
+      spec:
+        object-templates:
+        - complianceType: musthave
+          objectDefinition:
+$(oc create -f $MRR/result/release-signatures/ --dry-run=client -oyaml | sed 's/^\([ a-z]\)/    \1/g;s/---/- complianceType: musthave\n  objectDefinition:/g' | sed 's/^/        /g')
+EOF
