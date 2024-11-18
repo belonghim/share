@@ -18,5 +18,5 @@ spec:
         object-templates:
         - complianceType: musthave
           objectDefinition:
-$(oc create -f $MRR/result/release-signatures/ --dry-run=client -oyaml | sed 's/^\([ a-z]\)/    \1/g;s/---/- complianceType: musthave\n  objectDefinition:/g' | sed 's/^/        /g')
+$(oc create -f $SIGNATURE --dry-run=client -oyaml | sed 's/^\([ a-z]\)/    \1/g;s/---/- complianceType: musthave\n  objectDefinition:/g' | sed 's/^/        /g')
 EOF
