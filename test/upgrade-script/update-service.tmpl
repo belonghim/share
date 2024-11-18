@@ -40,4 +40,15 @@ spec:
               namespace: policies
             data:
               graphUrl: '{{ ( (cat (lookup "updateservice.operator.openshift.io/v1" "UpdateService" "openshift-update-service" "$MRR").status.policyEngineURI "/api/upgrades_info/v1/graph") | replace " " "") }}'
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: apps/v1
+            kind: Deployment
+            metadata:
+              name: $MRR
+              namespace: openshift-update-service
+            status:
+              conditions:
+              - status: "True"
+                type: Available
 EOF

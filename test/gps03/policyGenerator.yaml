@@ -278,7 +278,7 @@ policies:
   controls:
     - SI-7 Software Firmware and Information Integrity
   manifests:
-    - path: update/proxy-sync-hub.yaml
+    - path: proxy/proxy-sync-hub.yaml
   policySets:
     - opp-hub
 # All Create Router Bundle Policies - end
@@ -289,7 +289,7 @@ policies:
   controls:
     - SI-7 Software Firmware and Information Integrity
   manifests:
-    - path: update/proxy-sync.yaml
+    - path: proxy/proxy-sync.yaml
   policySets:
     - opp-clusters
 # All Proxy Router Bundle Policies - end
