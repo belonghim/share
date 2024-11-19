@@ -38,6 +38,7 @@ policies:
     - path: install/opp-all.yaml
   policySets:
     - opp-hub
+    - opp-clusters
 # All Operators Policies - end
 # Manual Subscription Policies - start
 - name: sub-enf-approval-manual

@@ -15,5 +15,9 @@ spec:
   upgrade:
     channel: $CHANNEL
     desiredUpdate: $VERSION
+    prehook:
+    - extra_vars: {}
+      name: Pause machinepool
+      type: Job
 EOF
 

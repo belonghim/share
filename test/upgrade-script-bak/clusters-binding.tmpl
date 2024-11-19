@@ -1,12 +1,24 @@
 cat <<EOF
 ---
+apiVersion: cluster.open-cluster-management.io/v1beta1
+kind: Placement
+metadata:
+  name: ocp4
+  namespace: policies
+spec:
+  predicates:
+  - requiredClusterSelector:
+      labelSelector:
+        matchExpressions:
+        - {key: policies.release-update, operator: In, values: ["ocp4"]}
+---
 apiVersion: policy.open-cluster-management.io/v1
 kind: PlacementBinding
 metadata:
   name: ocp4
   namespace: policies
 placementRef:
-  name: placement-all
+  name: ocp4
   kind: Placement
   apiGroup: cluster.open-cluster-management.io
 subjects:
