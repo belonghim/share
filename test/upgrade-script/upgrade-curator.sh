@@ -1,5 +1,4 @@
 CLUSTER=$1
-MRR=release-41611-41703
 CHANNEL=stable-4.17
 VERSION=4.17.3
 
