@@ -133,3 +133,27 @@ spec:
   source: cs-redhat-operator-index
   sourceNamespace: openshift-marketplace
 ---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: openshift-compliance
+---
+apiVersion: operators.coreos.com/v1
+kind: OperatorGroup
+metadata:
+  name: openshift-compliance
+  namespace: openshift-compliance
+spec:
+  targetNamespaces:
+  - openshift-compliance
+---
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  name: compliance-operator
+  namespace: openshift-compliance
+spec:
+  name: compliance-operator
+  source: cs-redhat-operator-index
+  sourceNamespace: openshift-marketplace
+---
