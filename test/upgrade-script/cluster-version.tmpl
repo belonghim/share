@@ -23,7 +23,6 @@ spec:
             metadata:
               name: version
             spec:
-              channel: $CHANNEL
-              upstream: '{{hub fromConfigMap "policies" "$MRR" "graphUrl" hub}}'
+              upstream: '{{hub fromConfigMap "policies" "update-service-$MRR" "graphUrl" hub}}'
 EOF
 

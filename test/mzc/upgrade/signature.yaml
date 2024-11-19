@@ -2,20 +2,20 @@
 apiVersion: policy.open-cluster-management.io/v1
 kind: ConfigurationPolicy
 metadata:
-  name: sub-approval-manual
+  name: signature
 spec:
-  remediationAction: enforce
+  remediationAction: inform
   severity: high
   object-templates-raw: |
-    {{- range $sub := (lookup "operators.coreos.com/v1alpha1" "Subscription" "" "" "!policies.ignore").items }}
+    {{hub with $cm := (lookup "v1" "ConfigMap" "policies" "" "!policies.ignore").items hub}}
     - complianceType: musthave
       objectDefinition:
         apiVersion: operators.coreos.com/v1alpha1
-        kind: Subscription
+        kind: ClusterServiceVersion
         metadata:
-          name: {{ $sub.metadata.name }}
+          name: {{ $ch.currentCSV }}
           namespace: {{ $sub.metadata.namespace }}
-        spec:
-          installPlanApproval: Manual
+        status:
+          phase: Succeeded
     {{- end }}
 ---

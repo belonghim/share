@@ -36,7 +36,7 @@ spec:
             apiVersion: v1
             kind: ConfigMap
             metadata:
-              name: $MRR
+              name: update-service-$MRR
               namespace: policies
             data:
               graphUrl: '{{ ( (cat (lookup "updateservice.operator.openshift.io/v1" "UpdateService" "openshift-update-service" "$MRR").status.policyEngineURI "/api/upgrades_info/v1/graph") | replace " " "") }}'

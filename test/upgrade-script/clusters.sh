@@ -1,4 +1,3 @@
-export CHANNEL=eus-4.16
 export MRR=ocp414-416
 export SIGNATURE=/data01/temp/mirror/ocp414-416/result/release-signatures/
 

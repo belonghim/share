@@ -7,7 +7,7 @@ spec:
   remediationAction: inform
   severity: high
   object-templates-raw: |
-    {{- range $sub := (lookup "operators.coreos.com/v1alpha1" "Subscription" "" "!policies.ignore").items }}
+    {{- range $sub := (lookup "operators.coreos.com/v1alpha1" "Subscription" "" "" "!policies.ignore").items }}
     {{- $pm := lookup "packages.operators.coreos.com/v1" "PackageManifest" "openshift-marketplace" $sub.metadata.name ( (cat "catalog=" $sub.spec.source ) | replace " " "" ) }}
     {{- range $ch := $pm.status.channels }}
     {{- if (eq $ch.name $pm.status.defaultChannel) }}
