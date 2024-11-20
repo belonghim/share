@@ -341,6 +341,33 @@ spec:
               name: redhat-oadp-operator
               source: cs-redhat-operator-index
               sourceNamespace: openshift-marketplace
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: v1
+            kind: Namespace
+            metadata:
+              name: openshift-compliance
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: operators.coreos.com/v1
+            kind: OperatorGroup
+            metadata:
+              name: openshift-compliance
+              namespace: openshift-compliance
+            spec:
+              targetNamespaces:
+              - openshift-compliance
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: operators.coreos.com/v1alpha1
+            kind: Subscription
+            metadata:
+              name: compliance-operator
+              namespace: openshift-compliance
+            spec:
+              name: compliance-operator
+              source: cs-redhat-operator-index
+              sourceNamespace: openshift-marketplace
         remediationAction: enforce
         severity: medium
   remediationAction: enforce
@@ -482,7 +509,7 @@ spec:
         name: csv-check
       spec:
         object-templates-raw: |
-          {{- range $sub := (lookup "operators.coreos.com/v1alpha1" "Subscription" "" "!policies.ignore").items }}
+          {{- range $sub := (lookup "operators.coreos.com/v1alpha1" "Subscription" "" "" "!policies.ignore").items }}
           {{- $pm := lookup "packages.operators.coreos.com/v1" "PackageManifest" "openshift-marketplace" $sub.metadata.name ( (cat "catalog=" $sub.spec.source ) | replace " " "" ) }}
           {{- range $ch := $pm.status.channels }}
           {{- if (eq $ch.name $pm.status.defaultChannel) }}
@@ -816,7 +843,7 @@ spec:
         name: sub-approval-automatic
       spec:
         object-templates-raw: |
-          {{- range $sub := (lookup "operators.coreos.com/v1alpha1" "Subscription" "" "!policies.ignore").items }}
+          {{- range $sub := (lookup "operators.coreos.com/v1alpha1" "Subscription" "" "" "!policies.ignore").items }}
           - complianceType: mustonlyhave
             objectDefinition:
               apiVersion: operators.coreos.com/v1alpha1
@@ -859,7 +886,7 @@ spec:
         name: sub-approval-manual
       spec:
         object-templates-raw: |
-          {{- range $sub := (lookup "operators.coreos.com/v1alpha1" "Subscription" "" "!policies.ignore").items }}
+          {{- range $sub := (lookup "operators.coreos.com/v1alpha1" "Subscription" "" "" "!policies.ignore").items }}
           - complianceType: musthave
             objectDefinition:
               apiVersion: operators.coreos.com/v1alpha1

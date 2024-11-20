@@ -1,8 +1,9 @@
+cat <<EOF
 ---
 apiVersion: cluster.open-cluster-management.io/v1beta1
 kind: Placement
 metadata:
-  name: placement-all-$REPO
+  name: clusters-placement-$REPO
   namespace: policies
 spec:
   predicates:
@@ -12,3 +13,4 @@ spec:
         - {key: vendor, operator: In, values: ["OpenShift"]}
         - {key: "policies.undeploy", operator: DoesNotExist}
         - {key: "policies.release-repo", operator: In, values: ["$REPO"]}
+EOF

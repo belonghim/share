@@ -3,10 +3,10 @@ cat <<EOF
 apiVersion: policy.open-cluster-management.io/v1
 kind: PlacementBinding
 metadata:
-  name: $REPO
+  name: clusters-$REPO
   namespace: policies
 placementRef:
-  name: placement-all
+  name: clusters-placement-$REPO
   kind: Placement
   apiGroup: cluster.open-cluster-management.io
 subjects:
