@@ -3,17 +3,17 @@ cat <<EOF
 apiVersion: policy.open-cluster-management.io/v1
 kind: PlacementBinding
 metadata:
-  name: ocp4
+  name: $REPO
   namespace: policies
 placementRef:
   name: placement-all
   kind: Placement
   apiGroup: cluster.open-cluster-management.io
 subjects:
-- name: cluster-version-ocp4
+- name: cv-$REPO
   kind: Policy
   apiGroup: policy.open-cluster-management.io
-- name: signature-ocp4
+- name: signature-$REPO
   kind: Policy
   apiGroup: policy.open-cluster-management.io
 EOF

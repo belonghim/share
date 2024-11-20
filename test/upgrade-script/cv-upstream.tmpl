@@ -3,7 +3,7 @@ cat <<EOF
 apiVersion: policy.open-cluster-management.io/v1
 kind: Policy
 metadata:
-  name: cluster-version-ocp4
+  name: cv-upstream-$REPO
   namespace: policies
 spec:
   disabled: false
@@ -13,7 +13,7 @@ spec:
       apiVersion: policy.open-cluster-management.io/v1
       kind: ConfigurationPolicy
       metadata:
-        name: cluster-version-ocp4
+        name: cv-upstream-$REPO
       spec:
         object-templates:
         - complianceType: musthave
@@ -23,6 +23,10 @@ spec:
             metadata:
               name: version
             spec:
-              upstream: '{{hub fromConfigMap "policies" "update-service-ocp4" "graphUrl" hub}}'
+              upstream: '{{hub fromConfigMap "policies" "update-service-$REPO" "graphUrl" hub}}'
+            status:
+              conditions:
+              - status: 'True'
+                type: RetrievedUpdates
 EOF
 

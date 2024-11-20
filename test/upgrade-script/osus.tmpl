@@ -3,7 +3,7 @@ cat <<EOF
 apiVersion: policy.open-cluster-management.io/v1
 kind: Policy
 metadata:
-  name: update-service-ocp4
+  name: osus-$REPO
   namespace: policies
 spec:
   disabled: false
@@ -13,7 +13,7 @@ spec:
       apiVersion: policy.open-cluster-management.io/v1
       kind: ConfigurationPolicy
       metadata:
-        name: update-service-ocp4
+        name: osus-$REPO
       spec:
         object-templates:
         - complianceType: musthave
@@ -21,12 +21,12 @@ spec:
             apiVersion: updateservice.operator.openshift.io/v1
             kind: UpdateService
             metadata:
-              name: ocp4
+              name: $REPO
               namespace: openshift-update-service
             spec:
               replicas: 2
-              releases: $REGISTRY/ocp4/openshift/release-images
-              graphDataImage: $REGISTRY/ocp4/openshift/graph-image:latest
+              releases: $REGISTRY/$REPO/openshift/release-images
+              graphDataImage: $REGISTRY/$REPO/openshift/graph-image:latest
             status:
               conditions:
               - status: "True"
@@ -36,16 +36,16 @@ spec:
             apiVersion: v1
             kind: ConfigMap
             metadata:
-              name: update-service-ocp4
+              name: osus-$REPO
               namespace: policies
             data:
-              graphUrl: '{{ ( (cat (lookup "updateservice.operator.openshift.io/v1" "UpdateService" "openshift-update-service" "ocp4").status.policyEngineURI "/api/upgrades_info/v1/graph") | replace " " "") }}'
+              graphUrl: '{{ ( (cat (lookup "updateservice.operator.openshift.io/v1" "UpdateService" "openshift-update-service" "$REPO").status.policyEngineURI "/api/upgrades_info/v1/graph") | replace " " "") }}'
         - complianceType: musthave
           objectDefinition:
             apiVersion: apps/v1
             kind: Deployment
             metadata:
-              name: ocp4
+              name: $REPO
               namespace: openshift-update-service
             status:
               conditions:

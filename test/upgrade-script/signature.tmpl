@@ -3,7 +3,7 @@ cat <<EOF
 apiVersion: policy.open-cluster-management.io/v1
 kind: Policy
 metadata:
-  name: signature-ocp4
+  name: signature-$REPO
   namespace: policies
 spec:
   disabled: false
@@ -13,7 +13,7 @@ spec:
       apiVersion: policy.open-cluster-management.io/v1
       kind: ConfigurationPolicy
       metadata:
-        name: signature-ocp4
+        name: signature-$REPO
       spec:
         object-templates:
         - complianceType: musthave
