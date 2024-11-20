@@ -140,6 +140,20 @@ policies:
     - opp-clusters
   remediationAction: inform
 # CSV check Policies - end
+# CSV update Policies - start
+- name: csv-inf-update
+  categories:
+    - SI System and Information Integrity
+  consolidateManifests: false
+  controls:
+    - SI-7 Software Firmware and Information Integrity
+  manifests:
+    - path: install/csv-update.yaml
+  policySets:
+    - opp-hub
+    - opp-clusters
+  remediationAction: inform
+# CSV update Policies - end
 policySets:
   - description: The OpenShift Platform Plus policy set applies several policies
       that will install the OpenShift Platform Plus products using best practices

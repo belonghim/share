@@ -1,5 +1,5 @@
 export SIGNATURE=/data01/temp/mirror/ocp414-416/result/release-signatures/
-export REPO=ocp414-416
+export REPO=service
 
 sh signature.tmpl
 sh cv-upstream.tmpl

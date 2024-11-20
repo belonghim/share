@@ -1,5 +1,5 @@
-export REGISTRY=gps07.redhat.lab:8443
-export REPO=ocp4
+export REGISTRY=registry.paas.woorifg.com:5000
+export REPO=service
 
 sh osus.tmpl
 sh hub-binding.tmpl
