@@ -1,0 +1,39 @@
+---
+apiVersion: policy.open-cluster-management.io/v1
+kind: ConfigurationPolicy
+metadata:
+  name: signature-cm
+spec:
+  remediationAction: enforce
+  severity: high
+  object-templates-raw: |
+    {{hub range $hcm := (lookup "v1" "ConfigMap" "policies" "" "release.openshift.io/verification-signatures").items hub}}
+    - complianceType: musthave
+      objectDefinition:
+        apiVersion: v1
+        kind: ConfigMap
+        metadata:
+          name: {{hub $hcm.metadata.name hub}}
+          namespace: openshift-config-managed
+          labels:
+            release.openshift.io/verification-signatures: ""
+        data: '{{hub copyConfigMapData "policies" $hcm.metadata.name hub}}'
+    {{hub end hub}}
+    {{- range $cm := (lookup "v1" "ConfigMap" "openshift-config-managed" "" "release.openshift.io/verification-signatures").items }}
+    {{- if ne $cm.metadata.name "signatures-managed" }}
+    {{- $not_exist := true }}
+    {{hub range $hcm := (lookup "v1" "ConfigMap" "policies" "" "release.openshift.io/verification-signatures").items hub}}
+    {{- if eq $cm.metadata.name {{hub $hcm.metadata.name hub}} }} {{- $not_exist := false }} {{- break }} {{- end }}
+    {{- if $not_exist }}
+    - complianceType: mustnothave
+      objectDefinition:
+        apiVersion: v1
+        kind: ConfigMap
+        metadata:
+          name: {{ $cm.metadata.name }}
+          namespace: openshift-config-managed
+    {{- end }}
+    {{hub end hub}}
+    {{- end }}
+    {{- end }}
+---

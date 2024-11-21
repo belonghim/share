@@ -154,6 +154,32 @@ policies:
     - opp-clusters
   remediationAction: inform
 # CSV update Policies - end
+# infra label Policies - start
+- name: infra-label
+  categories:
+    - SI System and Information Integrity
+  controls:
+    - SI-7 Software Firmware and Information Integrity
+  manifests:
+    - path: node/infra-label.yaml
+  policySets:
+    - opp-hub
+    - opp-clusters
+  remediationAction: enforce
+# infra label Policies - end
+# signature cm Policies - start
+- name: signature-cm
+  categories:
+    - SI System and Information Integrity
+  controls:
+    - SI-7 Software Firmware and Information Integrity
+  manifests:
+    - path: upgrade/signature-cm.yaml
+  policySets:
+    - opp-hub
+    - opp-clusters
+  remediationAction: enforce
+# signature cm Policies - end
 policySets:
   - description: The OpenShift Platform Plus policy set applies several policies
       that will install the OpenShift Platform Plus products using best practices

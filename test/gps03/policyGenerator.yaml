@@ -17,201 +17,6 @@ policyDefaults:
   standards:
     - NIST SP 800-53
 policies:
-# ACS Policies - start
-- name: acs-enf-operator-central
-  categories:
-    - SC System and Communications Protection
-  controls: 
-    - SC-1 Policy and Procedures
-  dependencies:
-    - name: odf-inf-status
-  manifests:
-    - path: input-acs-central/policy-acs-operator-central.yaml
-- name: acs-inf-central-status
-  categories:
-    - SI System and Information Integrity
-  controls:
-    - SI-5 Security Alerts Advisories and Directives
-  dependencies:
-    - name: acs-enf-operator-central
-  manifests:
-    - path: input-acs-central/policy-acs-central-status.yaml
-  remediationAction: inform
-- name: acs-enf-central-ca-bundle
-  categories:
-    - SI System and Information Integrity
-  consolidateManifests: false
-  controls:
-    - SI-5 Security Alerts Advisories and Directives
-  dependencies:
-    - name: acs-inf-central-status
-  manifests:
-    - path: input-sensor/policy-acs-central-ca-bundle.yaml
-    - path: input-sensor/policy-acs-central-ca-bundle-v2.yaml
-    - path: input-sensor/policy-acs-central-ca-bundle-v1.yaml
-      complianceType: mustnothave
-- name: acs-enf-sync-resources
-  categories:
-    - SI System and Information Integrity
-  consolidateManifests: false
-  controls:
-    - SI-5 Security Alerts Advisories and Directives
-  dependencies:
-    - name: acs-enf-central-ca-bundle
-  manifests:
-    - path: input-sensor/policy-acs-sync-resources.yaml
-- name: acs-inf-monitor-certs
-  categories:
-    - SC System and Communications Protection
-  consolidateManifests: false
-  controls:
-    - SC-8 Transmission Confidentiality and Integrity
-  dependencies:
-    - name: acs-enf-central-ca-bundle
-  manifests:
-    - path: input-sensor/acs-check-certificates.yaml
-    - path: input-sensor/policy-acs-central-ca-bundle-expired.yaml
-      remediationAction: inform
-- name: acs-enf-central-ca-bundle-expired
-  categories:
-    - SC System and Communications Protection
-  consolidateManifests: false
-  complianceType: mustnothave
-  controls:
-    - SC-8 Transmission Confidentiality and Integrity
-  dependencies:
-    - name: acs-inf-monitor-certs
-      compliance: "NonCompliant"
-  policyAnnotations:
-    policy.open-cluster-management.io/description: 'Policy will remove expired certificates created by the init-bundle in policy policy-acs-central-ca-bundle so we can create a new init-bundle'
-  evaluationInterval:
-    compliant: 1m
-    noncompliant: 45s
-  ## ignorePending prevents the NotCompliant dependency from causing this policy to always report as pending
-  ignorePending: true
-  manifests:
-    - path: input-sensor/policy-acs-central-ca-bundle-expired.yaml
-    - path: input-sensor/policy-acs-central-ca-bundle-v2.yaml
-- name: advanced-enf-managed-cluster-security
-  categories:
-    - SI System and Information Integrity
-  consolidateManifests: false
-  controls:
-    - SI-5 Security Alerts Advisories and Directives
-  manifests:
-    - path: input-sensor/policy-advanced-managed-cluster-security.yaml
-  policySets:
-    - opp-clusters
-- name: advanced-inf-managed-cluster-status
-  categories:
-    - SI System and Information Integrity
-  controls:
-    - SI-5 Security Alerts Advisories and Directives
-  manifests:
-    - path: input-sensor/policy-advanced-managed-cluster-status.yaml
-  policySets:
-    - opp-hub
-    - opp-clusters
-  remediationAction: inform
-# ACS Policies - end
-# Observability Policy - start
-- name: observability-enf-storage
-  consolidateManifests: false
-  categories:
-    - CA Assessment Authorization and Monitoring
-  controls: 
-    - CA-7 Continuous Monitoring
-  dependencies:
-    - name: odf-inf-status
-  manifests:
-    - path: input-acm-observability/storage.yaml
-- name: observability-enf-operator
-  consolidateManifests: false
-  categories:
-    - CA Assessment Authorization and Monitoring
-  controls: 
-    - CA-7 Continuous Monitoring
-  dependencies:
-    - name: observability-enf-storage
-  manifests:
-    - path: input-acm-observability/operator.yaml
-# Observability Policy - end
-# ODF Policies - start
-- name: odf-enf
-  categories:
-    - SI System and Information Integrity
-  controls: 
-    - SI-7 Software Firmware and Information Integrity
-  manifests:
-    - path: input-odf/policy-odf.yaml
-- name: odf-inf-volume
-  categories:
-    - SI System and Information Integrity
-  controls: 
-    - SI-7 Software Firmware and Information Integrity
-  manifests:
-    - path: input-odf/policy-odf-volume.yaml
-  remediationAction: inform
-- name: odf-enf-cluster
-  categories:
-    - SI System and Information Integrity
-  controls: 
-    - SI-7 Software Firmware and Information Integrity
-  dependencies:
-    - name: odf-enf
-    - name: odf-inf-volume
-  manifests:
-    - path: input-odf/policy-odf-cluster.yaml
-- name: odf-inf-status
-  categories:
-    - SI System and Information Integrity
-  controls: 
-    - SI-7 Software Firmware and Information Integrity
-  dependencies:
-    - name: odf-enf
-  manifests:
-    - path: input-odf/policy-odf-status.yaml
-  remediationAction: inform
-# ODF Policies - end
-# Quay Policies - start
-- name: quay-enf-storage
-  categories:
-    - SI System and Information Integrity
-  controls:
-    - SI-7 Software Firmware and Information Integrity
-  dependencies:
-    - name: odf-inf-status
-  manifests:
-    - path: input-quay/policy-quay-storage.yaml
-- name: quay-enf-install
-  categories:
-    - SI System and Information Integrity
-  controls:
-    - SI-7 Software Firmware and Information Integrity
-  dependencies:
-    - name: quay-enf-storage
-  manifests:
-    - path: input-quay/policy-quay-install.yaml
-- name: quay-enf-config
-  categories:
-    - SI System and Information Integrity
-  controls: 
-    - SI-7 Software Firmware and Information Integrity
-  dependencies:
-    - name: quay-enf-install
-  manifests:
-    - path: input-quay/policy-quay-config.yaml
-- name: quay-inf-status
-  categories:
-    - SI System and Information Integrity
-  controls:
-    - SI-7 Software Firmware and Information Integrity
-  dependencies:
-    - name: quay-enf-install
-  manifests:
-    - path: input-quay/policy-quay-status.yaml
-  remediationAction: inform
-# Quay Policies - end
 # Hub Operators Policies - start
 - name: hub-enf-operators-install
   categories:
@@ -335,6 +140,46 @@ policies:
     - opp-clusters
   remediationAction: inform
 # CSV check Policies - end
+# CSV update Policies - start
+- name: csv-inf-update
+  categories:
+    - SI System and Information Integrity
+  consolidateManifests: false
+  controls:
+    - SI-7 Software Firmware and Information Integrity
+  manifests:
+    - path: install/csv-update.yaml
+  policySets:
+    - opp-hub
+    - opp-clusters
+  remediationAction: inform
+# CSV update Policies - end
+# infra label Policies - start
+- name: infra-label
+  categories:
+    - SI System and Information Integrity
+  controls:
+    - SI-7 Software Firmware and Information Integrity
+  manifests:
+    - path: node/infra-label.yaml
+  policySets:
+    - opp-hub
+    - opp-clusters
+  remediationAction: enforce
+# infra label Policies - end
+# signature cm Policies - start
+- name: signature-cm
+  categories:
+    - SI System and Information Integrity
+  controls:
+    - SI-7 Software Firmware and Information Integrity
+  manifests:
+    - path: upgrade/signature-cm.yaml
+  policySets:
+    - opp-hub
+    - opp-clusters
+  remediationAction: enforce
+# signature cm Policies - end
 policySets:
   - description: The OpenShift Platform Plus policy set applies several policies
       that will install the OpenShift Platform Plus products using best practices
@@ -342,17 +187,17 @@ policySets:
       the components that install to the Advanced Cluster Management hub.
     name: opp-hub
     placement:
-      placementPath: input/hub-placement.yaml
+      placementPath: place/hub-placement.yaml
   - description: The OpenShift Platform Plus policy set applies several policies
       that install the OpenShift Platform Plus products using best practices
       that allow them to work well together. This policy set is focused on 
       the components that install to every managed cluster.
     name: opp-clusters
     placement:
-      placementPath: input/clusters-placement.yaml
+      placementPath: place/clusters-placement.yaml
   - name: sub-approval-manual
     placement:
-      placementPath: input/sub-approval-manual.yaml
+      placementPath: place/sub-approval-manual.yaml
   - name: sub-approval-automatic
     placement:
-      placementPath: input/sub-approval-automatic.yaml
+      placementPath: place/sub-approval-automatic.yaml

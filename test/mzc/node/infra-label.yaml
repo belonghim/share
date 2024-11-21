@@ -1,0 +1,22 @@
+---
+apiVersion: policy.open-cluster-management.io/v1
+kind: ConfigurationPolicy
+metadata:
+  name: infra-label
+spec:
+  remediationAction: enforce
+  severity: high
+  object-templates-raw: |
+    {{- range $no := (lookup "v1" "Node" "" "" "node-role.kubernetes.io/worker").items }}
+    {{- if (hasPrefix "infra" $no.metadata.name) }}
+    - complianceType: musthave
+      objectDefinition:
+        apiVersion: v1
+        kind: Node
+        metadata:
+          name: {{ $no.metadata.name }}
+          labels:
+            node-role.kubernetes.io/infra: ""
+    {{- end }}
+    {{- end }}
+---
