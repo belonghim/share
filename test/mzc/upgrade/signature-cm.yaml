@@ -23,7 +23,7 @@ spec:
     {{- if ne $cm.metadata.name "signatures-managed" }}
     {{- $not_exist := true }}
     {{hub range $hcm := (lookup "v1" "ConfigMap" "policies" "" "release.openshift.io/verification-signatures").items hub}}
-    {{- if eq $cm.metadata.name {{hub $hcm.metadata.name hub}} }} {{- $not_exist := false }} {{- break }} {{- end }}
+    {{- if eq $cm.metadata.name "{{hub $hcm.metadata.name hub}}" }} {{- $not_exist := false }} {{- break }} {{- end }}
     {{- if $not_exist }}
     - complianceType: mustnothave
       objectDefinition:
