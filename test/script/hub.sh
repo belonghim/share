@@ -1,3 +1,6 @@
+REGISTRY=gps03.redhat.lab:8443
+REPO=release
+
 cat <<EOF
 ---
 apiVersion: policy.open-cluster-management.io/v1
@@ -51,4 +54,18 @@ spec:
               conditions:
               - status: "True"
                 type: Available
+---
+apiVersion: policy.open-cluster-management.io/v1
+kind: PlacementBinding
+metadata:
+  name: osus-$REPO
+  namespace: policies
+placementRef:
+  name: placement-opp-hub
+  kind: Placement
+  apiGroup: cluster.open-cluster-management.io
+subjects:
+- name: osus-$REPO
+  kind: Policy
+  apiGroup: policy.open-cluster-management.io
 EOF
