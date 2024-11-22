@@ -1,5 +1,5 @@
-REGISTRY=gps03.redhat.lab:8443
-REPO=release
+REGISTRY=gps07.redhat.lab:8443
+REPO=ocp414-416
 
 cat <<EOF
 ---
@@ -51,6 +51,7 @@ spec:
               name: $REPO
               namespace: openshift-update-service
             status:
+              availableReplicas: 2
               conditions:
               - status: "True"
                 type: Available

@@ -41,6 +41,8 @@ metadata:
   name: auto-import-secret
   namespace: $CLUSTER
 stringData:
+  #token: sha256~fywkF0ePyj7wP_Hi7RLrfGYDL-0BQ-2Accc7GR6orKI
+  #server: https://api.sno-a.wooribank.lab:6443
   autoImportRetry: "120"
   kubeconfig: |-
 $(sed 's/^/    /g' $KUBECON)

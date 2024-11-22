@@ -1,5 +1,4 @@
 CLUSTER=$1
-CHANNEL=eus-4.16
 VERSION=4.15.35
 
 cat <<EOF
@@ -11,7 +10,6 @@ metadata:
 spec:
   desiredCuration: upgrade
   upgrade:
-    channel: $CHANNEL
     desiredUpdate: $VERSION
 EOF
 
