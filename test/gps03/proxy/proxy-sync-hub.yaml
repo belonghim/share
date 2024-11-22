@@ -16,18 +16,19 @@ spec:
   remediationAction: enforce
   severity: high
   object-templates-raw: |
-    {{- if ne (lookup "v1" "ConfigMap" "openshift-config" "router-bundle").kind "ConfigMap" -}}
+    {{- $ca := fromConfigMap "openshift-config" "router-bundle" "ca-bundle.crt" }}
     - complianceType: musthave
       objectDefinition:
         apiVersion: v1
         data:
-          ca-bundle.crt: |
+          ca-bundle.crt: |-
+            {{- if contains "## openshift-ingress-operator router-ca start" $ca }}{{ (splitn "## openshift-ingress-operator router-ca start" 2 $ca)._0 | autoindent }}{{- end }}## openshift-ingress-operator router-ca start
             {{ ( fromSecret "openshift-ingress-operator" "router-ca" "tls.crt" ) | base64dec | autoindent }}
+            ## openshift-ingress-operator router-ca end{{- if contains "## openshift-ingress-operator router-ca end" $ca }}{{ (splitn "## openshift-ingress-operator router-ca end" 2 $ca)._1 | autoindent }}{{- end }}
         kind: ConfigMap
         metadata:
           name: router-bundle
           namespace: openshift-config
-    {{- end -}}
 ---
 apiVersion: v1
 data:
