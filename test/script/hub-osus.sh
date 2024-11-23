@@ -1,5 +1,5 @@
-REGISTRY=gps07.redhat.lab:8443
-REPO=ocp414-416
+REGISTRY=labhost.jooan.local:8443
+REPO=release
 
 cat <<EOF
 ---
