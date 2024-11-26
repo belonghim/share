@@ -714,7 +714,7 @@ spec:
         name: infra-label
       spec:
         object-templates-raw: |
-          {{- range $no := (lookup "v1" "Node" "" "" "node-role.kubernetes.io/worker").items }}
+          {{- range $no := (lookup "v1" "Node" "" "" "!node-role.kubernetes.io/master").items }}
           {{- if (hasPrefix "infra" $no.metadata.name) }}
           - complianceType: musthave
             objectDefinition:
@@ -725,6 +725,44 @@ spec:
                 labels:
                   node-role.kubernetes.io/infra: ""
           {{- end }}
+          {{- end }}
+        remediationAction: enforce
+        severity: high
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: worker-label
+      spec:
+        object-templates-raw: |
+          {{- range $no := (lookup "v1" "Node" "" "" "node-role.kubernetes.io/infra").items }}
+          - complianceType: musthave
+            objectDefinition:
+              apiVersion: v1
+              kind: Node
+              metadata:
+                name: {{ $no.metadata.name }}
+                labels:
+                  node-role.kubernetes.io/worker:
+          {{- end }}
+        remediationAction: enforce
+        severity: high
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: infra-taint
+      spec:
+        object-templates-raw: |
+          {{- range $no := (lookup "v1" "Node" "" "" "node-role.kubernetes.io/infra").items }}
+          - complianceType: musthave
+            objectDefinition:
+              apiVersion: v1
+              kind: Node
+              metadata:
+                name: {{ $no.metadata.name }}
+                taints:
+                  node-role.kubernetes.io/worker:
           {{- end }}
         remediationAction: enforce
         severity: high
@@ -803,18 +841,37 @@ spec:
         object-templates-raw: |
           {{- if eq (lookup "v1" "ConfigMap" "openshift-config" "router-bundle").kind "ConfigMap" }}
           {{- $ca := fromConfigMap "openshift-config" "router-bundle" "ca-bundle.crt" }}
-          {{- if not (contains ((fromSecret "openshift-ingress-operator" "router-ca" "tls.crt") | base64dec) $ca) }}
+          {{- $rc := (fromSecret "openshift-ingress-operator" "router-ca" "tls.crt") | base64dec }}
+          {{- if not (contains $rc $ca) }}
+          {{- $mt := "# openshift-ingress-operator router-ca tls.crt" }}
+          {{- if contains $mt $ca }}
+          {{- $pr := (splitn "-----BEGIN CERTIFICATE-----" 2 $ca)._0 }}{{ if ne "" $pr }}{{ $mt := cat $pr $mt  }}{{ end }}
           - complianceType: musthave
             objectDefinition:
               apiVersion: v1
               data:
                 ca-bundle.crt: |
-                  {{ ( fromSecret "openshift-ingress-operator" "router-ca" "tls.crt" ) | base64dec | autoindent }}
+                  {{ $mt }}
+                  {{ $rc | autoindent }}
+                  {{ (splitn "-----END CERTIFICATE-----" 2 (splitn $mt 2 $ca)._1)._1 | autoindent }}
+              kind: ConfigMap
+              metadata:
+                name: router-bundle
+                namespace: openshift-config
+          {{- else }}
+          - complianceType: musthave
+            objectDefinition:
+              apiVersion: v1
+              data:
+                ca-bundle.crt: |
+                  {{ $mt }}
+                  {{ $rc | autoindent }}
                   {{ $ca | autoindent }}
               kind: ConfigMap
               metadata:
                 name: router-bundle
                 namespace: openshift-config
+          {{- end }}
           {{- end }}
           {{- else }}
           - complianceType: musthave
@@ -822,7 +879,8 @@ spec:
               apiVersion: v1
               data:
                 ca-bundle.crt: |
-                  {{ ( fromSecret "openshift-ingress-operator" "router-ca" "tls.crt" ) | base64dec | autoindent }}
+                  {{ $mt }}
+                  {{ $rc | autoindent }}
               kind: ConfigMap
               metadata:
                 name: router-bundle
@@ -1030,7 +1088,7 @@ spec:
       spec:
         object-templates-raw: |
           {{- range $sub := (lookup "operators.coreos.com/v1alpha1" "Subscription" "" "" "!policies.ignore").items }}
-          - complianceType: mustonlyhave
+          - complianceType: musthave
             objectDefinition:
               apiVersion: operators.coreos.com/v1alpha1
               kind: Subscription
@@ -1038,11 +1096,8 @@ spec:
                 name: {{ $sub.metadata.name }}
                 namespace: {{ $sub.metadata.namespace }}
               spec:
+                channel:
                 installPlanApproval: Automatic
-                name: {{ $sub.spec.name }}
-                source: {{ $sub.spec.source }}
-                sourceNamespace: {{ $sub.spec.sourceNamespace }}
-                config: {{  $sub.spec.config | toRawJson | toLiteral }}
           {{- end }}
         remediationAction: enforce
         severity: high

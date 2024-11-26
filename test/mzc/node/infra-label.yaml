@@ -7,7 +7,7 @@ spec:
   remediationAction: enforce
   severity: high
   object-templates-raw: |
-    {{- range $no := (lookup "v1" "Node" "" "" "node-role.kubernetes.io/worker").items }}
+    {{- range $no := (lookup "v1" "Node" "" "" "!node-role.kubernetes.io/master").items }}
     {{- if (hasPrefix "infra" $no.metadata.name) }}
     - complianceType: musthave
       objectDefinition:
@@ -18,5 +18,43 @@ spec:
           labels:
             node-role.kubernetes.io/infra: ""
     {{- end }}
+    {{- end }}
+---
+apiVersion: policy.open-cluster-management.io/v1
+kind: ConfigurationPolicy
+metadata:
+  name: worker-label
+spec:
+  remediationAction: enforce
+  severity: high
+  object-templates-raw: |
+    {{- range $no := (lookup "v1" "Node" "" "" "node-role.kubernetes.io/infra").items }}
+    - complianceType: musthave
+      objectDefinition:
+        apiVersion: v1
+        kind: Node
+        metadata:
+          name: {{ $no.metadata.name }}
+          labels:
+            node-role.kubernetes.io/worker:
+    {{- end }}
+---
+apiVersion: policy.open-cluster-management.io/v1
+kind: ConfigurationPolicy
+metadata:
+  name: infra-taint
+spec:
+  remediationAction: enforce
+  severity: high
+  object-templates-raw: |
+    {{- range $no := (lookup "v1" "Node" "" "" "node-role.kubernetes.io/infra").items }}
+    - complianceType: musthave
+      objectDefinition:
+        apiVersion: v1
+        kind: Node
+        metadata:
+          name: {{ $no.metadata.name }}
+          taints:
+            node-role.kubernetes.io/worker:
     {{- end }}
 ---
