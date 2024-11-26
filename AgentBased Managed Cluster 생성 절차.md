@@ -115,8 +115,12 @@ $ MachineNetworkCidr="192.168.1.0/24"
 $ ApiVIP="192.168.1.7"
 $ IngressVIP="192.168.1.8"
 
+## operator repository
 $ OperatorRepo="registry.example.com:5000/olm-redhat"
+
+## 인증 정보 생성
 $ htpasswdSecret="/opt/openshift/auth/htpasswd" ## htpasswd authentication 파일
+$ htpasswd -Bbc ${htpasswdSecret} admin <password>
 
 $ INSTALL_DIR="/root/${ClusterName}"
 $ rm -rf ${INSTALL_DIR}
@@ -850,6 +854,7 @@ done
 <br><br>
 ## 설치 후 구성 명령
 ```
+~~
 ## sysadmin KUBECONFIG 적용
 $ export KUBECONFIG=${INSTALL_DIR}/auth/kubeconfig
 
@@ -935,6 +940,7 @@ $ oc login -u admin -p <password> api.ocp4.example.com:6443
 
 ## get the admin token
 $ oc whoami -t
+~~
 ```
 
 <br><br>
@@ -943,14 +949,15 @@ $ oc whoami -t
 ### Preparing for cluster import (in Hub Cluster)
 ```
 ## create Namespace
-$ oc create namespace <managed_cluster_name>
+$ ManagedCluster=compact
+$ oc create namespace ${ManagedCluster}
 
 ## create ManagedCluster
 $ oc create -f - <<EOF
 apiVersion: cluster.open-cluster-management.io/v1
 kind: ManagedCluster
 metadata:
-  name: <managed_cluster_name>
+  name: ${ManagedCluster}
   labels:
     cloud: auto-detect
     vendor: auto-detect
@@ -961,22 +968,43 @@ EOF
 
 ### Importing a cluster by using the auto import secret (in Hub Cluster)
 ```
-## create Namespace
+## create auto import secret
+$ ManagedKubeconfig="/opt/compact/auth/kubeconfig"
 $ oc create -f - <<EOF
 apiVersion: v1
 kind: Secret
 metadata:
   name: auto-import-secret
-  namespace: <managed_cluster_name>
+  namespace: ${ManagedCluster}
 stringData:
-  autoImportRetry: "5"
-  token: <Managed cluster_admin_token>
-  server: <Managed cluster_api_url>
+  autoImportRetry: "120"
+  kubeconfig: |-
+$(sed 's/^/    /g' ${ManagedKubeconfig})
 type: Opaque
 EOF
 
+## create klusterlet addon config
+$ oc create -f - <<EOF
+apiVersion: agent.open-cluster-management.io/v1
+kind: KlusterletAddonConfig
+metadata:
+  name: ${ManagedKubeconfig}
+  namespace: ${ManagedKubeconfig}
+spec:
+  applicationManager:
+    enabled: true
+  certPolicyController:
+    enabled: true
+  iamPolicyController:
+    enabled: false
+  policyController:
+    enabled: true
+  searchCollector:
+    enabled: false
+EOF
+
 ## Validate the JOINED and AVAILABLE status of the managed cluster
-$ oc get managedcluster <managed_cluster_name>
+$ oc get managedcluster ${ManagedKubeconfig}
 
 ```
 
