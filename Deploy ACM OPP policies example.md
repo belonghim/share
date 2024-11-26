@@ -140,7 +140,7 @@ $ oc kustomize --enable-alpha-plugins --output ../sundo.yaml
 $ oc apply -f ../sundo.yaml
 ```
 
-##Check the policies & operators
+## Check the policies & operators
 ```
 ## Check the policies and operators
 $ oc get policy,sub,csv,ip -A -l \!olm.copiedFrom
