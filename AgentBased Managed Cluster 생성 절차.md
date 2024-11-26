@@ -700,6 +700,9 @@ metadata:
 spec:
   image: ${OperatorRepo}/redhat/redhat-operator-index:v${ReleaseVersion%.*}
   sourceType: grpc
+  updateStrategy:
+    registryPoll:
+      interval: 20m
 EOF
 
 ## ingress conroller 설정
