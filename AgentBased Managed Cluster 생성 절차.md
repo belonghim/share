@@ -115,6 +115,9 @@ $ MachineNetworkCidr="192.168.1.0/24"
 $ ApiVIP="192.168.1.7"
 $ IngressVIP="192.168.1.8"
 
+$ OperatorRepo="registry.example.com:5000/olm-redhat"
+$ htpasswdSecret="/opt/openshift/auth/htpasswd" ## htpasswd authentication 파일
+
 $ INSTALL_DIR="/root/${ClusterName}"
 $ rm -rf ${INSTALL_DIR}
 $ mkdir ${INSTALL_DIR}
@@ -673,6 +676,96 @@ spec:
           enabled: true
           name: var-lib-containers.mount
 EOF
+
+## redhat operator mirror repository 설정
+cat > ${INSTALL_DIR}/openshift/idms-redhat-operator.yml<<EOF
+apiVersion: config.openshift.io/v1
+kind: ImageDigestMirrorSet
+metadata:
+  name: redhat
+spec:
+  imageDigestMirrors:
+  - mirrors:
+    - ${OperatorRepo}
+    source: registry.redhat.io
+EOF
+
+## redhat operator catalog source 설정
+cat > ${INSTALL_DIR}/openshift/cs-redhat-operator-index.yml<<EOF
+apiVersion: operators.coreos.com/v1alpha1
+kind: CatalogSource
+metadata:
+  name: cs-redhat-operator-index
+  namespace: openshift-marketplace
+spec:
+  image: ${OperatorRepo}/redhat/redhat-operator-index:v${ReleaseVersion%.*}
+  sourceType: grpc
+  updateStrategy:
+    registryPoll:
+      interval: 20m
+EOF
+
+## ingress conroller 설정
+cat > ${INSTALL_DIR}/openshift/ingress-controller.yml<<EOF
+apiVersion: operator.openshift.io/v1
+kind: IngressController
+metadata:
+  name: default
+  namespace: openshift-ingress-operator
+spec:
+  nodePlacement:
+    nodeSelector:
+      matchLabels:
+        node-role.kubernetes.io/infra: ""
+    tolerations:
+    - effect: NoSchedule
+      operator: Exists
+      key: node-role.kubernetes.io/infra
+EOF
+
+## htpasswd secret 설정
+cat > ${INSTALL_DIR}/openshift/htpass-secret.yml<<EOF
+apiVersion: v1
+data:
+  htpasswd: $(base64 -w0 ${htpasswdSecret})
+kind: Secret
+metadata:
+  name: htpass-secret
+  namespace: openshift-config
+EOF
+
+## oauth cluster 설정
+cat > ${INSTALL_DIR}/openshift/oauth-cluster.yml<<EOF
+apiVersion: config.openshift.io/v1
+kind: OAuth
+metadata:
+  name: cluster
+spec:
+  identityProviders:
+  - htpasswd:
+      fileData:
+        name: htpass-secret
+    mappingMethod: claim
+    name: htpass-login
+    type: HTPasswd
+EOF
+
+## cluster-admin rolebinding 설정
+cat > ${INSTALL_DIR}/openshift/clusterrolebinding-cluster-admin0.yml<<EOF
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: cluster-admin0
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin
+subjects:
+- apiGroup: rbac.authorization.k8s.io
+  kind: User
+  name: admin
+EOF
+
 ```
 
 ### agent image 생성
