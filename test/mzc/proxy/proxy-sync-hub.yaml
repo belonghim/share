@@ -7,15 +7,20 @@ spec:
   remediationAction: enforce
   severity: high
   object-templates-raw: |
-    {{- if eq (lookup "v1" "ConfigMap" "openshift-config" "router-bundle").kind "ConfigMap" }}
-    {{- $ca := fromConfigMap "openshift-config" "router-bundle" "ca-bundle.crt" }}
-    {{- if not (contains ((fromSecret "openshift-ingress-operator" "router-ca" "tls.crt") | base64dec) $ca) }}
+    {{ $mt := "# openshift-ingress-operator router-ca tls.crt" }}
+    {{- if eq (lookup "v1" "ConfigMap" "openshift-config" "router-bundle").kind "ConfigMap" }}{{ $ca := fromConfigMap "openshift-config" "router-bundle" "ca-bundle.crt" }}{{ $rc := (fromSecret "openshift-ingress-operator" "router-ca" "tls.crt") | base64dec }}
+    {{- if not (contains $rc $ca) }}
+    {{- if contains $mt $ca }}
+    {{- $pr := (splitn $mt 2 $ca)._0 }}{{ if ne "" $pr }}{{ $mt = cat $pr $mt  }}{{ end }}
+    {{- $ca = (splitn "-----END CERTIFICATE-----" 2 (splitn $mt 2 $ca)._1)._1 }}
+    {{- end }}
     - complianceType: musthave
       objectDefinition:
         apiVersion: v1
         data:
           ca-bundle.crt: |
-            {{ ( fromSecret "openshift-ingress-operator" "router-ca" "tls.crt" ) | base64dec | autoindent }}
+            {{ $mt }}
+            {{ $rc | autoindent }}
             {{ $ca | autoindent }}
         kind: ConfigMap
         metadata:
@@ -28,7 +33,8 @@ spec:
         apiVersion: v1
         data:
           ca-bundle.crt: |
-            {{ ( fromSecret "openshift-ingress-operator" "router-ca" "tls.crt" ) | base64dec | autoindent }}
+            {{ $mt }}
+            {{ $rc | autoindent }}
         kind: ConfigMap
         metadata:
           name: router-bundle

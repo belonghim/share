@@ -772,8 +772,10 @@ spec:
               kind: Node
               metadata:
                 name: {{ $no.metadata.name }}
+              spec:
                 taints:
-                  node-role.kubernetes.io/worker:
+                - effect: NoSchedule
+                  key: node-role.kubernetes.io/infra
           {{- end }}
         remediationAction: enforce
         severity: high
