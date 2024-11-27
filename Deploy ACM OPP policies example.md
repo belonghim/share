@@ -5,29 +5,19 @@
 
 ### Set node labels
 ```
-## set CLUSTER variable
-$ CLUSTER=compact
-
-## set BASE variable
-$ BASE=wooribank.lab
-
 ## set DOMAIN variable
-$ DOMAIN=$CLUSTER.$BASE
+$ DOMAIN=hub.woorifg.lab
 
 ## Set acm node labels
 $ oc label node acm-0.$DOMAIN node-role.kubernetes.io/acm= 
 $ oc label node acm-1.$DOMAIN node-role.kubernetes.io/acm= 
 $ oc label node acm-2.$DOMAIN node-role.kubernetes.io/acm= 
 
-## Set quay node labels
-$ oc label node quay-0.$DOMAIN node-role.kubernetes.io/quay= 
-$ oc label node quay-1.$DOMAIN node-role.kubernetes.io/quay= 
-$ oc label node quay-2.$DOMAIN node-role.kubernetes.io/quay= 
+## Set infra node labels
+$ oc label node infra-0.$DOMAIN node-role.kubernetes.io/infra= 
+$ oc label node infra-1.$DOMAIN node-role.kubernetes.io/infra= 
+$ oc label node infra-2.$DOMAIN node-role.kubernetes.io/infra= 
 
-## Set storage node labels
-$ oc label node odf-0.$DOMAIN cluster.ocs.openshift.io/openshift-storage=
-$ oc label node odf-1.$DOMAIN cluster.ocs.openshift.io/openshift-storage=
-$ oc label node odf-2.$DOMAIN cluster.ocs.openshift.io/openshift-storage=
 ```
 
 
