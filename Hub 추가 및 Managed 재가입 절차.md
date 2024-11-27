@@ -238,10 +238,19 @@ $ oc get policy,sub,csv,ip -A -l \!olm.copiedFrom
 <br><br>
 ## Remporting to New Hub Cluster
 
+### Delete Managed Cluster from old Hub Cluster
+```
+## Delete Managed Cluster from old Hub Cluster
+$ CLUSTER=paas
+$ export KUBECONFIG=/opt/$CLUSTER/auth/kubeconfig
+$ oc delete managedcluster mngda
+
+```
+
 ### Preparing for cluster import
 ```
 ## create Namespace
-$ ManagedCluster=compact
+$ ManagedCluster=mngda
 $ oc create namespace ${ManagedCluster}
 
 ## create ManagedCluster
