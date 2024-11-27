@@ -1,27 +1,129 @@
-# Deploy ACM OPP policies example
+<!-- + 도와주세요 -->
 
+# Hub 추가 및 Managed 재가입 절차
 
-## MultiClusterHub Preparation
+<br><br>
+## DNS 구성
+
+### add DNS records
+
+```
+... skip ...
+```
+
+<br><br>
+## Bastion(또는 Installer pod) 준비 절차
+
+### 사전 설치된 Packages 확인
+
+```
+... skip ...
+```
+
+### 사전 다운로드된 tools 확인
+
+```
+... skip ...
+```
+
+### DNS 확인
+
+```
+... skip ...
+```
+
+### ping 테스트
+
+```
+... skip ...
+```
+
+### sshKey 확인
+
+```
+... skip ...
+```
+
+### additionalTrustBundle 확인
+
+```
+... skip ...
+```
+
+### image info 확인
+
+```
+... skip ...
+```
+
+### install config 준비
+
+```
+... skip ...
+```
+
+### agent config 구성
+
+```
+... skip ...
+```
+
+<br><br>
+## Installer 실행
+
+### agent cluster-manifests 생성
+
+```
+... skip ...
+```
+
+### cluster-manifests 파일들 추가
+
+```
+... skip ...
+```
+
+### agent image 생성
+```
+... skip ...
+```
+
+<br><br>
+## VM 노드 생성
+
+### vm.create
+
+```
+... skip ...
+```
+
+### disk.enableUUID 설정 및 시작
+
+```
+... skip ...
+```
+
+<br><br>
+## 설치 후 구성 명령
 
 ### Set node labels
 ```
 ## set DOMAIN variable
-$ DOMAIN=hub.woorifg.lab
+$ DOMAIN=new-hub.woorifg.lab
 
 ## Set acm node labels
 $ oc label node acm-0.$DOMAIN node-role.kubernetes.io/acm= 
 $ oc label node acm-1.$DOMAIN node-role.kubernetes.io/acm= 
 $ oc label node acm-2.$DOMAIN node-role.kubernetes.io/acm= 
 
-## Set infra node labels
+## Set quay node labels
 $ oc label node infra-0.$DOMAIN node-role.kubernetes.io/infra= 
 $ oc label node infra-1.$DOMAIN node-role.kubernetes.io/infra= 
 $ oc label node infra-2.$DOMAIN node-role.kubernetes.io/infra= 
 
 ```
 
-
-## Deploy ACM operator
+### Deploy ACM operator
 ```
 ## create Namespace, OperatorGroup, Subscription for ACM operator
 $ oc create -f -<<EOF
@@ -62,7 +164,7 @@ EOF
 $ oc -n open-cluster-management wait csv -l \!olm.copiedFrom --for=jsonpath={.status.phase}=Succeeded
 ```
 
-## Create MultiClusterHub
+### Create MultiClusterHub
 ```
 ## Create the multiclusterhub
 $ oc create -f - <<EOF
@@ -84,8 +186,6 @@ EOF
 ## Wait until the MCH is running
 $ oc -n open-cluster-management wait --timeout=10m mch/multiclusterhub --for=jsonpath={.status.phase}=Running
 ```
-
-## Make Policies 
 
 ### Create Namespace/policies
 ```
@@ -131,49 +231,107 @@ done
 
 ```
 
-## Install PolicyGenerator
+### Apply the policies
 ```
-## download & install PolicyGenerator
-$ wget https://github.com/open-cluster-management-io/policy-generator-plugin/releases/download/v1.16.0/linux-amd64-PolicyGenerator
-
-$ chmod 755 linux-amd64-PolicyGenerator 
-$ mkdir -p ${HOME}/.config/kustomize/plugin/policy.open-cluster-management.io/v1/policygenerator
-$ mv linux-amd64-PolicyGenerator ${HOME}/.config/kustomize/plugin/policy.open-cluster-management.io/v1/policygenerator/PolicyGenerator
-```
-
-## Apply the policies
-```
-## Download the git repo
-$ git clone https://github.com/belonghim/share
-
-## Generate policies
-$ cd share/test/mzc
-$ oc kustomize --enable-alpha-plugins --output ../mzc.yaml
-
 ## Apply the OPP policies
-$ oc apply -f ../mzc.yaml
+$ oc apply -f mzc.yaml
 
 
 #### Additional policies
-$ cd ../script
 
 ## Test osus policy
-$ sh hub-osus.sh
+$ sh script/hub-osus.sh
 
 ## Apply osus policy
-$ sh hub-osus.sh | oc create -f -
+$ sh script/hub-osus.sh | oc create -f -
 
 ## Test cv-upstream policy
-$ sh cv-upsteam.sh
+$ sh script/cv-upsteam.sh
 
 ## Apply cv-upstream policy
-$ sh cv-upsteam.sh | oc create -f -
+$ sh script/cv-upsteam.sh | oc create -f -
 
 ```
 
-## Check the policies & operators
+### Check the policies & operators
 ```
 ## Check the policies and operators
 $ oc get policy,sub,csv,ip -A -l \!olm.copiedFrom
 ```
+
+
+<br><br>
+## Reimporting to New Hub Cluster
+
+### Delete Managed Cluster from old Hub Cluster
+```
+## Delete Managed Cluster from old Hub Cluster
+$ CLUSTER=paas
+$ export KUBECONFIG=/opt/$CLUSTER/auth/kubeconfig
+$ oc delete managedcluster mngda
+
+```
+
+### Preparing for cluster import
+```
+## create Namespace
+$ ManagedCluster=mngda
+$ oc create namespace ${ManagedCluster}
+
+## create ManagedCluster
+$ oc create -f - <<EOF
+apiVersion: cluster.open-cluster-management.io/v1
+kind: ManagedCluster
+metadata:
+  name: ${ManagedCluster}
+  labels:
+    cloud: auto-detect
+    vendor: auto-detect
+spec:
+  hubAcceptsClient: true
+EOF
+```
+
+### Importing managed cluster by using the auto import secret
+```
+## create auto import secret
+$ ManagedKubeconfig="/opt/compact/auth/kubeconfig"
+$ oc create -f - <<EOF
+apiVersion: v1
+kind: Secret
+metadata:
+  name: auto-import-secret
+  namespace: ${ManagedCluster}
+stringData:
+  autoImportRetry: "120"
+  kubeconfig: |-
+$(sed 's/^/    /g' ${ManagedKubeconfig})
+type: Opaque
+EOF
+
+## create klusterlet addon config
+$ oc create -f - <<EOF
+apiVersion: agent.open-cluster-management.io/v1
+kind: KlusterletAddonConfig
+metadata:
+  name: ${ManagedKubeconfig}
+  namespace: ${ManagedKubeconfig}
+spec:
+  applicationManager:
+    enabled: true
+  certPolicyController:
+    enabled: true
+  iamPolicyController:
+    enabled: false
+  policyController:
+    enabled: true
+  searchCollector:
+    enabled: false
+EOF
+
+## Validate the JOINED and AVAILABLE status of the managed cluster
+$ oc get managedcluster ${ManagedKubeconfig}
+
+```
+
 
