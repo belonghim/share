@@ -132,11 +132,28 @@ $ mv linux-amd64-PolicyGenerator ${HOME}/.config/kustomize/plugin/policy.open-cl
 $ git clone https://github.com/belonghim/share
 
 ## Generate policies
-$ cd share/test/sundo
-$ oc kustomize --enable-alpha-plugins --output ../sundo.yaml
+$ cd share/test/mzc
+$ oc kustomize --enable-alpha-plugins --output ../mzc.yaml
 
 ## Apply the OPP policies
-$ oc apply -f ../sundo.yaml
+$ oc apply -f ../mzc.yaml
+
+
+#### Additional policies
+$ cd ../script
+
+## Test osus policy
+$ sh hub-osus.sh
+
+## Apply osus policy
+$ sh hub-osus.sh | oc create -f -
+
+## Test cv-upstream policy
+$ sh cv-upsteam.sh
+
+## Apply cv-upstream policy
+$ sh cv-upsteam.sh | oc create -f -
+
 ```
 
 ## Check the policies & operators
