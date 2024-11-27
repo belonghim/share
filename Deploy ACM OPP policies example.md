@@ -106,9 +106,9 @@ spec:
 EOF
 ```
 
-### Update clustermanagementaddon 
+### Update ClusterManagementAddon 
 ```
-## Create Namespace, ManagedClusterSetBinding
+## Create AddOnDeploymentConfig & Update ClusterManagementAddon
 $ oc create -f - <<EOF
 apiVersion: addon.open-cluster-management.io/v1alpha1
 kind: AddOnDeploymentConfig
