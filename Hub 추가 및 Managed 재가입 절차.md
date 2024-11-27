@@ -53,7 +53,7 @@
 ### image info 확인
 
 ```
-
+... skip ...
 ```
 
 ### install config 준비
@@ -109,7 +109,7 @@
 ### Set node labels
 ```
 ## set DOMAIN variable
-$ DOMAIN=new-hub.wooribank.lab
+$ DOMAIN=new-hub.woorifg.lab
 
 ## Set acm node labels
 $ oc label node acm-0.$DOMAIN node-role.kubernetes.io/acm= 
