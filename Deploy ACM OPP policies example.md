@@ -124,7 +124,8 @@ spec:
         operator: Exists
         effect: NoSchedule
 EOF
-for f in $(oc get clustermanagementaddon -oname);do
+
+$ for f in $(oc get clustermanagementaddon -oname);do
 oc patch $f --type='json' -p='[{"op":"add", "path":"/spec/supportedConfigs", "value":[{"group":"addon.open-cluster-management.io","resource":"addondeploymentconfigs", "defaultConfig":{"name":"global","namespace":"policies"}}]}]'
 done
 
