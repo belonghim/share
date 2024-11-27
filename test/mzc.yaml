@@ -643,6 +643,46 @@ metadata:
     policy.open-cluster-management.io/standards: NIST SP 800-53
   labels:
     open-cluster-management.io/policy-set: opp
+  name: cv-upstream-ocp4
+  namespace: policies
+spec:
+  disabled: false
+  policy-templates:
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: cv-upstream-ocp4
+      spec:
+        object-templates:
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: config.openshift.io/v1
+            kind: ClusterVersion
+            metadata:
+              name: version
+            spec:
+              upstream: '{{hub fromConfigMap "policies" "osus-ocp4" "graphUrl" hub}}'
+            status:
+              conditions:
+              - status: "True"
+                type: RetrievedUpdates
+        remediationAction: enforce
+        severity: medium
+  remediationAction: enforce
+---
+apiVersion: policy.open-cluster-management.io/v1
+kind: Policy
+metadata:
+  annotations:
+    argocd.argoproj.io/compare-options: IgnoreExtraneous
+    policy.open-cluster-management.io/categories: SI System and Information Integrity
+    policy.open-cluster-management.io/controls: SI-7 Software Firmware and Information
+      Integrity
+    policy.open-cluster-management.io/description: ""
+    policy.open-cluster-management.io/standards: NIST SP 800-53
+  labels:
+    open-cluster-management.io/policy-set: opp
   name: hub-enf-operators-install
   namespace: policies
 spec:
@@ -897,6 +937,9 @@ spec:
       metadata:
         name: proxy-sync-hub
       spec:
+        evaluationInterval:
+          compliant: 1m
+          noncompliant: 45s
         object-templates:
         - complianceType: musthave
           objectDefinition:
@@ -1164,6 +1207,7 @@ spec:
   - csv-inf-check
   - csv-inf-update
   - cv-inf-check
+  - cv-upstream-ocp4
   - infra-label
   - proxy-sync
   - remediation-enf-config
@@ -1188,6 +1232,7 @@ spec:
   - csv-inf-check
   - csv-inf-update
   - cv-inf-check
+  - cv-upstream-ocp4
   - hub-enf-operators-install
   - infra-label
   - proxy-sync-hub

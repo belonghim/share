@@ -155,7 +155,7 @@ policies:
   controls:
     - SI-7 Software Firmware and Information Integrity
   manifests:
-    - path: install/csv-update.yaml
+    - path: check/csv-update.yaml
   policySets:
     - opp-hub
     - opp-clusters
@@ -187,6 +187,19 @@ policies:
     - opp-clusters
   remediationAction: enforce
 # signature cm Policies - end
+# cv upstream ocp4 Policies - start
+- name: cv-upstream-ocp4
+  categories:
+    - SI System and Information Integrity
+  controls:
+    - SI-7 Software Firmware and Information Integrity
+  manifests:
+    - path: upgrade/cv-upstream-ocp4.yaml
+  policySets:
+    - opp-hub
+    - opp-clusters
+  remediationAction: enforce
+# cv upstream ocp4 Policies - end
 policySets:
   - description: The OpenShift Platform Plus policy set applies several policies
       that will install the OpenShift Platform Plus products using best practices

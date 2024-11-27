@@ -1,4 +1,4 @@
-REPO=release
+REPO=ocp4
 
 cat <<EOF
 ---

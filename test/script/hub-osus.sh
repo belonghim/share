@@ -1,5 +1,5 @@
 REGISTRY=labhost.jooan.local:8443
-REPO=release
+REPO=ocp4
 
 cat <<EOF
 ---
@@ -62,8 +62,8 @@ spec:
         name: digest-$REPO
       spec:
         evaluationInterval:
-          comliant: 10m
-          noncomliant: 10m
+          comliant: 1m
+          noncomliant: 1m
         object-templates:
         - complianceType: mustnothave
           objectDefinition:
@@ -73,9 +73,7 @@ spec:
               name: graph-data-tag-digest
               namespace: openshift-update-service
             status:
-              conditions:
-              - status: "False"
-                type: Ready
+              phase: Failed
 ---
 apiVersion: policy.open-cluster-management.io/v1
 kind: PlacementBinding
