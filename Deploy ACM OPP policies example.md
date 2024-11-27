@@ -116,6 +116,30 @@ spec:
 EOF
 ```
 
+### Update clustermanagementaddon 
+```
+## Create Namespace, ManagedClusterSetBinding
+$ oc create -f - <<EOF
+apiVersion: addon.open-cluster-management.io/v1alpha1
+kind: AddOnDeploymentConfig
+metadata:
+  name: global
+  namespace: policies
+spec:
+  nodePlacement:
+    nodeSelector:
+      node-role.kubernetes.io/infra: ""
+    tolerations:
+      - key: node-role.kubernetes.io/infra
+        operator: Exists
+        effect: NoSchedule
+EOF
+for f in $(oc get clustermanagementaddon -oname);do
+oc patch $f --type='json' -p='[{"op":"add", "path":"/spec/supportedConfigs", "value":[{"group":"addon.open-cluster-management.io","resource":"addondeploymentconfigs", "defaultConfig":{"name":"global","namespace":"policies"}}]}]'
+done
+
+```
+
 ## Install PolicyGenerator
 ```
 ## download & install PolicyGenerator
