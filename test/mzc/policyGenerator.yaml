@@ -91,6 +91,9 @@ policies:
     - path: proxy/proxy-sync-hub.yaml
   policySets:
     - opp-hub
+  evaluationInterval:
+    compliant: 1m
+    noncompliant: 45s
 # Create Router Bundle Policies - end
 # Proxy Router Bundle Policies - start
 - name: proxy-sync
