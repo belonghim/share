@@ -236,7 +236,7 @@ $ oc get policy,sub,csv,ip -A -l \!olm.copiedFrom
 
 
 <br><br>
-## Remporting to New Hub Cluster
+## Reimporting to New Hub Cluster
 
 ### Delete Managed Cluster from old Hub Cluster
 ```
