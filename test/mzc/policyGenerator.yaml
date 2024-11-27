@@ -37,7 +37,7 @@ policies:
   controls:
     - SI-7 Software Firmware and Information Integrity
   dependencies:
-      - name: cv-inf-check
+    - name: cv-inf-check
   manifests:
     - path: install/opp-all.yaml
   policySets:

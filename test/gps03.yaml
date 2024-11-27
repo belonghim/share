@@ -736,6 +736,7 @@ spec:
       spec:
         object-templates-raw: |
           {{- range $no := (lookup "v1" "Node" "" "" "node-role.kubernetes.io/infra").items }}
+          {{- if (hasPrefix "infra" $no.metadata.name) }}
           - complianceType: musthave
             objectDefinition:
               apiVersion: v1
@@ -744,6 +745,7 @@ spec:
                 name: {{ $no.metadata.name }}
                 labels:
                   node-role.kubernetes.io/worker:
+          {{- end }}
           {{- end }}
         remediationAction: enforce
         severity: high
@@ -755,6 +757,7 @@ spec:
       spec:
         object-templates-raw: |
           {{- range $no := (lookup "v1" "Node" "" "" "node-role.kubernetes.io/infra").items }}
+          {{- if (hasPrefix "infra" $no.metadata.name) }}
           - complianceType: musthave
             objectDefinition:
               apiVersion: v1
@@ -766,144 +769,9 @@ spec:
                 - effect: NoSchedule
                   key: node-role.kubernetes.io/infra
           {{- end }}
-        remediationAction: enforce
-        severity: high
-  remediationAction: enforce
----
-apiVersion: policy.open-cluster-management.io/v1
-kind: Policy
-metadata:
-  annotations:
-    argocd.argoproj.io/compare-options: IgnoreExtraneous
-    policy.open-cluster-management.io/categories: SI System and Information Integrity
-    policy.open-cluster-management.io/controls: SI-7 Software Firmware and Information
-      Integrity
-    policy.open-cluster-management.io/description: ""
-    policy.open-cluster-management.io/standards: NIST SP 800-53
-  labels:
-    open-cluster-management.io/policy-set: opp
-  name: proxy-sync
-  namespace: policies
-spec:
-  disabled: false
-  policy-templates:
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1
-      kind: ConfigurationPolicy
-      metadata:
-        name: proxy-sync
-      spec:
-        object-templates:
-        - complianceType: musthave
-          objectDefinition:
-            apiVersion: v1
-            data:
-              ca-bundle.crt: |
-                {{hub fromConfigMap "policies" "router-bundle" "ca-bundle.crt" | autoindent hub}}
-            kind: ConfigMap
-            metadata:
-              name: router-bundle
-              namespace: openshift-config
-        - complianceType: musthave
-          objectDefinition:
-            apiVersion: config.openshift.io/v1
-            kind: Proxy
-            metadata:
-              name: cluster
-            spec:
-              trustedCA:
-                name: router-bundle
-        remediationAction: enforce
-        severity: medium
-  remediationAction: enforce
----
-apiVersion: policy.open-cluster-management.io/v1
-kind: Policy
-metadata:
-  annotations:
-    argocd.argoproj.io/compare-options: IgnoreExtraneous
-    policy.open-cluster-management.io/categories: SI System and Information Integrity
-    policy.open-cluster-management.io/controls: SI-7 Software Firmware and Information
-      Integrity
-    policy.open-cluster-management.io/description: ""
-    policy.open-cluster-management.io/standards: NIST SP 800-53
-  labels:
-    open-cluster-management.io/policy-set: opp
-  name: proxy-sync-hub
-  namespace: policies
-spec:
-  disabled: false
-  policy-templates:
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1
-      kind: ConfigurationPolicy
-      metadata:
-        name: proxy-router-bundle
-      spec:
-        object-templates-raw: |
-          {{ $mt := "# openshift-ingress-operator router-ca tls.crt" }}
-          {{- if eq (lookup "v1" "ConfigMap" "openshift-config" "router-bundle").kind "ConfigMap" }}{{ $ca := fromConfigMap "openshift-config" "router-bundle" "ca-bundle.crt" }}{{ $rc := (fromSecret "openshift-ingress-operator" "router-ca" "tls.crt") | base64dec }}
-          {{- if not (contains $rc $ca) }}
-          {{- if contains $mt $ca }}
-          {{- $pr := (splitn $mt 2 $ca)._0 }}{{ if ne "" $pr }}{{ $mt = cat $pr $mt  }}{{ end }}
-          {{- $ca = (splitn "-----END CERTIFICATE-----" 2 (splitn $mt 2 $ca)._1)._1 }}
-          {{- end }}
-          - complianceType: musthave
-            objectDefinition:
-              apiVersion: v1
-              data:
-                ca-bundle.crt: |
-                  {{ $mt }}
-                  {{ $rc | autoindent }}
-                  {{ $ca | autoindent }}
-              kind: ConfigMap
-              metadata:
-                name: router-bundle
-                namespace: openshift-config
-          {{- end }}
-          {{- else }}
-          - complianceType: musthave
-            objectDefinition:
-              apiVersion: v1
-              data:
-                ca-bundle.crt: |
-                  {{ $mt }}
-                  {{ $rc | autoindent }}
-              kind: ConfigMap
-              metadata:
-                name: router-bundle
-                namespace: openshift-config
           {{- end }}
         remediationAction: enforce
         severity: high
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1
-      kind: ConfigurationPolicy
-      metadata:
-        name: proxy-sync-hub
-      spec:
-        object-templates:
-        - complianceType: musthave
-          objectDefinition:
-            apiVersion: v1
-            data:
-              ca-bundle.crt: |
-                {{ ( fromConfigMap "openshift-config" "router-bundle" "ca-bundle.crt" ) | autoindent }}
-            kind: ConfigMap
-            metadata:
-              name: router-bundle
-              namespace: policies
-        - complianceType: musthave
-          objectDefinition:
-            apiVersion: config.openshift.io/v1
-            kind: Proxy
-            metadata:
-              name: cluster
-            spec:
-              trustedCA:
-                name: router-bundle
-        remediationAction: enforce
-        severity: medium
   remediationAction: enforce
 ---
 apiVersion: policy.open-cluster-management.io/v1
@@ -1150,7 +1018,6 @@ spec:
   - csv-inf-update
   - cv-inf-check
   - infra-label
-  - proxy-sync
   - remediation-enf-config
   - signature-cm
 ---
@@ -1175,7 +1042,6 @@ spec:
   - cv-inf-check
   - hub-enf-operators-install
   - infra-label
-  - proxy-sync-hub
   - remediation-enf-config
   - signature-cm
 ---
