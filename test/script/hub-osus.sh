@@ -55,25 +55,24 @@ spec:
               conditions:
               - status: "True"
                 type: Available
-#  - objectDefinition:
-#      apiVersion: policy.open-cluster-management.io/v1
-#      kind: ConfigurationPolicy
-#      metadata:
-#        name: digest-$REPO
-#      spec:
-#        evaluationInterval:
-#          comliant: 5m
-#          noncomliant: 5m
-#        object-templates:
-#        - complianceType: mustnothave
-#          objectDefinition:
-#            apiVersion: v1
-#            kind: Pod
-#            metadata:
-#              name: graph-data-tag-digest
-#              namespace: openshift-update-service
-#            status:
-#              phase: Failed
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: digest-$REPO
+      spec:
+        evaluationInterval:
+          comliant: 5m
+          noncomliant: 5m
+        object-templates:
+        - complianceType: mustnothave
+          objectDefinition:
+            apiVersion: v1
+            kind: Pod
+            metadata:
+              namespace: openshift-update-service
+            status:
+              phase: Failed
 ---
 apiVersion: policy.open-cluster-management.io/v1
 kind: PlacementBinding
