@@ -467,52 +467,6 @@ metadata:
     policy.open-cluster-management.io/standards: NIST SP 800-53
   labels:
     open-cluster-management.io/policy-set: opp
-  name: csv-inf-update
-  namespace: policies
-spec:
-  disabled: false
-  policy-templates:
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1
-      kind: ConfigurationPolicy
-      metadata:
-        name: csv-update
-      spec:
-        object-templates-raw: |
-          {{- range $sub := (lookup "operators.coreos.com/v1alpha1" "Subscription" "" "" "!policies.ignore").items }}
-          {{- if eq (lookup "packages.operators.coreos.com/v1" "PackageManifest" "openshift-marketplace" $sub.metadata.name).kind "PackageManifest" }}
-          {{- $pm := lookup "packages.operators.coreos.com/v1" "PackageManifest" "openshift-marketplace" $sub.metadata.name ((cat "catalog=" $sub.spec.source ) | replace " " "") }}
-          {{- range $ch := $pm.status.channels }}
-          {{- if (eq $ch.name $pm.status.defaultChannel) }}
-          - complianceType: musthave
-            objectDefinition:
-              apiVersion: operators.coreos.com/v1alpha1
-              kind: ClusterServiceVersion
-              metadata:
-                name: {{ $ch.currentCSV }}
-                namespace: {{ $sub.metadata.namespace }}
-              status:
-                phase: Succeeded
-          {{- end }}
-          {{- end }}
-          {{- end }}
-          {{- end }}
-        remediationAction: inform
-        severity: high
-  remediationAction: inform
----
-apiVersion: policy.open-cluster-management.io/v1
-kind: Policy
-metadata:
-  annotations:
-    argocd.argoproj.io/compare-options: IgnoreExtraneous
-    policy.open-cluster-management.io/categories: SI System and Information Integrity
-    policy.open-cluster-management.io/controls: SI-7 Software Firmware and Information
-      Integrity
-    policy.open-cluster-management.io/description: ""
-    policy.open-cluster-management.io/standards: NIST SP 800-53
-  labels:
-    open-cluster-management.io/policy-set: opp
   name: cv-inf-check
   namespace: policies
 spec:
@@ -1017,7 +971,6 @@ spec:
   policies:
   - all-enf-operators-install
   - csv-inf-check
-  - csv-inf-update
   - cv-inf-check
   - infra-label
   - remediation-enf-config
@@ -1040,7 +993,6 @@ spec:
   policies:
   - all-enf-operators-install
   - csv-inf-check
-  - csv-inf-update
   - cv-inf-check
   - hub-enf-operators-install
   - infra-label

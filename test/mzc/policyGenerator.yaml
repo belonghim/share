@@ -148,18 +148,18 @@ policies:
   remediationAction: inform
 # CSV check Policies - end
 # CSV update Policies - start
-- name: csv-inf-update
-  categories:
-    - SI System and Information Integrity
-  consolidateManifests: false
-  controls:
-    - SI-7 Software Firmware and Information Integrity
-  manifests:
-    - path: check/csv-update.yaml
-  policySets:
-    - opp-hub
-    - opp-clusters
-  remediationAction: inform
+#- name: csv-inf-update
+#  categories:
+#    - SI System and Information Integrity
+#  consolidateManifests: false
+#  controls:
+#    - SI-7 Software Firmware and Information Integrity
+#  manifests:
+#    - path: check/csv-update.yaml
+#  policySets:
+#    - opp-hub
+#    - opp-clusters
+#  remediationAction: inform
 # CSV update Policies - end
 # infra label Policies - start
 - name: infra-label
