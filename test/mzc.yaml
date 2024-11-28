@@ -508,6 +508,7 @@ spec:
           {{- end }}
           {{- end }}
           {{- end }}
+          {{- end }}
         remediationAction: inform
         severity: high
   remediationAction: inform
