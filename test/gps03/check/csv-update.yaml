@@ -8,8 +8,8 @@ spec:
   severity: high
   object-templates-raw: |
     {{- range $sub := (lookup "operators.coreos.com/v1alpha1" "Subscription" "" "" "!policies.ignore").items }}
-    {{- range $pm := lookup "packages.operators.coreos.com/v1" "PackageManifest" "openshift-marketplace" "" ((cat "catalog=" $sub.spec.source ) | replace " " "") }}
-    {{- if eq $pm.metadata.name  $sub.metadata.name }}
+    {{- if eq (lookup "packages.operators.coreos.com/v1" "PackageManifest" "openshift-marketplace" $sub.metadata.name).kind "PackageManifest" }}
+    {{- $pm := lookup "packages.operators.coreos.com/v1" "PackageManifest" "openshift-marketplace" $sub.metadata.name ((cat "catalog=" $sub.spec.source ) | replace " " "") }}
     {{- range $ch := $pm.status.channels }}
     {{- if (eq $ch.name $pm.status.defaultChannel) }}
     - complianceType: musthave
@@ -21,7 +21,6 @@ spec:
           namespace: {{ $sub.metadata.namespace }}
         status:
           phase: Succeeded
-    {{- end }}
     {{- end }}
     {{- end }}
     {{- end }}
