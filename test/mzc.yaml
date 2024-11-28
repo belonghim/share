@@ -491,7 +491,8 @@ spec:
       spec:
         object-templates-raw: |
           {{- range $sub := (lookup "operators.coreos.com/v1alpha1" "Subscription" "" "" "!policies.ignore").items }}
-          {{- $pm := lookup "packages.operators.coreos.com/v1" "PackageManifest" "openshift-marketplace" $sub.metadata.name ( (cat "catalog=" $sub.spec.source ) | replace " " "" ) }}
+          {{- $lb := (cat "catalog=" $sub.spec.source ) | replace " " "" }}
+          {{- $pm := lookup "packages.operators.coreos.com/v1" "PackageManifest" "openshift-marketplace" $sub.metadata.name $lb }}
           {{- range $ch := $pm.status.channels }}
           {{- if (eq $ch.name $pm.status.defaultChannel) }}
           - complianceType: musthave
