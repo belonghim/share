@@ -8,7 +8,8 @@ spec:
   severity: high
   object-templates-raw: |
     {{ $mt := "# hub openshift-ingress-operator router-ca tls.crt" }}
-    {{- if eq (lookup "v1" "ConfigMap" "openshift-config" "router-bundle").kind "ConfigMap" }}{{ $ca := fromConfigMap "openshift-config" "router-bundle" "ca-bundle.crt" }}{{ $rc := (fromSecret "openshift-ingress-operator" "router-ca" "tls.crt") | base64dec }}
+    {{ $rc := (fromSecret "openshift-ingress-operator" "router-ca" "tls.crt") | base64dec }}
+    {{- if eq (lookup "v1" "ConfigMap" "openshift-config" "router-bundle").kind "ConfigMap" }}{{ $ca := fromConfigMap "openshift-config" "router-bundle" "ca-bundle.crt" }}
     {{- if not (contains $rc $ca) }}
     {{- if contains $mt $ca }}
     {{- $pr := (splitn $mt 2 $ca)._0 }}{{ if ne "" $pr }}{{ $mt = cat $pr $mt  }}{{ end }}
