@@ -1,4 +1,4 @@
-REGISTRY=labhost.jooan.local:8443
+REGISTRY=gps03.redhat.lab:5000
 REPO=ocp4
 
 cat <<EOF
@@ -29,7 +29,7 @@ spec:
             spec:
               replicas: 2
               releases: $REGISTRY/$REPO/openshift/release-images
-              graphDataImage: $REGISTRY/$REPO/openshift/graph-image:latest
+              graphDataImage: $REGISTRY/$REPO/openshift/graph-data:latest
             status:
               conditions:
               - status: "True"
