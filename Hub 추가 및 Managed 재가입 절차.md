@@ -189,7 +189,7 @@ $ oc -n open-cluster-management wait --timeout=10m mch/multiclusterhub --for=jso
 
 ### Update ClusterManagementAddon 
 ```
-## Create AddOnDeploymentConfig & Update ClusterManagementAddon
+## Create AddOnDeploymentConfig
 $ oc create -f - <<EOF
 apiVersion: addon.open-cluster-management.io/v1alpha1
 kind: AddOnDeploymentConfig
@@ -204,6 +204,7 @@ spec:
         effect: NoSchedule
 EOF
 
+## Update ClusterManagementAddon
 $ for f in $(oc get clustermanagementaddon -oname);do
 oc patch $f --type='json' -p='[{"op":"add", "path":"/spec/supportedConfigs", "value":[{"group":"addon.open-cluster-management.io","resource":"addondeploymentconfigs", "defaultConfig":{"name":"global","namespace":"open-cluster-management-hub"}}]}]'
 done
