@@ -217,8 +217,6 @@ metadata:
   namespace: policies
 spec:
   nodePlacement:
-    nodeSelector:
-      node-role.kubernetes.io/infra: ""
     tolerations:
       - key: node-role.kubernetes.io/infra
         operator: Exists
@@ -289,7 +287,7 @@ metadata:
     vendor: auto-detect
 spec:
   hubAcceptsClient: true
-  leaseDurationSeconds: 60
+  leaseDurationSeconds: 300
 EOF
 ```
 
