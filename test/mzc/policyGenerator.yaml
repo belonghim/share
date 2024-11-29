@@ -170,8 +170,7 @@ policies:
   manifests:
     - path: node/infra-label.yaml
   policySets:
-    - opp-hub
-    - opp-clusters
+    - all
   remediationAction: enforce
 # infra label Policies - end
 # signature cm Policies - start
@@ -208,3 +207,6 @@ policySets:
   - name: sub-approval-automatic
     placement:
       placementPath: place/sub-approval-automatic.yaml
+  - name: all
+    placement:
+      placementPath: place/all.yaml
