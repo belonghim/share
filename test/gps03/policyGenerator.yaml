@@ -82,29 +82,29 @@ policies:
     - sub-approval-automatic
 # cs-redhat operator update Policies - end
 # Create Router Bundle Policies - start
-#- name: proxy-sync-hub
-#  categories:
-#    - SI System and Information Integrity
-#  controls:
-#    - SI-7 Software Firmware and Information Integrity
-#  manifests:
-#    - path: proxy/proxy-sync-hub.yaml
-#  policySets:
-#    - opp-hub
-#  evaluationInterval:
-#    compliant: 1m
-#    noncompliant: 45s
+- name: proxy-sync-hub
+  categories:
+    - SI System and Information Integrity
+  controls:
+    - SI-7 Software Firmware and Information Integrity
+  manifests:
+    - path: proxy/proxy-sync-hub.yaml
+  policySets:
+    - opp-hub
+  evaluationInterval:
+    compliant: 1m
+    noncompliant: 45s
 # Create Router Bundle Policies - end
 # Proxy Router Bundle Policies - start
-#- name: proxy-sync
-#  categories:
-#    - SI System and Information Integrity
-#  controls:
-#    - SI-7 Software Firmware and Information Integrity
-#  manifests:
-#    - path: proxy/proxy-sync.yaml
-#  policySets:
-#    - opp-clusters
+- name: proxy-sync
+  categories:
+    - SI System and Information Integrity
+  controls:
+    - SI-7 Software Firmware and Information Integrity
+  manifests:
+    - path: proxy/proxy-sync.yaml
+  policySets:
+    - opp-clusters
 # Proxy Router Bundle Policies - end
 # Remediation config Policies - start
 - name: remediation-enf-config
