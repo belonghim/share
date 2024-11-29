@@ -877,6 +877,7 @@ metadata:
     vendor: auto-detect
 spec:
   hubAcceptsClient: true
+  leaseDurationSeconds: 300
 EOF
 ```
 
