@@ -289,6 +289,7 @@ metadata:
     vendor: auto-detect
 spec:
   hubAcceptsClient: true
+  leaseDurationSeconds: 60
 EOF
 ```
 
@@ -303,7 +304,7 @@ metadata:
   name: auto-import-secret
   namespace: ${ManagedCluster}
 stringData:
-  autoImportRetry: "120"
+  autoImportRetry: "240"
   kubeconfig: |-
 $(sed 's/^/    /g' ${ManagedKubeconfig})
 type: Opaque

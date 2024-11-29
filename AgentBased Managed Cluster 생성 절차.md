@@ -877,6 +877,7 @@ metadata:
     vendor: auto-detect
 spec:
   hubAcceptsClient: true
+  leaseDurationSeconds: 60
 EOF
 ```
 
@@ -891,7 +892,7 @@ metadata:
   name: auto-import-secret
   namespace: ${ManagedCluster}
 stringData:
-  autoImportRetry: "120"
+  autoImportRetry: "240"
   kubeconfig: |-
 $(sed 's/^/    /g' ${ManagedKubeconfig})
 type: Opaque
@@ -902,8 +903,8 @@ $ oc create -f - <<EOF
 apiVersion: agent.open-cluster-management.io/v1
 kind: KlusterletAddonConfig
 metadata:
-  name: ${ManagedKubeconfig}
-  namespace: ${ManagedKubeconfig}
+  name: ${ManagedCluster}
+  namespace: ${ManagedCluster}
 spec:
   applicationManager:
     enabled: true
@@ -918,7 +919,7 @@ spec:
 EOF
 
 ## Validate the JOINED and AVAILABLE status of the managed cluster
-$ oc get managedcluster ${ManagedKubeconfig}
+$ oc get managedcluster ${ManagedCluster}
 
 ```
 
