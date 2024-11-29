@@ -162,10 +162,10 @@ $ sh hub-osus.sh
 $ sh hub-osus.sh | oc create -f -
 
 ## Test cv-upstream policy
-$ sh cv-upsteam.sh
+$ sh cv-upstream.sh
 
 ## Apply cv-upstream policy
-$ sh cv-upsteam.sh | oc create -f -
+$ sh cv-upstream.sh | oc create -f -
 
 ```
 
