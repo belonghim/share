@@ -117,8 +117,6 @@ metadata:
   namespace: policies
 spec:
   nodePlacement:
-    nodeSelector:
-      node-role.kubernetes.io/infra: ""
     tolerations:
       - key: node-role.kubernetes.io/infra
         operator: Exists
