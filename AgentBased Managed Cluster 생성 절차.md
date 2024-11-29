@@ -918,7 +918,7 @@ spec:
 EOF
 
 ## Validate the JOINED and AVAILABLE status of the managed cluster
-$ oc get managedcluster ${ManagedKubeconfig}
+$ oc get managedcluster ${ManagedCluster}
 
 ```
 
