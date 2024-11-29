@@ -187,6 +187,29 @@ EOF
 $ oc -n open-cluster-management wait --timeout=10m mch/multiclusterhub --for=jsonpath={.status.phase}=Running
 ```
 
+### Update ClusterManagementAddon 
+```
+## Create AddOnDeploymentConfig & Update ClusterManagementAddon
+$ oc create -f - <<EOF
+apiVersion: addon.open-cluster-management.io/v1alpha1
+kind: AddOnDeploymentConfig
+metadata:
+  name: global
+  namespace: open-cluster-management-hub
+spec:
+  nodePlacement:
+    tolerations:
+      - key: node-role.kubernetes.io/infra
+        operator: Exists
+        effect: NoSchedule
+EOF
+
+$ for f in $(oc get clustermanagementaddon -oname);do
+oc patch $f --type='json' -p='[{"op":"add", "path":"/spec/supportedConfigs", "value":[{"group":"addon.open-cluster-management.io","resource":"addondeploymentconfigs", "defaultConfig":{"name":"global","namespace":"open-cluster-management-hub"}}]}]'
+done
+
+```
+
 ### Create Namespace/policies
 ```
 ## Create Namespace, ManagedClusterSetBinding
@@ -204,29 +227,6 @@ metadata:
 spec:
     clusterSet: default
 EOF
-```
-
-### Update ClusterManagementAddon 
-```
-## Create AddOnDeploymentConfig & Update ClusterManagementAddon
-$ oc create -f - <<EOF
-apiVersion: addon.open-cluster-management.io/v1alpha1
-kind: AddOnDeploymentConfig
-metadata:
-  name: global
-  namespace: policies
-spec:
-  nodePlacement:
-    tolerations:
-      - key: node-role.kubernetes.io/infra
-        operator: Exists
-        effect: NoSchedule
-EOF
-
-$ for f in $(oc get clustermanagementaddon -oname);do
-oc patch $f --type='json' -p='[{"op":"add", "path":"/spec/supportedConfigs", "value":[{"group":"addon.open-cluster-management.io","resource":"addondeploymentconfigs", "defaultConfig":{"name":"global","namespace":"policies"}}]}]'
-done
-
 ```
 
 ### Apply the policies
