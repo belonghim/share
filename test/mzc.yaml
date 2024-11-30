@@ -240,6 +240,8 @@ spec:
             apiVersion: v1
             kind: Namespace
             metadata:
+              annotations:
+                scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator":"Exists","effect":"NoSchedule","key":"node-role.kubernetes.io/infra"}]'
               name: openshift-logging
         - complianceType: musthave
           objectDefinition:
@@ -267,6 +269,8 @@ spec:
             apiVersion: v1
             kind: Namespace
             metadata:
+              annotations:
+                scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator":"Exists","effect":"NoSchedule","key":"node-role.kubernetes.io/infra"}]'
               name: openshift-nmstate
         - complianceType: musthave
           objectDefinition:
@@ -294,6 +298,8 @@ spec:
             apiVersion: v1
             kind: Namespace
             metadata:
+              annotations:
+                scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator":"Exists","effect":"NoSchedule","key":"node-role.kubernetes.io/infra"}]'
               name: openshift-workload-availability
         - complianceType: musthave
           objectDefinition:
@@ -318,17 +324,6 @@ spec:
             apiVersion: operators.coreos.com/v1alpha1
             kind: Subscription
             metadata:
-              name: node-maintenance-operator
-              namespace: openshift-workload-availability
-            spec:
-              name: node-maintenance-operator
-              source: cs-redhat-operator-index
-              sourceNamespace: openshift-marketplace
-        - complianceType: musthave
-          objectDefinition:
-            apiVersion: operators.coreos.com/v1alpha1
-            kind: Subscription
-            metadata:
               name: self-node-remediation
               namespace: openshift-workload-availability
             spec:
@@ -340,6 +335,8 @@ spec:
             apiVersion: v1
             kind: Namespace
             metadata:
+              annotations:
+                scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator":"Exists","effect":"NoSchedule","key":"node-role.kubernetes.io/infra"}]'
               name: metallb-system
         - complianceType: musthave
           objectDefinition:
@@ -364,6 +361,8 @@ spec:
             apiVersion: v1
             kind: Namespace
             metadata:
+              annotations:
+                scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator":"Exists","effect":"NoSchedule","key":"node-role.kubernetes.io/infra"}]'
               name: openshift-adp
         - complianceType: musthave
           objectDefinition:
@@ -391,6 +390,8 @@ spec:
             apiVersion: v1
             kind: Namespace
             metadata:
+              annotations:
+                scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator":"Exists","effect":"NoSchedule","key":"node-role.kubernetes.io/infra"}]'
               name: openshift-compliance
         - complianceType: musthave
           objectDefinition:
@@ -634,6 +635,58 @@ metadata:
     policy.open-cluster-management.io/standards: NIST SP 800-53
   labels:
     open-cluster-management.io/policy-set: opp
+  name: default-tolerations
+  namespace: policies
+spec:
+  disabled: false
+  policy-templates:
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: default-tolerations
+      spec:
+        object-templates:
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: v1
+            kind: Namespace
+            metadata:
+              annotations:
+                scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator":"Exists","effect":"NoSchedule","key":"node-role.kubernetes.io/infra"}]'
+              name: openshift-operator-lifecycle-manager
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: v1
+            kind: Namespace
+            metadata:
+              annotations:
+                scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator":"Exists","effect":"NoSchedule","key":"node-role.kubernetes.io/infra"}]'
+              name: openshift-image-registry
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: v1
+            kind: Namespace
+            metadata:
+              annotations:
+                scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator":"Exists","effect":"NoSchedule","key":"node-role.kubernetes.io/infra"}]'
+              name: openshift-marketplace
+        remediationAction: enforce
+        severity: medium
+  remediationAction: enforce
+---
+apiVersion: policy.open-cluster-management.io/v1
+kind: Policy
+metadata:
+  annotations:
+    argocd.argoproj.io/compare-options: IgnoreExtraneous
+    policy.open-cluster-management.io/categories: SI System and Information Integrity
+    policy.open-cluster-management.io/controls: SI-7 Software Firmware and Information
+      Integrity
+    policy.open-cluster-management.io/description: ""
+    policy.open-cluster-management.io/standards: NIST SP 800-53
+  labels:
+    open-cluster-management.io/policy-set: opp
   name: hub-enf-operators-install
   namespace: policies
 spec:
@@ -657,6 +710,8 @@ spec:
             apiVersion: v1
             kind: Namespace
             metadata:
+              annotations:
+                scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator":"Exists","effect":"NoSchedule","key":"node-role.kubernetes.io/infra"}]'
               labels:
                 openshift.io/cluster-monitoring: "true"
               name: openshift-update-service
@@ -772,6 +827,48 @@ spec:
                   key: node-role.kubernetes.io/infra
           {{- end }}
           {{- end }}
+        remediationAction: enforce
+        severity: high
+  remediationAction: enforce
+---
+apiVersion: policy.open-cluster-management.io/v1
+kind: Policy
+metadata:
+  annotations:
+    argocd.argoproj.io/compare-options: IgnoreExtraneous
+    policy.open-cluster-management.io/categories: SI System and Information Integrity
+    policy.open-cluster-management.io/controls: SI-7 Software Firmware and Information
+      Integrity
+    policy.open-cluster-management.io/description: ""
+    policy.open-cluster-management.io/standards: NIST SP 800-53
+  labels:
+    open-cluster-management.io/policy-set: opp
+  name: marketplace-jobs
+  namespace: policies
+spec:
+  disabled: false
+  policy-templates:
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: marketplace-jobs
+      spec:
+        evaluationInterval:
+          comliant: 10m
+          noncomliant: 10m
+        object-templates-raw: |
+          {{ range $mj := (lookup "batch/v1" "Job" "openshift-marketplace" "" "olm.managed").items }}
+          {{ if ne 0 $mj.status.failed }}
+          - complianceType: mustnothave
+            objectDefinition:
+              apiVersion: batch/v1
+              kind: Job
+              metadata:
+                name: {{ $mj.metadata.name }}
+                namespace: openshift-marketplace
+          {{ end }}
+          {{ end }}
         remediationAction: enforce
         severity: high
   remediationAction: enforce
@@ -1152,6 +1249,7 @@ metadata:
 spec:
   description: ""
   policies:
+  - default-tolerations
   - infra-label
 ---
 apiVersion: policy.open-cluster-management.io/v1beta1
@@ -1212,6 +1310,7 @@ spec:
   description: ""
   policies:
   - cs-enf-redhat-operator-update
+  - marketplace-jobs
   - sub-enf-approval-automatic
 ---
 apiVersion: policy.open-cluster-management.io/v1beta1

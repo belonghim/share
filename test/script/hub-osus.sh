@@ -59,20 +59,22 @@ spec:
       apiVersion: policy.open-cluster-management.io/v1
       kind: ConfigurationPolicy
       metadata:
-        name: digest-$REPO
+        name: graph-data-tag-digest
       spec:
         evaluationInterval:
           comliant: 5m
           noncomliant: 5m
-        object-templates:
-        - complianceType: mustnothave
-          objectDefinition:
-            apiVersion: v1
-            kind: Pod
-            metadata:
-              namespace: openshift-update-service
-            status:
-              phase: Failed
+        object-templates-raw: |
+	  {{ $dg := lookup "v1" "Pod" "openshift-update-service" "graph-data-tag-digest" }}
+	  {{ if or (eq "Failed" $dg.status.phase) (eq "Pending" $dg.status.phase) }}
+          - complianceType: mustnothave
+            objectDefinition:
+              apiVersion: v1
+              kind: Pod
+              metadata:
+                name: graph-data-tag-digest
+                namespace: openshift-update-service
+	  {{ end }}
 ---
 apiVersion: policy.open-cluster-management.io/v1
 kind: PlacementBinding

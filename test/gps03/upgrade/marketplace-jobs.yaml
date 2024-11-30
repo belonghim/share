@@ -1,0 +1,23 @@
+---
+apiVersion: policy.open-cluster-management.io/v1
+kind: ConfigurationPolicy
+metadata:
+  name: marketplace-jobs
+spec:
+  remediationAction: enforce
+  severity: high
+  evaluationInterval:
+    comliant: 10m
+    noncomliant: 10m
+  object-templates-raw: |
+    {{ range $mj := (lookup "batch/v1" "Job" "openshift-marketplace" "" "olm.managed").items }}
+    {{ if ne 0 ($mj.status.failed | toInt) }}
+    - complianceType: mustnothave
+      objectDefinition:
+        apiVersion: batch/v1
+        kind: Job
+        metadata:
+          name: {{ $mj.metadata.name }}
+          namespace: openshift-marketplace
+    {{ end }}
+    {{ end }}

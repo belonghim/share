@@ -51,7 +51,7 @@ policies:
   controls:
     - SI-7 Software Firmware and Information Integrity
   manifests:
-    - path: install/sub-approval-manual.yaml
+    - path: upgrade/sub-approval-manual.yaml
   policySets:
     - sub-approval-manual
 # Manual Subscription Policies - end
@@ -63,7 +63,7 @@ policies:
   controls:
     - SI-7 Software Firmware and Information Integrity
   manifests:
-    - path: install/sub-approval-automatic.yaml
+    - path: upgrade/sub-approval-automatic.yaml
   policySets:
     - sub-approval-automatic
 # Automatic Subscription Policies - end
@@ -77,7 +77,7 @@ policies:
   dependencies:
     - name: cv-inf-check
   manifests:
-    - path: install/cs-redhat-operator-update.yaml
+    - path: upgrade/cs-redhat-operator-update.yaml
   policySets:
     - sub-approval-automatic
 # cs-redhat operator update Policies - end
@@ -173,6 +173,18 @@ policies:
     - all
   remediationAction: enforce
 # infra label Policies - end
+# default tolerations Policies - start
+- name: default-tolerations
+  categories:
+    - SI System and Information Integrity
+  controls:
+    - SI-7 Software Firmware and Information Integrity
+  manifests:
+    - path: node/default-tolerations.yaml
+  policySets:
+    - all
+  remediationAction: enforce
+# default tolerations Policies - end
 # signature cm Policies - start
 - name: signature-cm
   categories:
@@ -186,6 +198,18 @@ policies:
     - opp-clusters
   remediationAction: enforce
 # signature cm Policies - end
+# marketplace jobs Policies - start
+- name: marketplace-jobs
+  categories:
+    - SI System and Information Integrity
+  controls:
+    - SI-7 Software Firmware and Information Integrity
+  manifests:
+    - path: upgrade/marketplace-jobs.yaml
+  policySets:
+    - sub-approval-automatic
+  remediationAction: enforce
+# marketplace jobs Policies - end
 policySets:
   - description: The OpenShift Platform Plus policy set applies several policies
       that will install the OpenShift Platform Plus products using best practices
