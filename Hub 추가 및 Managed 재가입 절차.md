@@ -267,7 +267,7 @@ $ oc get policy,sub,csv,ip -A -l \!olm.copiedFrom
 ## Delete Managed Cluster from old Hub Cluster
 $ CLUSTER=paas
 $ export KUBECONFIG=/opt/$CLUSTER/auth/kubeconfig
-$ oc delete managedcluster mngda
+$ oc delete --cascade=foreground managedcluster mngda
 
 ```
 
@@ -288,7 +288,6 @@ metadata:
     vendor: auto-detect
 spec:
   hubAcceptsClient: true
-  leaseDurationSeconds: 120
 EOF
 ```
 
