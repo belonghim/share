@@ -268,6 +268,7 @@ $ oc get policy,sub,csv,ip -A -l \!olm.copiedFrom
 $ CLUSTER=paas
 $ export KUBECONFIG=/opt/$CLUSTER/auth/kubeconfig
 $ oc delete --cascade=foreground managedcluster mngda
+$ oc delete ns mngda
 
 ```
 
