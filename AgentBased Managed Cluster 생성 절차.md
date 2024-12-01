@@ -940,8 +940,9 @@ done
 ```
 
 <br><br>
-## 설치 후 구성 명령
+## 설치 진행 확인 및 대기
 ```
+$ openshift-install agent wait-for bootstrap-complete  --log-level=debug--dir ${INSTALL_DIR}
 
 ```
 
