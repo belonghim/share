@@ -940,9 +940,8 @@ done
 ```
 
 <br><br>
-## 설치 진행 확인 및 대기
+## 설치 후 구성 설정
 ```
-$ openshift-install agent wait-for bootstrap-complete  --log-level=debug--dir ${INSTALL_DIR}
 
 ```
 
@@ -963,7 +962,7 @@ metadata:
   name: ${ManagedCluster}
   labels:
     cloud: auto-detect
-    vendor: auto-detect
+    vendor: OpenShift
 spec:
   hubAcceptsClient: true
 EOF
