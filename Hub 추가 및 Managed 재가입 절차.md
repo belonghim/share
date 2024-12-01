@@ -286,7 +286,7 @@ metadata:
   name: ${ManagedCluster}
   labels:
     cloud: auto-detect
-    vendor: OpenShift
+    vendor: auto-detect
 spec:
   hubAcceptsClient: true
 EOF
@@ -302,6 +302,8 @@ kind: Secret
 metadata:
   name: auto-import-secret
   namespace: ${ManagedCluster}
+  annotations:
+    managedcluster-import-controller.open-cluster-management.io/keeping-auto-import-secret: ""
 stringData:
   autoImportRetry: "240"
   kubeconfig: |-
