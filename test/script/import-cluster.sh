@@ -13,7 +13,8 @@ metadata:
   name: $CLUSTER
   labels:
     cloud: auto-detect
-    vendor: auto-detect
+    vendor: OpenShift
+    policies.release-repo: ocp4
 spec:
   hubAcceptsClient: true
   leaseDurationSeconds: 300
@@ -43,7 +44,7 @@ metadata:
 stringData:
   #token: sha256~fywkF0ePyj7wP_Hi7RLrfGYDL-0BQ-2Accc7GR6orKI
   #server: https://api.sno-a.wooribank.lab:6443
-  autoImportRetry: "120"
+  autoImportRetry: "720"
   kubeconfig: |-
 $(sed 's/^/    /g' $KUBECON)
 type: Opaque

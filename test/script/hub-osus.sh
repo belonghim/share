@@ -50,8 +50,8 @@ spec:
         name: graph-data-tag-digest
       spec:
         evaluationInterval:
-          comliant: 5m
-          noncomliant: 5m
+          comliant: 10m
+          noncomliant: 10m
         object-templates-raw: |
           {{ \$dg := lookup "v1" "Pod" "openshift-update-service" "graph-data-tag-digest" }}
           {{ if or (eq "Failed" \$dg.status.phase) (eq "Pending" \$dg.status.phase) }}
