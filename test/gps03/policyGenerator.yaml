@@ -173,18 +173,18 @@ policies:
     - all
   remediationAction: enforce
 # infra label Policies - end
-# default tolerations Policies - start
-- name: default-tolerations
+# infra toleration Policies - start
+- name: infra-toleration
   categories:
     - SI System and Information Integrity
   controls:
     - SI-7 Software Firmware and Information Integrity
   manifests:
-    - path: node/default-tolerations.yaml
+    - path: node/infra-toleration.yaml
   policySets:
     - all
   remediationAction: enforce
-# default tolerations Policies - end
+# infra toleration Policies - end
 # signature cm Policies - start
 - name: signature-cm
   categories:

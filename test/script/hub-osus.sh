@@ -43,18 +43,6 @@ spec:
               namespace: policies
             data:
               graphUrl: '{{ ( (cat (lookup "updateservice.operator.openshift.io/v1" "UpdateService" "openshift-update-service" "$REPO").status.policyEngineURI "/api/upgrades_info/v1/graph") | replace " " "") }}'
-        - complianceType: musthave
-          objectDefinition:
-            apiVersion: apps/v1
-            kind: Deployment
-            metadata:
-              name: $REPO
-              namespace: openshift-update-service
-            status:
-              availableReplicas: 2
-              conditions:
-              - status: "True"
-                type: Available
   - objectDefinition:
       apiVersion: policy.open-cluster-management.io/v1
       kind: ConfigurationPolicy
@@ -65,8 +53,8 @@ spec:
           comliant: 5m
           noncomliant: 5m
         object-templates-raw: |
-	  {{ $dg := lookup "v1" "Pod" "openshift-update-service" "graph-data-tag-digest" }}
-	  {{ if or (eq "Failed" $dg.status.phase) (eq "Pending" $dg.status.phase) }}
+          {{ \$dg := lookup "v1" "Pod" "openshift-update-service" "graph-data-tag-digest" }}
+          {{ if or (eq "Failed" \$dg.status.phase) (eq "Pending" \$dg.status.phase) }}
           - complianceType: mustnothave
             objectDefinition:
               apiVersion: v1
@@ -74,7 +62,7 @@ spec:
               metadata:
                 name: graph-data-tag-digest
                 namespace: openshift-update-service
-	  {{ end }}
+          {{ end }}
 ---
 apiVersion: policy.open-cluster-management.io/v1
 kind: PlacementBinding
