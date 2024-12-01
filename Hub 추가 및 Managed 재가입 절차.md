@@ -286,7 +286,7 @@ metadata:
   name: ${ManagedCluster}
   labels:
     cloud: auto-detect
-    vendor: auto-detect
+    vendor: OpenShift
 spec:
   hubAcceptsClient: true
 EOF
