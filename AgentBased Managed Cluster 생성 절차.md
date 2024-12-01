@@ -940,7 +940,7 @@ done
 ```
 
 <br><br>
-## 설치 후 구성 명령
+## 설치 후 구성 설정
 ```
 
 ```
@@ -962,10 +962,11 @@ metadata:
   name: ${ManagedCluster}
   labels:
     cloud: auto-detect
-    vendor: auto-detect
+    vendor: OpenShift
+    policies.release-repo: ocp4
 spec:
   hubAcceptsClient: true
-  leaseDurationSeconds: 120
+  leaseDurationSeconds: 300
 EOF
 ```
 
@@ -979,8 +980,10 @@ kind: Secret
 metadata:
   name: auto-import-secret
   namespace: ${ManagedCluster}
+  annotations:
+    managedcluster-import-controller.open-cluster-management.io/keeping-auto-import-secret: ""
 stringData:
-  autoImportRetry: "240"
+  autoImportRetry: "720"
   kubeconfig: |-
 $(sed 's/^/    /g' ${ManagedKubeconfig})
 type: Opaque
