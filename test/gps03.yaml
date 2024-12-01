@@ -199,6 +199,8 @@ spec:
       metadata:
         name: all-enf-operators-install
       spec:
+        evaluationInterval:
+          compliant: never
         object-templates:
         - complianceType: musthave
           objectDefinition:
@@ -617,6 +619,8 @@ spec:
       metadata:
         name: hub-enf-operators-install
       spec:
+        evaluationInterval:
+          compliant: never
         object-templates:
         - complianceType: musthave
           objectDefinition:
@@ -767,6 +771,8 @@ spec:
       metadata:
         name: infra-toleration
       spec:
+        evaluationInterval:
+          compliant: never
         object-templates:
         - complianceType: musthave
           objectDefinition:
@@ -828,11 +834,11 @@ spec:
         name: marketplace-jobs
       spec:
         evaluationInterval:
-          comliant: 10m
-          noncomliant: 10m
+          compliant: 10m
+          noncompliant: 10m
         object-templates-raw: |
           {{ range $mj := (lookup "batch/v1" "Job" "openshift-marketplace" "" "olm.managed").items }}
-          {{ if ne 0 ($mj.status.failed | toInt) }}
+          {{ if gt ($mj.status.failed | toInt) 0 }}
           - complianceType: mustnothave
             objectDefinition:
               apiVersion: batch/v1
@@ -961,7 +967,7 @@ spec:
       spec:
         evaluationInterval:
           compliant: 1m
-          noncompliant: 45s
+          noncompliant: 1m
         object-templates:
         - complianceType: musthave
           objectDefinition:
@@ -1009,6 +1015,8 @@ spec:
       metadata:
         name: remediation-enf-config
       spec:
+        evaluationInterval:
+          compliant: never
         object-templates:
         - complianceType: musthave
           objectDefinition:

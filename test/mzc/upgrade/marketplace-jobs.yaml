@@ -7,11 +7,11 @@ spec:
   remediationAction: enforce
   severity: high
   evaluationInterval:
-    comliant: 10m
-    noncomliant: 10m
+    compliant: 10m
+    noncompliant: 10m
   object-templates-raw: |
     {{ range $mj := (lookup "batch/v1" "Job" "openshift-marketplace" "" "olm.managed").items }}
-    {{ if ne 0 $mj.status.failed }}
+    {{ if gt ($mj.status.failed | toInt) 0 }}
     - complianceType: mustnothave
       objectDefinition:
         apiVersion: batch/v1

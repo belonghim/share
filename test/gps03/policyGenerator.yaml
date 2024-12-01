@@ -25,6 +25,8 @@ policies:
     - SI-7 Software Firmware and Information Integrity
   dependencies:
     - name: cv-inf-check
+  evaluationInterval:
+    compliant: never
   manifests:
     - path: install/opp-hub.yaml
   policySets:
@@ -38,6 +40,8 @@ policies:
     - SI-7 Software Firmware and Information Integrity
   dependencies:
     - name: cv-inf-check
+  evaluationInterval:
+    compliant: never
   manifests:
     - path: install/opp-all.yaml
   policySets:
@@ -50,6 +54,8 @@ policies:
     - SI System and Information Integrity
   controls:
     - SI-7 Software Firmware and Information Integrity
+  evaluationInterval:
+    compliant: never
   manifests:
     - path: upgrade/sub-approval-manual.yaml
   policySets:
@@ -89,11 +95,11 @@ policies:
     - SI-7 Software Firmware and Information Integrity
   manifests:
     - path: proxy/proxy-sync-hub.yaml
-  policySets:
-    - opp-hub
   evaluationInterval:
     compliant: 1m
-    noncompliant: 45s
+    noncompliant: 1m
+  policySets:
+    - opp-hub
 # Create Router Bundle Policies - end
 # Proxy Router Bundle Policies - start
 - name: proxy-sync
@@ -112,6 +118,8 @@ policies:
     - SI System and Information Integrity
   controls:
     - SI-7 Software Firmware and Information Integrity
+  evaluationInterval:
+    compliant: never
   manifests:
     - path: remediation/config.yaml
   policySets:
@@ -165,8 +173,11 @@ policies:
 - name: infra-label
   categories:
     - SI System and Information Integrity
+  consolidateManifests: false
   controls:
     - SI-7 Software Firmware and Information Integrity
+  evaluationInterval:
+    compliant: never
   manifests:
     - path: node/infra-label.yaml
   policySets:
@@ -180,6 +191,8 @@ policies:
     - SI System and Information Integrity
   controls:
     - SI-7 Software Firmware and Information Integrity
+  evaluationInterval:
+    compliant: never
   manifests:
     - path: node/infra-toleration.yaml
   policySets:
@@ -206,6 +219,9 @@ policies:
     - SI System and Information Integrity
   controls:
     - SI-7 Software Firmware and Information Integrity
+  evaluationInterval:
+    compliant: 10m
+    noncompliant: 10m
   manifests:
     - path: upgrade/marketplace-jobs.yaml
   policySets:
