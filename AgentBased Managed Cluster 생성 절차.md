@@ -1140,6 +1140,10 @@ $ oc get managedcluster ${ManagedCluster}
 
 ```
 
+### Delete auto-import secret
+```
+```
+
 <br><br>
 ## Adding AgentBased node
 - https://github.com/openshift/enhancements/blob/master/enhancements/oc/day2-add-nodes.md
