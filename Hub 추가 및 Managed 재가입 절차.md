@@ -106,6 +106,11 @@
 <br><br>
 ## 설치 후 구성 명령
 
+###
+```
+$ openshift-install agent wait-for bootstrap-complete --dir ${Install_Dir} --log-level=debug
+```
+
 ### Set node labels
 ```
 ## set DOMAIN variable
