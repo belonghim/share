@@ -55,8 +55,7 @@ worker1.ocp4.example.com.	IN	A	192.168.1.16
 listen api-server-6443
   bind *:6443
   mode tcp
-  option  httpchk GET /readyz HTTP/1.0
-  option  log-health-checks
+  option httpchk GET /readyz HTTP/1.0
   balance roundrobin
   server master0 master0.ocp4.example.com:6443 weight 1 verify none check check-ssl inter 10s fall 2 rise 3
   server master1 master1.ocp4.example.com:6443 weight 1 verify none check check-ssl inter 10s fall 2 rise 3
@@ -72,7 +71,7 @@ listen machine-config-server-22623
 listen ingress-router-443
   bind *:443
   mode tcp
-  option httpchk GET /healthz/ready 
+  option httpchk GET /healthz/ready HTTP/1.0
   balance source
   server infra0 infra0.ocp4.example.com:443 check port 1936 inter 1s
   server infra1 infra1.ocp4.example.com:443 check port 1936 inter 1s
@@ -80,7 +79,7 @@ listen ingress-router-443
 listen ingress-router-80
   bind *:80
   mode tcp
-  option httpchk GET /healthz/ready 
+  option httpchk GET /healthz/ready HTTP/1.0
   balance source
   server infra0 infra0.ocp4.example.com:80 check port 1936 inter 1s
   server infra1 infra1.ocp4.example.com:80 check port 1936 inter 1s
