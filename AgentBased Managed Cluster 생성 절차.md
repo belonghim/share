@@ -37,8 +37,11 @@ master0.ocp4.example.com.	IN	A	192.168.1.10
 master1.ocp4.example.com.	IN	A	192.168.1.11 
 master2.ocp4.example.com.	IN	A	192.168.1.12 
 ;
-worker0.ocp4.example.com.	IN	A	192.168.1.13 
-worker1.ocp4.example.com.	IN	A	192.168.1.14
+infra0.ocp4.example.com.	IN	A	192.168.1.13 
+infra1.ocp4.example.com.	IN	A	192.168.1.14
+;
+worker0.ocp4.example.com.	IN	A	192.168.1.15 
+worker1.ocp4.example.com.	IN	A	192.168.1.16
 ;
 ;
 ```
@@ -110,7 +113,7 @@ $ oc image info -a ${PullSecret} ${Repository}/openshift/release-images:${Releas
 $ BaseDomain="example.com"
 $ WorkerRelicas="2"
 $ ClusterName="ocp4"
-$ ClusterNetworkCidr="10.128.0.0/14"
+$ ClusterNetworkCidr="10.0.0.0/16"
 $ MachineNetworkCidr="192.168.1.0/24"
 $ ApiVIP="192.168.1.7"
 $ IngressVIP="192.168.1.8"
@@ -140,9 +143,9 @@ networking:
   networkType: OVNKubernetes
   clusterNetwork:
   - cidr: ${ClusterNetworkCidr}
-    hostPrefix: 23
+    hostPrefix: 24
   serviceNetwork:
-  - 172.30.0.0/16
+  - 10.1.0.0/17
   machineNetwork:
   - cidr: ${MachineNetworkCidr}
 platform:
@@ -176,13 +179,17 @@ $ Gateway="192.168.1.1"
 $ MacAddress_m0="00:ef:50:30:f0:b0"
 $ MacAddress_m1="00:ef:50:30:f1:b0"
 $ MacAddress_m2="00:ef:50:30:f2:b0"
-$ MacAddress_w0="00:ef:50:30:f3:b0"
-$ MacAddress_w1="00:ef:50:30:f4:b0"
+$ MacAddress_i0="00:ef:50:30:f3:b0"
+$ MacAddress_i1="00:ef:50:30:f4:b0"
+$ MacAddress_w0="00:ef:50:30:f5:b0"
+$ MacAddress_w1="00:ef:50:30:f6:b0"
 $ Ip_m0="192.168.1.10"
 $ Ip_m1="192.168.1.11"
 $ Ip_m2="192.168.1.12"
-$ Ip_w0="192.168.1.13"
-$ Ip_w1="192.168.1.14"
+$ Ip_i0="192.168.1.13"
+$ Ip_i1="192.168.1.14"
+$ Ip_w0="192.168.1.15"
+$ Ip_w1="192.168.1.16"
 
 $ cat > ${INSTALL_DIR}/agent-config.yaml <<EOF
 apiVersion: v1alpha1
@@ -282,6 +289,66 @@ hosts:
         next-hop-address: ${Gateway}
         next-hop-interface: enp1s0
         table-id: 254
+- hostname: infra0.${ClusterName}.${BaseDomain}
+  role: worker
+  rootDeviceHints:
+    deviceName: ${DeviceName}
+  interfaces:
+  - name: enp1s0
+    macAddress: ${MacAddress_i0}
+  networkConfig:
+    interfaces:
+    - name: enp1s0
+      type: ethernet
+      state: up
+      ipv4:
+        enabled: true
+        address:
+        - ip: ${Ip_i0}
+          prefix-length: 24
+        dhcp: false
+      ipv6:
+        enabled: false
+    dns-resolver:
+      config:
+        server:
+        - ${DnsServer}
+    routes:
+      config:
+      - destination: 0.0.0.0/0
+        next-hop-address: ${Gateway}
+        next-hop-interface: enp1s0
+        table-id: 254
+- hostname: infra1.${ClusterName}.${BaseDomain}
+  role: worker
+  rootDeviceHints:
+    deviceName: ${DeviceName}
+  interfaces:
+  - name: enp1s0
+    macAddress: ${MacAddress_i1}
+  networkConfig:
+    interfaces:
+    - name: enp1s0
+      type: ethernet
+      state: up
+      ipv4:
+        enabled: true
+        address:
+        - ip: ${Ip_i1}
+          prefix-length: 24
+        dhcp: false
+      ipv6:
+        enabled: false
+    dns-resolver:
+      config:
+        server:
+        - ${DnsServer}
+    routes:
+      config:
+      - destination: 0.0.0.0/0
+        next-hop-address: ${Gateway}
+        next-hop-interface: enp1s0
+        table-id: 254
 - hostname: worker0.${ClusterName}.${BaseDomain}
   role: worker
   rootDeviceHints:
@@ -359,6 +426,25 @@ $ openshift-install agent create cluster-manifests --log-level debug --dir ${INS
 
 ```
 $ mkdir ${INSTALL_DIR}/openshift
+
+## sample config 삭제
+$ cat > ${INSTALL_DIR}/openshift/02-cluster-network-operator.yml<<EOF
+apiVersion: operator.openshift.io/v1
+kind: Network
+metadata:
+  name: cluster
+spec:
+  defaultNetwork:
+    ovnKubernetesConfig:
+      ipv4:
+        internalTransitSwitchSubnet: 10.1.128.0/22
+        internalJoinSubnet: 10.1.132.0/22
+      gatewayConfig:
+        ipv4:
+          internalMasqueradeSubnet: 10.1.136.0/22
+        ipForwarding: Global
+  disableNetworkDiagnostics: true
+EOF
 
 ## sample config 삭제
 $ cat > ${INSTALL_DIR}/openshift/02-sample-config.yml<<EOF
