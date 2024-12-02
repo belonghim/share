@@ -47,6 +47,47 @@ worker1.ocp4.example.com.	IN	A	192.168.1.16
 ```
 
 <br><br>
+## LoadBalancer 구성
+
+### haproxy config 예시
+
+```
+listen api-server-6443
+  bind *:6443
+  mode tcp
+  option  httpchk GET /readyz HTTP/1.0
+  option  log-health-checks
+  balance roundrobin
+  server master0 master0.ocp4.example.com:6443 weight 1 verify none check check-ssl inter 10s fall 2 rise 3
+  server master1 master1.ocp4.example.com:6443 weight 1 verify none check check-ssl inter 10s fall 2 rise 3
+  server master2 master2.ocp4.example.com:6443 weight 1 verify none check check-ssl inter 10s fall 2 rise 3
+
+listen machine-config-server-22623
+  bind *:22623
+  mode tcp
+  server master0 master0.ocp4.example.com:22623 check inter 1s
+  server master1 master1.ocp4.example.com:22623 check inter 1s
+  server master2 master2.ocp4.example.com:22623 check inter 1s
+
+listen ingress-router-443
+  bind *:443
+  mode tcp
+  option httpchk GET /healthz/ready 
+  balance source
+  server infra0 infra0.ocp4.example.com:443 check port 1936 inter 1s
+  server infra1 infra1.ocp4.example.com:443 check port 1936 inter 1s
+
+listen ingress-router-80
+  bind *:80
+  mode tcp
+  option httpchk GET /healthz/ready 
+  balance source
+  server infra0 infra0.ocp4.example.com:80 check port 1936 inter 1s
+  server infra1 infra1.ocp4.example.com:80 check port 1936 inter 1s
+
+```
+
+<br><br>
 ## Bastion(또는 Installer pod) 준비 절차
 
 ### 사전 설치된 Packages 확인 (registry.redhat.io/ubi8/ubi 기준 추가 필요)
