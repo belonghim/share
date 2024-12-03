@@ -25,7 +25,7 @@ spec:
             metadata:
               name: version
             spec:
-              upstream: '{{hub fromConfigMap "policies" "osus-$REPO" "graphUrl" hub}}'
+              upstream: '{{hub fromConfigMap "policies" "upgrade-osus-$REPO" "graphUrl" hub}}'
             status:
               conditions:
               - status: 'True'
