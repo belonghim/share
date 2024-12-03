@@ -34,8 +34,6 @@ kind: ConfigurationPolicy
 metadata:
   name: add-infra-label
 spec:
-  evaluationInterval:
-    compliant: never
   remediationAction: enforce
   severity: high
   object-templates-raw: |

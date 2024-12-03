@@ -711,8 +711,6 @@ spec:
       metadata:
         name: add-infra-label
       spec:
-        evaluationInterval:
-          compliant: never
         object-templates-raw: |
           {{- range $no := (lookup "v1" "Node" "" "" "!node-role.kubernetes.io/master").items }}
           {{- if (hasPrefix "infra" $no.metadata.name) }}
