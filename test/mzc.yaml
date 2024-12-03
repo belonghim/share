@@ -687,6 +687,8 @@ spec:
       metadata:
         name: infra-label
       spec:
+        evaluationInterval:
+          compliant: never
         object-templates-raw: |
           {{- range $no := (lookup "v1" "Node" "" "" "!node-role.kubernetes.io/master").items }}
           {{- if (hasPrefix "infra" $no.metadata.name) }}
@@ -708,6 +710,8 @@ spec:
       metadata:
         name: worker-label
       spec:
+        evaluationInterval:
+          compliant: never
         object-templates-raw: |
           {{- range $no := (lookup "v1" "Node" "" "" "node-role.kubernetes.io/infra").items }}
           {{- if (hasPrefix "infra" $no.metadata.name) }}
@@ -729,6 +733,8 @@ spec:
       metadata:
         name: infra-taint
       spec:
+        evaluationInterval:
+          compliant: never
         object-templates-raw: |
           {{- range $no := (lookup "v1" "Node" "" "" "node-role.kubernetes.io/infra").items }}
           {{- if (hasPrefix "infra" $no.metadata.name) }}

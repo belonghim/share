@@ -4,6 +4,8 @@ kind: ConfigurationPolicy
 metadata:
   name: infra-label
 spec:
+  evaluationInterval:
+    compliant: never
   remediationAction: enforce
   severity: high
   object-templates-raw: |
@@ -25,6 +27,8 @@ kind: ConfigurationPolicy
 metadata:
   name: worker-label
 spec:
+  evaluationInterval:
+    compliant: never
   remediationAction: enforce
   severity: high
   object-templates-raw: |
@@ -46,6 +50,8 @@ kind: ConfigurationPolicy
 metadata:
   name: infra-taint
 spec:
+  evaluationInterval:
+    compliant: never
   remediationAction: enforce
   severity: high
   object-templates-raw: |
