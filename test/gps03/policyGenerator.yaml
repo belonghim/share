@@ -8,7 +8,6 @@ policyDefaults:
   categories:
   controls:
   standards:
-  consolidateManifests: false
   namespace: policies
   policySets:
   - hub

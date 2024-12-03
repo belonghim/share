@@ -239,15 +239,6 @@ spec:
               conditions:
               - status: "False"
                 type: Available
-        remediationAction: inform
-        severity: medium
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1
-      kind: ConfigurationPolicy
-      metadata:
-        name: check-cv2
-      spec:
-        object-templates:
         - complianceType: mustnothave
           objectDefinition:
             apiVersion: config.openshift.io/v1
@@ -256,15 +247,6 @@ spec:
               conditions:
               - status: "True"
                 type: Degraded
-        remediationAction: inform
-        severity: medium
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1
-      kind: ConfigurationPolicy
-      metadata:
-        name: check-cv3
-      spec:
-        object-templates:
         - complianceType: mustnothave
           objectDefinition:
             apiVersion: machineconfiguration.openshift.io/v1
@@ -273,15 +255,6 @@ spec:
               conditions:
               - status: "False"
                 type: Updated
-        remediationAction: inform
-        severity: medium
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1
-      kind: ConfigurationPolicy
-      metadata:
-        name: check-cv4
-      spec:
-        object-templates:
         - complianceType: mustnothave
           objectDefinition:
             apiVersion: machineconfiguration.openshift.io/v1
@@ -290,15 +263,6 @@ spec:
               conditions:
               - status: "True"
                 type: Degraded
-        remediationAction: inform
-        severity: medium
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1
-      kind: ConfigurationPolicy
-      metadata:
-        name: check-cv5
-      spec:
-        object-templates:
         - complianceType: mustnothave
           objectDefinition:
             apiVersion: config.openshift.io/v1
@@ -307,15 +271,6 @@ spec:
               conditions:
               - status: "False"
                 type: Available
-        remediationAction: inform
-        severity: medium
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1
-      kind: ConfigurationPolicy
-      metadata:
-        name: check-cv6
-      spec:
-        object-templates:
         - complianceType: mustnothave
           objectDefinition:
             apiVersion: config.openshift.io/v1
@@ -365,17 +320,6 @@ spec:
               - effect: NoSchedule
                 key: node-role.kubernetes.io/infra
                 operator: Exists
-        remediationAction: enforce
-        severity: medium
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1
-      kind: ConfigurationPolicy
-      metadata:
-        name: config-operators2
-      spec:
-        evaluationInterval:
-          compliant: never
-        object-templates:
         - complianceType: musthave
           objectDefinition:
             apiVersion: remediation.medik8s.io/v1alpha1
@@ -400,17 +344,6 @@ spec:
               - duration: 300s
                 status: Unknown
                 type: Ready
-        remediationAction: enforce
-        severity: medium
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1
-      kind: ConfigurationPolicy
-      metadata:
-        name: config-operators3
-      spec:
-        evaluationInterval:
-          compliant: never
-        object-templates:
         - complianceType: musthave
           objectDefinition:
             apiVersion: remediation.medik8s.io/v1alpha1
@@ -478,17 +411,6 @@ spec:
               annotations:
                 scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator":"Exists","effect":"NoSchedule","key":"node-role.kubernetes.io/infra"}]'
               name: openshift-logging
-        remediationAction: enforce
-        severity: medium
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1
-      kind: ConfigurationPolicy
-      metadata:
-        name: install-operators2
-      spec:
-        evaluationInterval:
-          compliant: never
-        object-templates:
         - complianceType: musthave
           objectDefinition:
             apiVersion: operators.coreos.com/v1
@@ -499,17 +421,6 @@ spec:
             spec:
               targetNamespaces:
               - openshift-logging
-        remediationAction: enforce
-        severity: medium
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1
-      kind: ConfigurationPolicy
-      metadata:
-        name: install-operators3
-      spec:
-        evaluationInterval:
-          compliant: never
-        object-templates:
         - complianceType: musthave
           objectDefinition:
             apiVersion: operators.coreos.com/v1alpha1
@@ -521,17 +432,6 @@ spec:
               name: cluster-logging
               source: cs-redhat-operator-index
               sourceNamespace: openshift-marketplace
-        remediationAction: enforce
-        severity: medium
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1
-      kind: ConfigurationPolicy
-      metadata:
-        name: install-operators4
-      spec:
-        evaluationInterval:
-          compliant: never
-        object-templates:
         - complianceType: musthave
           objectDefinition:
             apiVersion: v1
@@ -540,17 +440,6 @@ spec:
               annotations:
                 scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator":"Exists","effect":"NoSchedule","key":"node-role.kubernetes.io/infra"}]'
               name: openshift-nmstate
-        remediationAction: enforce
-        severity: medium
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1
-      kind: ConfigurationPolicy
-      metadata:
-        name: install-operators5
-      spec:
-        evaluationInterval:
-          compliant: never
-        object-templates:
         - complianceType: musthave
           objectDefinition:
             apiVersion: operators.coreos.com/v1
@@ -561,17 +450,6 @@ spec:
             spec:
               targetNamespaces:
               - openshift-nmstate
-        remediationAction: enforce
-        severity: medium
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1
-      kind: ConfigurationPolicy
-      metadata:
-        name: install-operators6
-      spec:
-        evaluationInterval:
-          compliant: never
-        object-templates:
         - complianceType: musthave
           objectDefinition:
             apiVersion: operators.coreos.com/v1alpha1
@@ -583,17 +461,6 @@ spec:
               name: kubernetes-nmstate-operator
               source: cs-redhat-operator-index
               sourceNamespace: openshift-marketplace
-        remediationAction: enforce
-        severity: medium
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1
-      kind: ConfigurationPolicy
-      metadata:
-        name: install-operators7
-      spec:
-        evaluationInterval:
-          compliant: never
-        object-templates:
         - complianceType: musthave
           objectDefinition:
             apiVersion: v1
@@ -602,17 +469,6 @@ spec:
               annotations:
                 scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator":"Exists","effect":"NoSchedule","key":"node-role.kubernetes.io/infra"}]'
               name: openshift-workload-availability
-        remediationAction: enforce
-        severity: medium
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1
-      kind: ConfigurationPolicy
-      metadata:
-        name: install-operators8
-      spec:
-        evaluationInterval:
-          compliant: never
-        object-templates:
         - complianceType: musthave
           objectDefinition:
             apiVersion: operators.coreos.com/v1
@@ -620,17 +476,6 @@ spec:
             metadata:
               name: openshift-workload-availability
               namespace: openshift-workload-availability
-        remediationAction: enforce
-        severity: medium
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1
-      kind: ConfigurationPolicy
-      metadata:
-        name: install-operators9
-      spec:
-        evaluationInterval:
-          compliant: never
-        object-templates:
         - complianceType: musthave
           objectDefinition:
             apiVersion: operators.coreos.com/v1alpha1
@@ -642,17 +487,6 @@ spec:
               name: node-healthcheck-operator
               source: cs-redhat-operator-index
               sourceNamespace: openshift-marketplace
-        remediationAction: enforce
-        severity: medium
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1
-      kind: ConfigurationPolicy
-      metadata:
-        name: install-operators10
-      spec:
-        evaluationInterval:
-          compliant: never
-        object-templates:
         - complianceType: musthave
           objectDefinition:
             apiVersion: operators.coreos.com/v1alpha1
@@ -664,17 +498,6 @@ spec:
               name: self-node-remediation
               source: cs-redhat-operator-index
               sourceNamespace: openshift-marketplace
-        remediationAction: enforce
-        severity: medium
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1
-      kind: ConfigurationPolicy
-      metadata:
-        name: install-operators11
-      spec:
-        evaluationInterval:
-          compliant: never
-        object-templates:
         - complianceType: musthave
           objectDefinition:
             apiVersion: v1
@@ -683,17 +506,6 @@ spec:
               annotations:
                 scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator":"Exists","effect":"NoSchedule","key":"node-role.kubernetes.io/infra"}]'
               name: metallb-system
-        remediationAction: enforce
-        severity: medium
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1
-      kind: ConfigurationPolicy
-      metadata:
-        name: install-operators12
-      spec:
-        evaluationInterval:
-          compliant: never
-        object-templates:
         - complianceType: musthave
           objectDefinition:
             apiVersion: operators.coreos.com/v1
@@ -701,17 +513,6 @@ spec:
             metadata:
               name: metallb-system
               namespace: metallb-system
-        remediationAction: enforce
-        severity: medium
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1
-      kind: ConfigurationPolicy
-      metadata:
-        name: install-operators13
-      spec:
-        evaluationInterval:
-          compliant: never
-        object-templates:
         - complianceType: musthave
           objectDefinition:
             apiVersion: operators.coreos.com/v1alpha1
@@ -723,17 +524,6 @@ spec:
               name: metallb-operator
               source: cs-redhat-operator-index
               sourceNamespace: openshift-marketplace
-        remediationAction: enforce
-        severity: medium
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1
-      kind: ConfigurationPolicy
-      metadata:
-        name: install-operators14
-      spec:
-        evaluationInterval:
-          compliant: never
-        object-templates:
         - complianceType: musthave
           objectDefinition:
             apiVersion: v1
@@ -742,17 +532,6 @@ spec:
               annotations:
                 scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator":"Exists","effect":"NoSchedule","key":"node-role.kubernetes.io/infra"}]'
               name: openshift-adp
-        remediationAction: enforce
-        severity: medium
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1
-      kind: ConfigurationPolicy
-      metadata:
-        name: install-operators15
-      spec:
-        evaluationInterval:
-          compliant: never
-        object-templates:
         - complianceType: musthave
           objectDefinition:
             apiVersion: operators.coreos.com/v1
@@ -763,17 +542,6 @@ spec:
             spec:
               targetNamespaces:
               - openshift-adp
-        remediationAction: enforce
-        severity: medium
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1
-      kind: ConfigurationPolicy
-      metadata:
-        name: install-operators16
-      spec:
-        evaluationInterval:
-          compliant: never
-        object-templates:
         - complianceType: musthave
           objectDefinition:
             apiVersion: operators.coreos.com/v1alpha1
@@ -785,17 +553,6 @@ spec:
               name: redhat-oadp-operator
               source: cs-redhat-operator-index
               sourceNamespace: openshift-marketplace
-        remediationAction: enforce
-        severity: medium
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1
-      kind: ConfigurationPolicy
-      metadata:
-        name: install-operators17
-      spec:
-        evaluationInterval:
-          compliant: never
-        object-templates:
         - complianceType: musthave
           objectDefinition:
             apiVersion: v1
@@ -804,17 +561,6 @@ spec:
               annotations:
                 scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator":"Exists","effect":"NoSchedule","key":"node-role.kubernetes.io/infra"}]'
               name: openshift-compliance
-        remediationAction: enforce
-        severity: medium
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1
-      kind: ConfigurationPolicy
-      metadata:
-        name: install-operators18
-      spec:
-        evaluationInterval:
-          compliant: never
-        object-templates:
         - complianceType: musthave
           objectDefinition:
             apiVersion: operators.coreos.com/v1
@@ -825,17 +571,6 @@ spec:
             spec:
               targetNamespaces:
               - openshift-compliance
-        remediationAction: enforce
-        severity: medium
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1
-      kind: ConfigurationPolicy
-      metadata:
-        name: install-operators19
-      spec:
-        evaluationInterval:
-          compliant: never
-        object-templates:
         - complianceType: musthave
           objectDefinition:
             apiVersion: operators.coreos.com/v1alpha1
@@ -892,17 +627,6 @@ spec:
               labels:
                 openshift.io/cluster-monitoring: "true"
               name: openshift-update-service
-        remediationAction: enforce
-        severity: medium
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1
-      kind: ConfigurationPolicy
-      metadata:
-        name: install-operators-hub2
-      spec:
-        evaluationInterval:
-          compliant: never
-        object-templates:
         - complianceType: musthave
           objectDefinition:
             apiVersion: operators.coreos.com/v1
@@ -913,17 +637,6 @@ spec:
             spec:
               targetNamespaces:
               - openshift-update-service
-        remediationAction: enforce
-        severity: medium
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1
-      kind: ConfigurationPolicy
-      metadata:
-        name: install-operators-hub3
-      spec:
-        evaluationInterval:
-          compliant: never
-        object-templates:
         - complianceType: musthave
           objectDefinition:
             apiVersion: operators.coreos.com/v1alpha1
@@ -1054,17 +767,6 @@ spec:
               annotations:
                 scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator":"Exists","effect":"NoSchedule","key":"node-role.kubernetes.io/infra"}]'
               name: openshift-operator-lifecycle-manager
-        remediationAction: enforce
-        severity: medium
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1
-      kind: ConfigurationPolicy
-      metadata:
-        name: node-infra-toleration2
-      spec:
-        evaluationInterval:
-          compliant: never
-        object-templates:
         - complianceType: musthave
           objectDefinition:
             apiVersion: v1
@@ -1073,17 +775,6 @@ spec:
               annotations:
                 scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator":"Exists","effect":"NoSchedule","key":"node-role.kubernetes.io/infra"}]'
               name: openshift-image-registry
-        remediationAction: enforce
-        severity: medium
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1
-      kind: ConfigurationPolicy
-      metadata:
-        name: node-infra-toleration3
-      spec:
-        evaluationInterval:
-          compliant: never
-        object-templates:
         - complianceType: musthave
           objectDefinition:
             apiVersion: v1
@@ -1092,17 +783,6 @@ spec:
               annotations:
                 scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator":"Exists","effect":"NoSchedule","key":"node-role.kubernetes.io/infra"}]'
               name: openshift-marketplace
-        remediationAction: enforce
-        severity: medium
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1
-      kind: ConfigurationPolicy
-      metadata:
-        name: node-infra-toleration4
-      spec:
-        evaluationInterval:
-          compliant: never
-        object-templates:
         - complianceType: musthave
           objectDefinition:
             apiVersion: v1
@@ -1178,7 +858,7 @@ spec:
       apiVersion: policy.open-cluster-management.io/v1
       kind: ConfigurationPolicy
       metadata:
-        name: proxy-sync-hub2
+        name: proxy-sync-hub
       spec:
         evaluationInterval:
           compliant: 1m
@@ -1194,18 +874,6 @@ spec:
             metadata:
               name: router-bundle
               namespace: policies
-        remediationAction: enforce
-        severity: medium
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1
-      kind: ConfigurationPolicy
-      metadata:
-        name: proxy-sync-hub3
-      spec:
-        evaluationInterval:
-          compliant: 1m
-          noncompliant: 1m
-        object-templates:
         - complianceType: musthave
           objectDefinition:
             apiVersion: config.openshift.io/v1
@@ -1252,15 +920,6 @@ spec:
             metadata:
               name: router-bundle
               namespace: openshift-config
-        remediationAction: enforce
-        severity: medium
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1
-      kind: ConfigurationPolicy
-      metadata:
-        name: proxy-sync-managed2
-      spec:
-        object-templates:
         - complianceType: musthave
           objectDefinition:
             apiVersion: config.openshift.io/v1
@@ -1379,7 +1038,7 @@ spec:
       apiVersion: policy.open-cluster-management.io/v1
       kind: ConfigurationPolicy
       metadata:
-        name: signature-cm
+        name: upgrade-signatures
       spec:
         object-templates-raw: |
           {{hub range $hcm := (lookup "v1" "ConfigMap" "policies" "" "release.openshift.io/verification-signatures").items hub}}
@@ -1392,7 +1051,7 @@ spec:
                 namespace: openshift-config-managed
                 labels:
                   release.openshift.io/verification-signatures: ""
-              data: '{{hub copyConfigMapData "policies" $hcm.metadata.name hub}}'
+              binaryData: {{hub $hcm.binaryData | toRawJson hub}}
           {{hub end hub}}
           {{- range $cm := (lookup "v1" "ConfigMap" "openshift-config-managed" "" "release.openshift.io/verification-signatures").items }}
           {{- if ne $cm.metadata.name "signatures-managed" }}
