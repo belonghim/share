@@ -2,7 +2,7 @@
 apiVersion: policy.open-cluster-management.io/v1
 kind: ConfigurationPolicy
 metadata:
-  name: infra-label
+  name: remove-worker-label
 spec:
   evaluationInterval:
     compliant: never
@@ -11,6 +11,7 @@ spec:
   object-templates-raw: |
     {{- range $no := (lookup "v1" "Node" "" "" "!node-role.kubernetes.io/master").items }}
     {{- if (hasPrefix "infra" $no.metadata.name) }}
+    {{- if (hasKey $no.metadata.labels "node-role.kubernetes.io/worker") }}
     - complianceType: musthave
       objectDefinition:
         apiVersion: v1
@@ -19,21 +20,28 @@ spec:
           name: {{ $no.metadata.name }}
           labels:
             node-role.kubernetes.io/infra: ""
+            node-role.kubernetes.io/worker:
+        spec:
+          taints:
+          - effect: NoSchedule
+            key: node-role.kubernetes.io/infra
+    {{- end }}
     {{- end }}
     {{- end }}
 ---
 apiVersion: policy.open-cluster-management.io/v1
 kind: ConfigurationPolicy
 metadata:
-  name: worker-label
+  name: add-infra-label
 spec:
   evaluationInterval:
     compliant: never
   remediationAction: enforce
   severity: high
   object-templates-raw: |
-    {{- range $no := (lookup "v1" "Node" "" "" "node-role.kubernetes.io/infra").items }}
+    {{- range $no := (lookup "v1" "Node" "" "" "!node-role.kubernetes.io/master").items }}
     {{- if (hasPrefix "infra" $no.metadata.name) }}
+    {{- if and (not (hasKey $no.metadata.labels "node-role.kubernetes.io/worker")) (not (hasKey $no.metadata.labels "kubernetes.io/hostname")) }}
     - complianceType: musthave
       objectDefinition:
         apiVersion: v1
@@ -41,32 +49,10 @@ spec:
         metadata:
           name: {{ $no.metadata.name }}
           labels:
-            node-role.kubernetes.io/worker:
+            kubernetes.io/hostname: {{ $no.metadata.name }}
+            node-role.kubernetes.io/infra: ""
+            node.openshift.io/os_id: rhcos
     {{- end }}
-    {{- end }}
----
-apiVersion: policy.open-cluster-management.io/v1
-kind: ConfigurationPolicy
-metadata:
-  name: infra-taint
-spec:
-  evaluationInterval:
-    compliant: never
-  remediationAction: enforce
-  severity: high
-  object-templates-raw: |
-    {{- range $no := (lookup "v1" "Node" "" "" "node-role.kubernetes.io/infra").items }}
-    {{- if (hasPrefix "infra" $no.metadata.name) }}
-    - complianceType: musthave
-      objectDefinition:
-        apiVersion: v1
-        kind: Node
-        metadata:
-          name: {{ $no.metadata.name }}
-        spec:
-          taints:
-          - effect: NoSchedule
-            key: node-role.kubernetes.io/infra
     {{- end }}
     {{- end }}
 ---

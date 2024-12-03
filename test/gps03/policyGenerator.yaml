@@ -3,249 +3,164 @@ kind: PolicyGenerator
 metadata:
   name: policy-opp
 placementBindingDefaults:
-  name: binding-policy-opp-hub
+  name: binding-policy-hub
 policyDefaults:
   categories:
-    - CM Configuration Management
-  controls: 
-    - CM-2 Baseline Configuration
+  controls:
+  standards:
+  consolidateManifests: false
   namespace: policies
   policySets:
-    - opp-hub
+  - hub
   remediationAction: enforce
   severity: medium
-  standards:
-    - NIST SP 800-53
 policies:
 # Hub Operators Policies - start
-- name: hub-enf-operators-install
-  categories:
-    - SI System and Information Integrity
-  controls:
-    - SI-7 Software Firmware and Information Integrity
+- name: install-operators-hub
   dependencies:
-    - name: cv-inf-check
+  - name: check-cv
   evaluationInterval:
     compliant: never
   manifests:
-    - path: install/opp-hub.yaml
+  - path: install/install-operators-hub.yaml
   policySets:
-    - opp-hub
+  - hub
 # Hub Operators Policies - end
 # All Operators Policies - start
-- name: all-enf-operators-install
-  categories:
-    - SI System and Information Integrity
-  controls:
-    - SI-7 Software Firmware and Information Integrity
+- name: install-operators
   dependencies:
-    - name: cv-inf-check
+  - name: check-cv
   evaluationInterval:
     compliant: never
   manifests:
-    - path: install/opp-all.yaml
+  - path: install/install-operators.yaml
   policySets:
-    - opp-hub
-    - opp-clusters
+  - hub
+  - managed
 # All Operators Policies - end
 # Manual Subscription Policies - start
-- name: sub-enf-approval-manual
-  categories:
-    - SI System and Information Integrity
-  controls:
-    - SI-7 Software Firmware and Information Integrity
+- name: upgrade-sub-manual
   evaluationInterval:
     compliant: never
   manifests:
-    - path: upgrade/sub-approval-manual.yaml
+  - path: upgrade/upgrade-sub-manual.yaml
   policySets:
-    - sub-approval-manual
+  - sub-manual
 # Manual Subscription Policies - end
 # Automatic Subscription Policies - start
-- name: sub-enf-approval-automatic
-  categories:
-    - SI System and Information Integrity
+- name: upgrade-sub-automatic
   complianceType: mustonlyhave
-  controls:
-    - SI-7 Software Firmware and Information Integrity
   manifests:
-    - path: upgrade/sub-approval-automatic.yaml
+  - path: upgrade/upgrade-sub-automatic.yaml
   policySets:
-    - sub-approval-automatic
+  - sub-automatic
 # Automatic Subscription Policies - end
 # cs-redhat operator update Policies - start
-- name: cs-enf-redhat-operator-update
-  categories:
-    - SI System and Information Integrity
+- name: upgrade-cs-redhat-operator
   complianceType: musthave
-  controls:
-    - SI-7 Software Firmware and Information Integrity
   dependencies:
-    - name: cv-inf-check
+  - name: check-cv
   manifests:
-    - path: upgrade/cs-redhat-operator-update.yaml
+  - path: upgrade/upgrade-cs-redhat-operator.yaml
   policySets:
-    - sub-approval-automatic
+  - sub-automatic
 # cs-redhat operator update Policies - end
 # Create Router Bundle Policies - start
 - name: proxy-sync-hub
-  categories:
-    - SI System and Information Integrity
-  controls:
-    - SI-7 Software Firmware and Information Integrity
   manifests:
-    - path: proxy/proxy-sync-hub.yaml
+  - path: proxy/proxy-sync-hub.yaml
   evaluationInterval:
     compliant: 1m
     noncompliant: 1m
   policySets:
-    - opp-hub
+  - hub
 # Create Router Bundle Policies - end
 # Proxy Router Bundle Policies - start
-- name: proxy-sync
-  categories:
-    - SI System and Information Integrity
-  controls:
-    - SI-7 Software Firmware and Information Integrity
+- name: proxy-sync-managed
   manifests:
-    - path: proxy/proxy-sync.yaml
+  - path: proxy/proxy-sync-managed.yaml
   policySets:
-    - opp-clusters
+  - managed
 # Proxy Router Bundle Policies - end
 # Remediation config Policies - start
-- name: remediation-enf-config
-  categories:
-    - SI System and Information Integrity
-  controls:
-    - SI-7 Software Firmware and Information Integrity
+- name: config-operators
   evaluationInterval:
     compliant: never
   manifests:
-    - path: remediation/config.yaml
+  - path: config/config-operators.yaml
   policySets:
-    - opp-hub
-    - opp-clusters
+  - hub
+  - managed
 # Remediation config Policies - end
 # CV check Policies - start
-- name: cv-inf-check
-  categories:
-    - SI System and Information Integrity
+- name: check-cv
   complianceType: mustnothave
-  consolidateManifests: false
-  controls:
-    - SI-7 Software Firmware and Information Integrity
   manifests:
-    - path: check/cv-check.yaml
+  - path: check/check-cv.yaml
   policySets:
-    - opp-hub
-    - opp-clusters
+  - hub
+  - managed
   remediationAction: inform
 # CV check Policies - end
 # CSV check Policies - start
-- name: csv-inf-check
-  categories:
-    - SI System and Information Integrity
-  consolidateManifests: false
-  controls:
-    - SI-7 Software Firmware and Information Integrity
+- name: check-csv
   manifests:
-    - path: check/csv-check.yaml
+  - path: check/check-csv.yaml
   policySets:
-    - opp-hub
-    - opp-clusters
+  - hub
+  - managed
   remediationAction: inform
 # CSV check Policies - end
-# CSV update Policies - start
-#- name: csv-inf-update
-#  categories:
-#    - SI System and Information Integrity
-#  consolidateManifests: false
-#  controls:
-#    - SI-7 Software Firmware and Information Integrity
-#  manifests:
-#    - path: check/csv-update.yaml
-#  policySets:
-#    - opp-hub
-#    - opp-clusters
-#  remediationAction: inform
-# CSV update Policies - end
 # infra label Policies - start
-- name: infra-label
-  categories:
-    - SI System and Information Integrity
-  consolidateManifests: false
-  controls:
-    - SI-7 Software Firmware and Information Integrity
-  evaluationInterval:
-    compliant: never
+- name: node-infra-label
   manifests:
-    - path: node/infra-label.yaml
+  - path: node/node-infra-label.yaml
   policySets:
-    - opp-hub
-    - opp-clusters
+  - hub
+  - managed
   remediationAction: enforce
 # infra label Policies - end
 # infra toleration Policies - start
-- name: infra-toleration
-  categories:
-    - SI System and Information Integrity
-  controls:
-    - SI-7 Software Firmware and Information Integrity
+- name: node-infra-toleration
   evaluationInterval:
     compliant: never
   manifests:
-    - path: node/infra-toleration.yaml
+  - path: node/node-infra-toleration.yaml
   policySets:
-    - opp-hub
-    - opp-clusters
+  - hub
+  - managed
   remediationAction: enforce
 # infra toleration Policies - end
 # signature cm Policies - start
-- name: signature-cm
-  categories:
-    - SI System and Information Integrity
-  controls:
-    - SI-7 Software Firmware and Information Integrity
+- name: upgrade-signatures
   manifests:
-    - path: upgrade/signature-cm.yaml
+  - path: upgrade/upgrade-signatures.yaml
   policySets:
-    - opp-hub
-    - opp-clusters
+  - hub
+  - managed
   remediationAction: enforce
 # signature cm Policies - end
 # marketplace jobs Policies - start
-- name: marketplace-jobs
-  categories:
-    - SI System and Information Integrity
-  controls:
-    - SI-7 Software Firmware and Information Integrity
+- name: upgrade-marketplace-job
   evaluationInterval:
     compliant: 10m
     noncompliant: 10m
   manifests:
-    - path: upgrade/marketplace-jobs.yaml
+  - path: upgrade/upgrade-marketplace-job.yaml
   policySets:
-    - sub-approval-automatic
+  - sub-automatic
   remediationAction: enforce
 # marketplace jobs Policies - end
 policySets:
-  - description: The OpenShift Platform Plus policy set applies several policies
-      that will install the OpenShift Platform Plus products using best practices
-      that allow them to work well together. This policy set is focused on 
-      the components that install to the Advanced Cluster Management hub.
-    name: opp-hub
+  - name: hub
     placement:
-      placementPath: place/hub-placement.yaml
-  - description: The OpenShift Platform Plus policy set applies several policies
-      that install the OpenShift Platform Plus products using best practices
-      that allow them to work well together. This policy set is focused on 
-      the components that install to every managed cluster.
-    name: opp-clusters
+      placementPath: placement/placement-hub.yaml
+  - name: managed
     placement:
-      placementPath: place/clusters-placement.yaml
-  - name: sub-approval-manual
+      placementPath: placement/placement-managed.yaml
+  - name: sub-manual
     placement:
-      placementPath: place/sub-approval-manual.yaml
-  - name: sub-approval-automatic
+      placementPath: placement/placement-sub-manual.yaml
+  - name: sub-automatic
     placement:
-      placementPath: place/sub-approval-automatic.yaml
+      placementPath: placement/placement-sub-automatic.yaml

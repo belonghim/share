@@ -5,7 +5,7 @@ cat <<EOF
 apiVersion: policy.open-cluster-management.io/v1
 kind: Policy
 metadata:
-  name: cv-upstream-$REPO
+  name: upgrade-upstream-$REPO
   namespace: policies
 spec:
   disabled: false
@@ -15,7 +15,7 @@ spec:
       apiVersion: policy.open-cluster-management.io/v1
       kind: ConfigurationPolicy
       metadata:
-        name: cv-upstream-$REPO
+        name: upgrade-upstream-$REPO
       spec:
         object-templates:
         - complianceType: musthave
@@ -34,21 +34,21 @@ spec:
 apiVersion: policy.open-cluster-management.io/v1
 kind: PlacementBinding
 metadata:
-  name: clusters-$REPO
+  name: upgrade-upstream-$REPO
   namespace: policies
 placementRef:
-  name: clusters-placement-$REPO
+  name: placement-repo-$REPO
   kind: Placement
   apiGroup: cluster.open-cluster-management.io
 subjects:
-- name: cv-upstream-$REPO
+- name: upgrade-upstream-$REPO
   kind: Policy
   apiGroup: policy.open-cluster-management.io
 ---
 apiVersion: cluster.open-cluster-management.io/v1beta1
 kind: Placement
 metadata:
-  name: clusters-placement-$REPO
+  name: placement-repo-$REPO
   namespace: policies
 spec:
   predicates:

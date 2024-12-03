@@ -6,7 +6,7 @@ cat <<EOF
 apiVersion: policy.open-cluster-management.io/v1
 kind: Policy
 metadata:
-  name: osus-$REPO
+  name: upgrade-osus-$REPO
   namespace: policies
 spec:
   disabled: false
@@ -16,7 +16,7 @@ spec:
       apiVersion: policy.open-cluster-management.io/v1
       kind: ConfigurationPolicy
       metadata:
-        name: osus-$REPO
+        name: upgrade-osus-$REPO
       spec:
         object-templates:
         - complianceType: musthave
@@ -39,7 +39,7 @@ spec:
             apiVersion: v1
             kind: ConfigMap
             metadata:
-              name: osus-$REPO
+              name: upgrade-osus-$REPO
               namespace: policies
             data:
               graphUrl: '{{ ( (cat (lookup "updateservice.operator.openshift.io/v1" "UpdateService" "openshift-update-service" "$REPO").status.policyEngineURI "/api/upgrades_info/v1/graph") | replace " " "") }}'
@@ -67,14 +67,14 @@ spec:
 apiVersion: policy.open-cluster-management.io/v1
 kind: PlacementBinding
 metadata:
-  name: osus-$REPO
+  name: upgrade-osus-$REPO
   namespace: policies
 placementRef:
-  name: placement-opp-hub
+  name: placement-hub
   kind: Placement
   apiGroup: cluster.open-cluster-management.io
 subjects:
-- name: osus-$REPO
+- name: upgrade-osus-$REPO
   kind: Policy
   apiGroup: policy.open-cluster-management.io
 EOF
