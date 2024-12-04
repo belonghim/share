@@ -1142,6 +1142,12 @@ $ oc get managedcluster ${ManagedCluster}
 
 ### Delete auto-import secret
 ```
+## Wait until the managedluster joined
+$ oc wait mcl ${ManagedCluster} --for=condition=ManagedClusterImportSucceeded && oc wait mcl ${ManagedCluster} --for=condition=ManagedClusterConditionAvailable && oc wait mcl ${ManagedCluster} --for=condition=ManagedClusterJoined
+
+## Delete auto-import-secret
+$ oc -n ${ManagedCluster} delete secret auto-import-secret
+
 ```
 
 <br><br>
