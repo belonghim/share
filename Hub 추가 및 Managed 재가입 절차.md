@@ -323,8 +323,8 @@ $ oc create -f - <<EOF
 apiVersion: agent.open-cluster-management.io/v1
 kind: KlusterletAddonConfig
 metadata:
-  name: ${ManagedKubeconfig}
-  namespace: ${ManagedKubeconfig}
+  name: ${ManagedCluster}
+  namespace: ${ManagedCluster}
 spec:
   applicationManager:
     enabled: false
