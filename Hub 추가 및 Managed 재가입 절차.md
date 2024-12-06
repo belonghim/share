@@ -302,7 +302,7 @@ EOF
 ### Importing managed cluster by using the auto import secret
 ```
 ## create auto import secret
-$ ManagedKubeconfig="/opt/compact/auth/kubeconfig"
+$ ManagedKubeconfig="/opt/mngda/auth/kubeconfig"
 $ oc create -f - <<EOF
 apiVersion: v1
 kind: Secret
