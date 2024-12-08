@@ -27,3 +27,10 @@ metadata:
   annotations:
     scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator":"Exists","effect":"NoSchedule","key":"node-role.kubernetes.io/infra"}]'
 ---
+kind: Namespace
+apiVersion: v1
+metadata:
+  name: openshift-network-diagnostics
+  annotations:
+    scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator":"Exists","effect":"NoSchedule","key":"node-role.kubernetes.io/infra"}]'
+---
