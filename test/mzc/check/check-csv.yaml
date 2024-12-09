@@ -19,3 +19,18 @@ spec:
           phase: Succeeded
     {{- end }}
 ---
+apiVersion: policy.open-cluster-management.io/v1
+kind: ConfigurationPolicy
+metadata:
+  name: ip-check
+spec:
+  remediationAction: inform
+  severity: high
+  object-templates:
+  - complianceType: mustnothave
+    objectDefinition:
+      apiVersion: operators.coreos.com/v1alpha1
+      kind: InstallPlan
+      spec:
+        approved: false
+---

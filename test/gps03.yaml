@@ -206,6 +206,21 @@ spec:
           {{- end }}
         remediationAction: inform
         severity: high
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: ip-check
+      spec:
+        object-templates:
+        - complianceType: mustnothave
+          objectDefinition:
+            apiVersion: operators.coreos.com/v1alpha1
+            kind: InstallPlan
+            spec:
+              approved: false
+        remediationAction: inform
+        severity: high
   remediationAction: inform
 ---
 apiVersion: policy.open-cluster-management.io/v1
