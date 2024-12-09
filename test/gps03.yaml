@@ -681,11 +681,10 @@ spec:
       metadata:
         name: remove-worker-label
       spec:
-        evaluationInterval:
-          compliant: never
         object-templates-raw: |
           {{- range $no := (lookup "v1" "Node" "" "" "!node-role.kubernetes.io/master").items }}
           {{- if (hasPrefix "infra" $no.metadata.name) }}
+          {{- if not (hasKey $no.metadata.annotations "policies.done") }}
           {{- if (hasKey $no.metadata.labels "node-role.kubernetes.io/worker") }}
           - complianceType: musthave
             objectDefinition:
@@ -703,6 +702,7 @@ spec:
           {{- end }}
           {{- end }}
           {{- end }}
+          {{- end }}
         remediationAction: enforce
         severity: high
   - objectDefinition:
@@ -712,8 +712,9 @@ spec:
         name: add-infra-label
       spec:
         object-templates-raw: |
-          {{- range $no := (lookup "v1" "Node" "" "" "!node-role.kubernetes.io/master").items }}
+          {{- range $no := (lookup "v1" "Node" "" "" "!node-role.kubernetes.io/master,!policies.ignore").items }}
           {{- if (hasPrefix "infra" $no.metadata.name) }}
+          {{- if not (hasKey $no.metadata.annotations "policies.done") }}
           {{- if and (not (hasKey $no.metadata.labels "node-role.kubernetes.io/worker")) (not (hasKey $no.metadata.labels "kubernetes.io/hostname")) }}
           - complianceType: musthave
             objectDefinition:
@@ -721,10 +722,13 @@ spec:
               kind: Node
               metadata:
                 name: {{ $no.metadata.name }}
+                annotations:
+                  policies.done: {{ now | date }}
                 labels:
                   kubernetes.io/hostname: {{ $no.metadata.name }}
                   node-role.kubernetes.io/infra: ""
                   node.openshift.io/os_id: rhcos
+          {{- end }}
           {{- end }}
           {{- end }}
           {{- end }}
