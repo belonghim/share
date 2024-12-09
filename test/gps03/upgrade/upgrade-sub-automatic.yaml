@@ -29,7 +29,7 @@ spec:
   severity: high
   object-templates-raw: |
     {{- range $ip := (lookup "operators.coreos.com/v1alpha1" "InstallPlan" "" "").items }}
-    {{- if ne $ip.spec.approval "Automatic" }}
+    {{- if ne "Automatic" $ip.spec.approval }}
     - complianceType: musthave
       objectDefinition:
         apiVersion: operators.coreos.com/v1alpha1

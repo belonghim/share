@@ -9,8 +9,8 @@ metadata:
   name: upgrade-osus-$REPO
   namespace: policies
 spec:
-  disabled: false
   remediationAction: enforce
+  disabled: false
   policy-templates:
   - objectDefinition:
       apiVersion: policy.open-cluster-management.io/v1

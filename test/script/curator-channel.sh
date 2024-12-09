@@ -1,5 +1,5 @@
 CLUSTER=$1
-CHANNEL=eus-4.16
+CHANNEL=stable-4.17
 
 cat <<EOF
 apiVersion: cluster.open-cluster-management.io/v1beta1

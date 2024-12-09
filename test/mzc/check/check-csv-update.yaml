@@ -2,16 +2,15 @@
 apiVersion: policy.open-cluster-management.io/v1
 kind: ConfigurationPolicy
 metadata:
-  name: csv-update
+  name: check-csv-update
 spec:
   remediationAction: inform
   severity: high
   object-templates-raw: |
     {{- range $sub := (lookup "operators.coreos.com/v1alpha1" "Subscription" "" "" "!policies.ignore").items }}
-    {{- if eq (lookup "packages.operators.coreos.com/v1" "PackageManifest" "openshift-marketplace" $sub.metadata.name).kind "PackageManifest" }}
-    {{- $pm := lookup "packages.operators.coreos.com/v1" "PackageManifest" "openshift-marketplace" $sub.metadata.name ((cat "catalog=" $sub.spec.source ) | replace " " "") }}
+    {{- $pm := lookup "packages.operators.coreos.com/v1" "PackageManifest" "openshift-marketplace" $sub.spec.name }}
     {{- range $ch := $pm.status.channels }}
-    {{- if (eq $ch.name $pm.status.defaultChannel) }}
+    {{- if eq $pm.status.defaultChannel $ch.name }}
     - complianceType: musthave
       objectDefinition:
         apiVersion: operators.coreos.com/v1alpha1
@@ -21,7 +20,6 @@ spec:
           namespace: {{ $sub.metadata.namespace }}
         status:
           phase: Succeeded
-    {{- end }}
     {{- end }}
     {{- end }}
     {{- end }}

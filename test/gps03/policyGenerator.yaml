@@ -18,8 +18,6 @@ policies:
 - name: install-operators-hub
   dependencies:
   - name: check-cv
-  evaluationInterval:
-    compliant: never
   manifests:
   - path: install/install-operators-hub.yaml
   policySets:
@@ -29,8 +27,6 @@ policies:
 - name: install-operators
   dependencies:
   - name: check-cv
-  evaluationInterval:
-    compliant: never
   manifests:
   - path: install/install-operators.yaml
   policySets:
@@ -150,6 +146,24 @@ policies:
   - sub-automatic
   remediationAction: enforce
 # marketplace jobs Policies - end
+# upgrade upstream ocp4 Policies - start
+- name: upgrade-upstream-ocp4
+  manifests:
+  - path: upgrade/upgrade-upstream-ocp4.yaml
+  policySets:
+  - hub
+  - managed
+  remediationAction: enforce
+# upgrade upstream ocp4 Policies - end
+# upgrade release channel Policies - start
+- name: upgrade-release-channel
+  manifests:
+  - path: upgrade/upgrade-release-channel.yaml
+  policySets:
+  - hub
+  - managed
+  remediationAction: enforce
+# upgrade release channel Policies - end
 policySets:
   - name: hub
     placement:

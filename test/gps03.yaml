@@ -422,8 +422,6 @@ spec:
       metadata:
         name: install-operators
       spec:
-        evaluationInterval:
-          compliant: never
         object-templates:
         - complianceType: musthave
           objectDefinition:
@@ -636,8 +634,6 @@ spec:
       metadata:
         name: install-operators-hub
       spec:
-        evaluationInterval:
-          compliant: never
         object-templates:
         - complianceType: musthave
           objectDefinition:
@@ -1061,6 +1057,43 @@ metadata:
     policy.open-cluster-management.io/standards: NIST SP 800-53
   labels:
     open-cluster-management.io/policy-set: opp
+  name: upgrade-release-channel
+  namespace: policies
+spec:
+  disabled: false
+  policy-templates:
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: upgrade-release-channel
+      spec:
+        object-templates-raw: |
+          {{- if eq (lookup "cluster.open-cluster-management.io/v1alpha1" "ClusterClaim" "" "policies.release-channel").kind "ClusterClaim" }}
+          - complianceType: musthave
+            objectDefinition:
+              apiVersion: config.openshift.io/v1
+              kind: ClusterVersion
+              metadata:
+                name: version
+              spec:
+                channel: {{ fromClusterClaim "policies.release-channel" }}
+          {{- end }}
+        remediationAction: enforce
+        severity: high
+  remediationAction: enforce
+---
+apiVersion: policy.open-cluster-management.io/v1
+kind: Policy
+metadata:
+  annotations:
+    argocd.argoproj.io/compare-options: IgnoreExtraneous
+    policy.open-cluster-management.io/categories: CM Configuration Management
+    policy.open-cluster-management.io/controls: CM-2 Baseline Configuration
+    policy.open-cluster-management.io/description: ""
+    policy.open-cluster-management.io/standards: NIST SP 800-53
+  labels:
+    open-cluster-management.io/policy-set: opp
   name: upgrade-signatures
   namespace: policies
 spec:
@@ -1151,7 +1184,7 @@ spec:
       spec:
         object-templates-raw: |
           {{- range $ip := (lookup "operators.coreos.com/v1alpha1" "InstallPlan" "" "").items }}
-          {{- if ne $ip.spec.approval "Automatic" }}
+          {{- if ne "Automatic" $ip.spec.approval }}
           - complianceType: musthave
             objectDefinition:
               apiVersion: operators.coreos.com/v1alpha1
@@ -1205,6 +1238,46 @@ spec:
         severity: high
   remediationAction: enforce
 ---
+apiVersion: policy.open-cluster-management.io/v1
+kind: Policy
+metadata:
+  annotations:
+    argocd.argoproj.io/compare-options: IgnoreExtraneous
+    policy.open-cluster-management.io/categories: CM Configuration Management
+    policy.open-cluster-management.io/controls: CM-2 Baseline Configuration
+    policy.open-cluster-management.io/description: ""
+    policy.open-cluster-management.io/standards: NIST SP 800-53
+  labels:
+    open-cluster-management.io/policy-set: opp
+  name: upgrade-upstream-ocp4
+  namespace: policies
+spec:
+  disabled: false
+  policy-templates:
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: upgrade-upstream-ocp4
+      spec:
+        object-templates:
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: config.openshift.io/v1
+            kind: ClusterVersion
+            metadata:
+              name: version
+            spec:
+              upstream: '{{hub fromConfigMap "policies" "upgrade-osus-ocp4" "graphUrl"
+                hub}}'
+            status:
+              conditions:
+              - status: "True"
+                type: RetrievedUpdates
+        remediationAction: enforce
+        severity: medium
+  remediationAction: enforce
+---
 apiVersion: policy.open-cluster-management.io/v1beta1
 kind: PolicySet
 metadata:
@@ -1225,7 +1298,9 @@ spec:
   - node-infra-label
   - node-infra-toleration
   - proxy-sync-hub
+  - upgrade-release-channel
   - upgrade-signatures
+  - upgrade-upstream-ocp4
 ---
 apiVersion: policy.open-cluster-management.io/v1beta1
 kind: PolicySet
@@ -1246,7 +1321,9 @@ spec:
   - node-infra-label
   - node-infra-toleration
   - proxy-sync-managed
+  - upgrade-release-channel
   - upgrade-signatures
+  - upgrade-upstream-ocp4
 ---
 apiVersion: policy.open-cluster-management.io/v1beta1
 kind: PolicySet

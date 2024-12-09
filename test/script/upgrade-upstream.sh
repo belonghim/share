@@ -8,8 +8,8 @@ metadata:
   name: upgrade-upstream-$REPO
   namespace: policies
 spec:
-  disabled: false
   remediationAction: enforce
+  disabled: false
   policy-templates:
   - objectDefinition:
       apiVersion: policy.open-cluster-management.io/v1
