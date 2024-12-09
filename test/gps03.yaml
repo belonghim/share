@@ -212,13 +212,20 @@ spec:
       metadata:
         name: ip-check
       spec:
-        object-templates:
-        - complianceType: mustnothave
-          objectDefinition:
-            apiVersion: operators.coreos.com/v1alpha1
-            kind: InstallPlan
-            spec:
-              approved: false
+        object-templates-raw: |
+          {{- range $ip := (lookup "operators.coreos.com/v1alpha1" "InstallPlan" "" "").items }}
+          - complianceType: musthave
+            objectDefinition:
+              apiVersion: operators.coreos.com/v1alpha1
+              kind: InstallPlan
+              metadata:
+                name: {{ $ip.metadata.name }}
+                namespace: {{ $ip.metadata.namespace }}
+              spec:
+                approved: true
+              status:
+                phase: Complete
+          {{- end }}
         remediationAction: inform
         severity: high
   remediationAction: inform
