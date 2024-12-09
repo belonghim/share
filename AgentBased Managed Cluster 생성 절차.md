@@ -1124,9 +1124,9 @@ metadata:
   namespace: ${ManagedCluster}
 spec:
   applicationManager:
-    enabled: true
+    enabled: false
   certPolicyController:
-    enabled: true
+    enabled: false
   iamPolicyController:
     enabled: false
   policyController:
