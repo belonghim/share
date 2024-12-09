@@ -1121,6 +1121,28 @@ spec:
           {{- end }}
         remediationAction: enforce
         severity: high
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: ip-approved-true
+      spec:
+        object-templates-raw: |
+          {{- range $ip := (lookup "operators.coreos.com/v1alpha1" "InstallPlan" "" "").items }}
+          {{- if eq $ip.spec.approval "Manual" }}
+          - complianceType: musthave
+            objectDefinition:
+              apiVersion: operators.coreos.com/v1alpha1
+              kind: InstallPlan
+              metadata:
+                name: {{ $ip.metadata.name }}
+                namespace: {{ $ip.metadata.namespace }}
+              spec:
+                approved: true
+          {{- end }}
+          {{- end }}
+        remediationAction: enforce
+        severity: high
   remediationAction: enforce
 ---
 apiVersion: policy.open-cluster-management.io/v1
