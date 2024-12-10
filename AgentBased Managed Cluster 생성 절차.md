@@ -1067,7 +1067,7 @@ $ openshift-install agent create image --dir ${INSTALL_DIR} --log-level debug
 $ govc datastore.rm -ds <iso_datastore> <image_full_path>
 
 ## Upload the Assisted Installer discovery ISO:
-$ govc datastore.upload -ds <iso_datastore> agent.x86_64.iso <image_directory>
+$ govc datastore.upload -ds <iso_datastore> agent.x86_64.iso <datastore_directory>
 
 ```
 
