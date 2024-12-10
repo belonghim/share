@@ -52,7 +52,7 @@ do
 done; unset IFS
 ```
 
-### disk.enableUUID 설정 및 시작
+### disk.enableUUID 설정
 
 ```
 ## Set the disk.enableUUID setting to TRUE:
@@ -61,11 +61,6 @@ do
      govc vm.change -vm $VM -e disk.enableUUID=TRUE
 done; unset IFS
 
-## Restart the VMs:
-$ IFS=$'\n'; for VM in $(govc ls /<datacenter>/vm/<folder_name>)
-do
-     govc vm.power -on=true $VM
-done; unset IFS
 ```
 
 ### mac Address 와 disk path 확인
@@ -1063,77 +1058,41 @@ $ openshift-install agent create image --dir ${INSTALL_DIR} --log-level debug
 ```
 
 <br><br>
-## VM 노드 생성
+## ISO 업로드 및 ISO 삽입 후 VM 재기동
 
-### vm.create
+### datastore.upload
 
 ```
-## On the command line, power off and delete any preexisting virtual machines:
-$ for VM in $(/usr/local/bin/govc ls /<datacenter>/vm/<folder_name>)
-do
- 	/usr/local/bin/govc vm.power -off $VM
- 	/usr/local/bin/govc vm.destroy $VM
-done
-
 ## Remove preexisting ISO images from the data store, if there are any:
-$ govc datastore.rm -ds <iso_datastore> <image>
+$ govc datastore.rm -ds <iso_datastore> <image_full_path>
 
 ## Upload the Assisted Installer discovery ISO:
-$ govc datastore.upload -ds <iso_datastore> agent.x86_64.iso
+$ govc datastore.upload -ds <iso_datastore> agent.x86_64.iso <image_directory>
 
-## Boot three control plane nodes:
-$ govc vm.create -net.adapter <network_adapter_type> \
-                 -disk.controller <disk_controller_type> \
-                 -pool=<resource_pool> \
-                 -c=16 \
-                 -m=32768 \
-                 -disk=120GB \
-                 -disk-datastore=<datastore_file> \
-                 -net.address="<nic_mac_address>" \
-                 -iso-datastore=<iso_datastore> \
-                 -iso="agent.x86_64.iso" \
-                 -folder="<inventory_folder>" \
-                 <hostname>.<cluster_name>.example.com
+```
 
-## Boot at least two worker nodes:
-$ govc vm.create -net.adapter <network_adapter_type> \
-                 -disk.controller <disk_controller_type> \
-                 -pool=<resource_pool> \
-                 -c=4 \
-                 -m=8192 \
-                 -disk=120GB \
-                 -disk-datastore=<datastore_file> \
-                 -net.address="<nic_mac_address>" \
-                 -iso-datastore=<iso_datastore> \
-                 -iso="agent.x86_64.iso" \
-                 -folder="<inventory_folder>" \
-                 <hostname>.<cluster_name>.example.com
+### cdrom.insert
+```
+## Insert cdrom to VM
+$ IFS=$'\n'; for VM in $(govc ls /<datacenter>/vm/<folder_name>)
+do
+     govc device.cdrom.insert -vm $VM -device cdrom-16000 -ds <iso_datastore> <image_full_path>
+done; unset IFS
 
-## Ensure the VMs are running:
-$  govc ls /<datacenter>/vm/<folder_name>
-
-## After 2 minutes, shut down the VMs:
-$ for VM in $(govc ls /<datacenter>/vm/<folder_name>)
+## Shut down the VMs:
+$ IFS=$'\n'; for VM in $(govc ls /<datacenter>/vm/<folder_name>)
 do
      govc vm.power -s=true $VM
-done
-```
-
-### disk.enableUUID 설정 및 시작
-
-```
-## Set the disk.enableUUID setting to TRUE:
-$ for VM in $(govc ls /<datacenter>/vm/<folder_name>)
-do
-     govc vm.change -vm $VM -e disk.enableUUID=TRUE
-done
+done; unset IFS
 
 ## Restart the VMs:
-$ for VM in $(govc ls /<datacenter>/vm/<folder_name>)
+$ IFS=$'\n'; for VM in $(govc ls /<datacenter>/vm/<folder_name>)
 do
      govc vm.power -on=true $VM
-done
+done; unset IFS
+
 ```
+
 
 <br><br>
 ## 설치 후 구성 설정
