@@ -68,7 +68,7 @@ do
 done; unset IFS
 ```
 
-### mac Address 와 disk path 설정
+### mac Address 와 disk path 확인
 
 ```
 ## Set mac address
