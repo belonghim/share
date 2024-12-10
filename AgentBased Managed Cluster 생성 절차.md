@@ -1077,6 +1077,7 @@ $ govc datastore.upload -ds <iso_datastore> agent.x86_64.iso <datastore_director
 $ IFS=$'\n'; for VM in $(govc ls /<datacenter>/vm/<folder_name>)
 do
      govc device.cdrom.insert -vm $VM -device cdrom-16000 -ds <iso_datastore> <image_full_path>
+     govc device.connect -vm $VM cdrom-16000
 done; unset IFS
 
 ## Shut down the VMs:
