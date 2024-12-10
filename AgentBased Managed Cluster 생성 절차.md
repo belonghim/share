@@ -310,7 +310,7 @@ hosts:
     deviceName: ${DeviceName}
   interfaces:
   - name: enp1s0
-    macAddress: ${MacAddress_m0}
+    macAddress: ${Mac_master0}
   networkConfig:
     interfaces:
     - name: enp1s0
@@ -340,7 +340,7 @@ hosts:
     deviceName: ${DeviceName}
   interfaces:
   - name: enp1s0
-    macAddress: ${MacAddress_m1}
+    macAddress: ${Mac_master1}
   networkConfig:
     interfaces:
     - name: enp1s0
@@ -370,7 +370,7 @@ hosts:
     deviceName: ${DeviceName}
   interfaces:
   - name: enp1s0
-    macAddress: ${MacAddress_m2}
+    macAddress: ${Mac_master2}
   networkConfig:
     interfaces:
     - name: enp1s0
@@ -400,7 +400,7 @@ hosts:
     deviceName: ${DeviceName}
   interfaces:
   - name: enp1s0
-    macAddress: ${MacAddress_i0}
+    macAddress: ${Mac_infra0}
   networkConfig:
     interfaces:
     - name: enp1s0
@@ -430,7 +430,7 @@ hosts:
     deviceName: ${DeviceName}
   interfaces:
   - name: enp1s0
-    macAddress: ${MacAddress_i1}
+    macAddress: ${Mac_infra1}
   networkConfig:
     interfaces:
     - name: enp1s0
@@ -460,7 +460,7 @@ hosts:
     deviceName: ${DeviceName}
   interfaces:
   - name: enp1s0
-    macAddress: ${MacAddress_w0}
+    macAddress: ${Mac_worker0}
   networkConfig:
     interfaces:
     - name: enp1s0
@@ -490,7 +490,7 @@ hosts:
     deviceName: ${DeviceName}
   interfaces:
   - name: enp1s0
-    macAddress: ${MacAddress_w1}
+    macAddress: ${Mac_worker1}
   networkConfig:
     interfaces:
     - name: enp1s0
