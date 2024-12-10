@@ -74,11 +74,11 @@ done; unset IFS
 ## Set mac address
 $ IFS=$'\n'; for VM in $(govc ls /<datacenter>/vm/<folder_name>)
 do
-  eval mac_$(basename ${f##*-})=$(govc device.info -json -vm "$VM" ethernet-0 | jq -r '.devices[].macAddress')
+  eval Mac_$(basename ${f##*-})=$(govc device.info -json -vm "$VM" ethernet-0 | jq -r '.devices[].macAddress')
 done; unset IFS
 
-## Set disk path by-path pci
-$ DISK_PATH /dev/disk/by-path/pci-0000:03:00.0-scsi-0:0:0:0
+## Set DeviceName by-path pci
+$ DeviceName="/dev/disk/by-path/pci-0000:03:00.0-scsi-0:0:0:0"
 
 ```
 
@@ -291,16 +291,8 @@ EOF
 
 ```
 $ AdditionalNTPSource="192.168.1.3"
-$ DeviceName="/dev/disk/by-path/pci-0000:05:00.0"
 $ DnsServer="192.168.1.5"
 $ Gateway="192.168.1.1"
-$ MacAddress_m0="00:ef:50:30:f0:b0"
-$ MacAddress_m1="00:ef:50:30:f1:b0"
-$ MacAddress_m2="00:ef:50:30:f2:b0"
-$ MacAddress_i0="00:ef:50:30:f3:b0"
-$ MacAddress_i1="00:ef:50:30:f4:b0"
-$ MacAddress_w0="00:ef:50:30:f5:b0"
-$ MacAddress_w1="00:ef:50:30:f6:b0"
 $ Ip_m0="192.168.1.10"
 $ Ip_m1="192.168.1.11"
 $ Ip_m2="192.168.1.12"
