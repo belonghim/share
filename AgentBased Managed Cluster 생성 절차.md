@@ -12,11 +12,11 @@
 
 ```
 ## On the command line, power off and delete any preexisting virtual machines:
-$ for VM in $(/usr/local/bin/govc ls /<datacenter>/vm/<folder_name>)
+$ IFS=$'\n'; for VM in $(/usr/local/bin/govc ls /<datacenter>/vm/<folder_name>)
 do
  	/usr/local/bin/govc vm.power -off $VM
  	/usr/local/bin/govc vm.destroy $VM
-done
+done; unset IFS
 
 ## Boot three control plane nodes:
 $ govc vm.create -net.adapter <network_adapter_type> \
@@ -43,45 +43,43 @@ $ govc vm.create -net.adapter <network_adapter_type> \
                  <hostname>.<cluster_name>.example.com
 
 ## Ensure the VMs are running:
-$  govc ls /<datacenter>/vm/<folder_name>
+$ govc ls /<datacenter>/vm/<folder_name>
 
 ## After 2 minutes, shut down the VMs:
-$ for VM in $(govc ls /<datacenter>/vm/<folder_name>)
+$ IFS=$'\n'; for VM in $(govc ls /<datacenter>/vm/<folder_name>)
 do
      govc vm.power -s=true $VM
-done
+done; unset IFS
 ```
 
 ### disk.enableUUID 설정 및 시작
 
 ```
 ## Set the disk.enableUUID setting to TRUE:
-$ for VM in $(govc ls /<datacenter>/vm/<folder_name>)
+$ IFS=$'\n'; for VM in $(govc ls /<datacenter>/vm/<folder_name>)
 do
      govc vm.change -vm $VM -e disk.enableUUID=TRUE
-done
+done; unset IFS
 
 ## Restart the VMs:
-$ for VM in $(govc ls /<datacenter>/vm/<folder_name>)
+$ IFS=$'\n'; for VM in $(govc ls /<datacenter>/vm/<folder_name>)
 do
      govc vm.power -on=true $VM
-done
+done; unset IFS
 ```
 
-### mac Address 와 disk UUID 조회
+### mac Address 와 disk path 설정
 
 ```
-## Set the disk.enableUUID setting to TRUE:
-$ for VM in $(govc ls /<datacenter>/vm/<folder_name>)
+## Set mac address
+$ IFS=$'\n'; for VM in $(govc ls /<datacenter>/vm/<folder_name>)
 do
-  govc device.info -json -vm $VM ethernet-0 | jq -r '.devices[].macAddress'
-done
+  eval mac_$(basename ${f##*-})=$(govc device.info -json -vm "$VM" ethernet-0 | jq -r '.devices[].macAddress')
+done; unset IFS
 
-## Restart the VMs:
-$ for VM in $(govc ls /<datacenter>/vm/<folder_name>)
-do
-     govc vm.power -on=true $VM
-done
+## Set disk path by-path pci
+$ DISK_PATH /dev/disk/by-path/pci-0000:03:00.0-scsi-0:0:0:0
+
 ```
 
 
