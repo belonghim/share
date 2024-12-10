@@ -6,6 +6,86 @@
 ![tempFileForShare_20241210-132720.png](https://github.com/user-attachments/assets/7e9259e6-840e-4830-8c8b-d24c409295c6)
 
 <br><br>
+## VM 생성 및 조회
+
+### vm.create
+
+```
+## On the command line, power off and delete any preexisting virtual machines:
+$ for VM in $(/usr/local/bin/govc ls /<datacenter>/vm/<folder_name>)
+do
+ 	/usr/local/bin/govc vm.power -off $VM
+ 	/usr/local/bin/govc vm.destroy $VM
+done
+
+## Boot three control plane nodes:
+$ govc vm.create -net.adapter <network_adapter_type> \
+                 -disk.controller <disk_controller_type> \
+                 -pool=<resource_pool> \
+                 -c=16 \
+                 -m=32768 \
+                 -disk=100GB \
+                 -disk=120GB \
+                 -disk-datastore=<datastore_file> \
+                 -folder="<inventory_folder>" \
+                 <hostname>.<cluster_name>.example.com
+
+## Boot at least two worker nodes:
+$ govc vm.create -net.adapter <network_adapter_type> \
+                 -disk.controller <disk_controller_type> \
+                 -pool=<resource_pool> \
+                 -c=4 \
+                 -m=8192 \
+                 -disk=100GB \
+                 -disk=120GB \
+                 -disk-datastore=<datastore_file> \
+                 -folder="<inventory_folder>" \
+                 <hostname>.<cluster_name>.example.com
+
+## Ensure the VMs are running:
+$  govc ls /<datacenter>/vm/<folder_name>
+
+## After 2 minutes, shut down the VMs:
+$ for VM in $(govc ls /<datacenter>/vm/<folder_name>)
+do
+     govc vm.power -s=true $VM
+done
+```
+
+### disk.enableUUID 설정 및 시작
+
+```
+## Set the disk.enableUUID setting to TRUE:
+$ for VM in $(govc ls /<datacenter>/vm/<folder_name>)
+do
+     govc vm.change -vm $VM -e disk.enableUUID=TRUE
+done
+
+## Restart the VMs:
+$ for VM in $(govc ls /<datacenter>/vm/<folder_name>)
+do
+     govc vm.power -on=true $VM
+done
+```
+
+### mac Address 와 disk UUID 조회
+
+```
+## Set the disk.enableUUID setting to TRUE:
+$ for VM in $(govc ls /<datacenter>/vm/<folder_name>)
+do
+  govc device.info -json -vm $VM ethernet-0 | jq -r '.devices[].macAddress'
+done
+
+## Restart the VMs:
+$ for VM in $(govc ls /<datacenter>/vm/<folder_name>)
+do
+     govc vm.power -on=true $VM
+done
+```
+
+
+<br><br>
 ## DNS 구성
 
 ### named conf DNS records 예시
