@@ -3,7 +3,7 @@
 # AgentBased Managed Cluster 생성 절차
 
 ## 절차별 예시 구성도
-![image](https://github.com/belonghim/share/blob/main/Screenshot_20241004_151744_Slides.jpg)
+![tempFileForShare_20241210-132720.png](https://github.com/user-attachments/assets/7e9259e6-840e-4830-8c8b-d24c409295c6)
 
 <br><br>
 ## DNS 구성
