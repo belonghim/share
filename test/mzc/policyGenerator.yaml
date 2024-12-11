@@ -146,15 +146,15 @@ policies:
   - sub-automatic
   remediationAction: enforce
 # marketplace jobs Policies - end
-# upgrade upstream ocp4 Policies - start
-- name: upgrade-upstream-ocp4
+# upgrade upstream Policies - start
+- name: upgrade-upstream
   manifests:
-  - path: upgrade/upgrade-upstream-ocp4.yaml
+  - path: upgrade/upgrade-upstream.yaml
   policySets:
   - hub
   - managed
   remediationAction: enforce
-# upgrade upstream ocp4 Policies - end
+# upgrade upstream Policies - end
 # upgrade release channel Policies - start
 - name: upgrade-release-channel
   manifests:
