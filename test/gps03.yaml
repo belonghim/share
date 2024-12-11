@@ -1251,7 +1251,7 @@ metadata:
     policy.open-cluster-management.io/standards: NIST SP 800-53
   labels:
     open-cluster-management.io/policy-set: opp
-  name: upgrade-upstream-ocp4
+  name: upgrade-upstream
   namespace: policies
 spec:
   disabled: false
@@ -1260,24 +1260,28 @@ spec:
       apiVersion: policy.open-cluster-management.io/v1
       kind: ConfigurationPolicy
       metadata:
-        name: upgrade-upstream-ocp4
+        name: upgrade-upstream
       spec:
-        object-templates:
-        - complianceType: musthave
-          objectDefinition:
-            apiVersion: config.openshift.io/v1
-            kind: ClusterVersion
-            metadata:
-              name: version
-            spec:
-              upstream: '{{hub fromConfigMap "policies" "upgrade-osus-ocp4" "graphUrl"
-                hub}}'
-            status:
-              conditions:
-              - status: "True"
-                type: RetrievedUpdates
+        object-templates-raw: |
+          {{- if eq (lookup "cluster.open-cluster-management.io/v1alpha1" "ClusterClaim" "" "policies.release-repo").kind "ClusterClaim" }}
+          {{hub $cm := (cat "upgrade-osus-" (index .ManagedClusterLabels "policies.release-repo") | replace " " "") hub}}
+          {{hub if eq (lookup "v1" "ConfigMap" "policies" $cm).kind "ConfigMap" hub}}
+          - complianceType: musthave
+            objectDefinition:
+              apiVersion: config.openshift.io/v1
+              kind: ClusterVersion
+              metadata:
+                name: version
+              spec:
+                upstream: {{hub fromConfigMap "policies" $cm "graphUrl" hub}}
+              status:
+                conditions:
+                - status: 'True'
+                  type: RetrievedUpdates
+          {{hub end hub}}
+          {{- end }}
         remediationAction: enforce
-        severity: medium
+        severity: high
   remediationAction: enforce
 ---
 apiVersion: policy.open-cluster-management.io/v1beta1
@@ -1302,7 +1306,7 @@ spec:
   - proxy-sync-hub
   - upgrade-release-channel
   - upgrade-signatures
-  - upgrade-upstream-ocp4
+  - upgrade-upstream
 ---
 apiVersion: policy.open-cluster-management.io/v1beta1
 kind: PolicySet
@@ -1325,7 +1329,7 @@ spec:
   - proxy-sync-managed
   - upgrade-release-channel
   - upgrade-signatures
-  - upgrade-upstream-ocp4
+  - upgrade-upstream
 ---
 apiVersion: policy.open-cluster-management.io/v1beta1
 kind: PolicySet

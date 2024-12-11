@@ -1,0 +1,27 @@
+---
+apiVersion: policy.open-cluster-management.io/v1
+kind: ConfigurationPolicy
+metadata:
+  name: upgrade-upstream
+spec:
+  remediationAction: enforce
+  severity: high
+  object-templates-raw: |
+    {{- if eq (lookup "cluster.open-cluster-management.io/v1alpha1" "ClusterClaim" "" "policies.release-repo").kind "ClusterClaim" }}
+    {{hub $cm := (cat "upgrade-osus-" (index .ManagedClusterLabels "policies.release-repo") | replace " " "") hub}}
+    {{hub if eq (lookup "v1" "ConfigMap" "policies" $cm).kind "ConfigMap" hub}}
+    - complianceType: musthave
+      objectDefinition:
+        apiVersion: config.openshift.io/v1
+        kind: ClusterVersion
+        metadata:
+          name: version
+        spec:
+          upstream: {{hub fromConfigMap "policies" $cm "graphUrl" hub}}
+        status:
+          conditions:
+          - status: 'True'
+            type: RetrievedUpdates
+    {{hub end hub}}
+    {{- end }}
+---
