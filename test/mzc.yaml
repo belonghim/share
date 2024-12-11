@@ -1331,9 +1331,9 @@ spec:
         name: upgrade-upstream
       spec:
         object-templates-raw: |
-          {{- if eq (lookup "cluster.open-cluster-management.io/v1alpha1" "ClusterClaim" "" "policies.release-repo").kind "ClusterClaim" }}
-          {{hub $cm := (cat "upgrade-osus-" (index .ManagedClusterLabels "policies.release-repo") | replace " " "") hub}}
-          {{hub $gr := fromConfigMap "policies" $cm "graphUrl" hub}}
+          {{hub $rp := index .ManagedClusterLabels "policies.release-repo" hub}}
+          {{hub if ne "" $rp hub}}
+          {{hub $gr := fromConfigMap "policies" (cat "upgrade-osus-" $rp | replace " " "") "graphUrl" hub}}
           - complianceType: musthave
             objectDefinition:
               apiVersion: config.openshift.io/v1
@@ -1346,7 +1346,7 @@ spec:
                 conditions:
                 - status: 'True'
                   type: RetrievedUpdates
-          {{- end }}
+          {{hub end hub}}
         remediationAction: enforce
         severity: high
   remediationAction: enforce
