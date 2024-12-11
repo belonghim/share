@@ -249,18 +249,13 @@ $ sh script/hub-osus.sh
 ## Apply osus policy
 $ sh script/hub-osus.sh | oc create -f -
 
-## Test cv-upstream policy
-$ sh script/cv-upstream.sh
-
-## Apply cv-upstream policy
-$ sh script/cv-upstream.sh | oc create -f -
-
 ```
 
 ### Check the policies & operators
 ```
 ## Check the policies and operators
 $ oc get policy,sub,csv,ip -A -l \!olm.copiedFrom
+
 ```
 
 
