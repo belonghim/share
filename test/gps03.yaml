@@ -1258,8 +1258,29 @@ spec:
                 name: {{ $sub.metadata.name }}
                 namespace: {{ $sub.metadata.namespace }}
               spec:
-                channel:
                 installPlanApproval: Automatic
+          {{- end }}
+        remediationAction: enforce
+        severity: high
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: sub-channel-reset
+      spec:
+        evaluationInterval:
+          compliant: 1m
+        object-templates-raw: |
+          {{- range $sub := (lookup "operators.coreos.com/v1alpha1" "Subscription" "" "" "!policies.ignore").items }}
+          - complianceType: musthave
+            objectDefinition:
+              apiVersion: operators.coreos.com/v1alpha1
+              kind: Subscription
+              metadata:
+                name: {{ $sub.metadata.name }}
+                namespace: {{ $sub.metadata.namespace }}
+              spec:
+                channel:
           {{- end }}
         remediationAction: enforce
         severity: high
