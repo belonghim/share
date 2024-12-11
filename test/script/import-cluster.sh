@@ -14,7 +14,7 @@ metadata:
   labels:
     cloud: auto-detect
     vendor: OpenShift
-    policies.release-repo: ocp4
+    policies.osus: ocp4
 spec:
   hubAcceptsClient: true
   leaseDurationSeconds: 300

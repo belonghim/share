@@ -212,10 +212,12 @@ spec:
       apiVersion: policy.open-cluster-management.io/v1
       kind: ConfigurationPolicy
       metadata:
-        name: ip-check
+        name: install-plan-check
       spec:
         object-templates-raw: |
-          {{- range $ip := (lookup "operators.coreos.com/v1alpha1" "InstallPlan" "" "").items }}
+          {{- range $sb := (lookup "operators.coreos.com/v1alpha1" "Subscription" "" "" "!policies.ignore").items }}
+          {{- range $ip := (lookup "operators.coreos.com/v1alpha1" "InstallPlan" $sb.metadata.namespace "").items }}
+          {{- if contains $sb.spec.name (index $ip.spec.clusterServiceVersionNames 0) }}
           - complianceType: musthave
             objectDefinition:
               apiVersion: operators.coreos.com/v1alpha1
@@ -227,6 +229,8 @@ spec:
                 approved: true
               status:
                 phase: Complete
+          {{- end }}
+          {{- end }}
           {{- end }}
         remediationAction: inform
         severity: high
@@ -1173,9 +1177,10 @@ spec:
       apiVersion: policy.open-cluster-management.io/v1
       kind: ConfigurationPolicy
       metadata:
-        name: upgrade-signatures
+        name: create-signatures
       spec:
         object-templates-raw: |
+          {{hub if ne "" (index .ManagedClusterLabels "policies.osus") hub}}
           {{hub range $hcm := (lookup "v1" "ConfigMap" "policies" "" "release.openshift.io/verification-signatures").items hub}}
           - complianceType: musthave
             objectDefinition:
@@ -1188,11 +1193,24 @@ spec:
                   release.openshift.io/verification-signatures: ""
               binaryData: {{hub $hcm.binaryData | toRawJson hub}}
           {{hub end hub}}
+          {{hub end hub}}
+        remediationAction: enforce
+        severity: high
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: delete-signatures
+      spec:
+        object-templates-raw: |
           {{- range $cm := (lookup "v1" "ConfigMap" "openshift-config-managed" "" "release.openshift.io/verification-signatures").items }}
           {{- if ne $cm.metadata.name "signatures-managed" }}
           {{- $not_exist := true }}
+          {{hub if ne "" (index .ManagedClusterLabels "policies.osus") hub}}
           {{hub range $hcm := (lookup "v1" "ConfigMap" "policies" "" "release.openshift.io/verification-signatures").items hub}}
-          {{- if eq $cm.metadata.name "{{hub $hcm.metadata.name hub}}" }} {{- $not_exist := false }} {{- break }} {{- end }}
+          {{- if eq $cm.metadata.name "{{hub $hcm.metadata.name hub}}" }} {{ $not_exist := false }} {{ continue }} {{ end }}
+          {{hub end hub}}
+          {{hub end hub}}
           {{- if $not_exist }}
           - complianceType: mustnothave
             objectDefinition:
@@ -1202,7 +1220,6 @@ spec:
                 name: {{ $cm.metadata.name }}
                 namespace: openshift-config-managed
           {{- end }}
-          {{hub end hub}}
           {{- end }}
           {{- end }}
         remediationAction: enforce
@@ -1250,11 +1267,12 @@ spec:
       apiVersion: policy.open-cluster-management.io/v1
       kind: ConfigurationPolicy
       metadata:
-        name: ip-approved-true
+        name: install-plan-approved
       spec:
         object-templates-raw: |
-          {{- range $ip := (lookup "operators.coreos.com/v1alpha1" "InstallPlan" "" "").items }}
-          {{- if ne "Automatic" $ip.spec.approval }}
+          {{- range $sb := (lookup "operators.coreos.com/v1alpha1" "Subscription" "" "" "!policies.ignore").items }}
+          {{- range $ip := (lookup "operators.coreos.com/v1alpha1" "InstallPlan" $sb.metadata.namespace "").items }}
+          {{- if contains $sb.spec.name (index $ip.spec.clusterServiceVersionNames 0) }}
           - complianceType: musthave
             objectDefinition:
               apiVersion: operators.coreos.com/v1alpha1
@@ -1264,6 +1282,7 @@ spec:
                 namespace: {{ $ip.metadata.namespace }}
               spec:
                 approved: true
+          {{- end }}
           {{- end }}
           {{- end }}
         remediationAction: enforce
@@ -1331,7 +1350,7 @@ spec:
         name: upgrade-upstream
       spec:
         object-templates-raw: |
-          {{hub $rp := index .ManagedClusterLabels "policies.release-repo" hub}}
+          {{hub $rp := index .ManagedClusterLabels "policies.osus" hub}}
           {{hub if ne "" $rp hub}}
           {{hub $gr := fromConfigMap "policies" (cat "upgrade-osus-" $rp | replace " " "") "graphUrl" hub}}
           - complianceType: musthave

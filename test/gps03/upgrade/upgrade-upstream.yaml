@@ -7,7 +7,7 @@ spec:
   remediationAction: enforce
   severity: high
   object-templates-raw: |
-    {{hub $rp := index .ManagedClusterLabels "policies.release-repo" hub}}
+    {{hub $rp := index .ManagedClusterLabels "policies.osus" hub}}
     {{hub if ne "" $rp hub}}
     {{hub $gr := fromConfigMap "policies" (cat "upgrade-osus-" $rp | replace " " "") "graphUrl" hub}}
     - complianceType: musthave

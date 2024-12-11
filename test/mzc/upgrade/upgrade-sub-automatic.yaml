@@ -23,13 +23,14 @@ spec:
 apiVersion: policy.open-cluster-management.io/v1
 kind: ConfigurationPolicy
 metadata:
-  name: ip-approved-true
+  name: install-plan-approved
 spec:
   remediationAction: enforce
   severity: high
   object-templates-raw: |
-    {{- range $ip := (lookup "operators.coreos.com/v1alpha1" "InstallPlan" "" "").items }}
-    {{- if ne $ip.spec.approval "Automatic" }}
+    {{- range $sb := (lookup "operators.coreos.com/v1alpha1" "Subscription" "" "" "!policies.ignore").items }}
+    {{- range $ip := (lookup "operators.coreos.com/v1alpha1" "InstallPlan" $sb.metadata.namespace "").items }}
+    {{- if contains $sb.spec.name (index $ip.spec.clusterServiceVersionNames 0) }}
     - complianceType: musthave
       objectDefinition:
         apiVersion: operators.coreos.com/v1alpha1
@@ -39,6 +40,7 @@ spec:
           namespace: {{ $ip.metadata.namespace }}
         spec:
           approved: true
+    {{- end }}
     {{- end }}
     {{- end }}
 ---

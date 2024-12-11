@@ -2,11 +2,12 @@
 apiVersion: policy.open-cluster-management.io/v1
 kind: ConfigurationPolicy
 metadata:
-  name: upgrade-signatures
+  name: create-signatures
 spec:
   remediationAction: enforce
   severity: high
   object-templates-raw: |
+    {{hub if ne "" (index .ManagedClusterLabels "policies.osus") hub}}
     {{hub range $hcm := (lookup "v1" "ConfigMap" "policies" "" "release.openshift.io/verification-signatures").items hub}}
     - complianceType: musthave
       objectDefinition:
@@ -19,11 +20,24 @@ spec:
             release.openshift.io/verification-signatures: ""
         binaryData: {{hub $hcm.binaryData | toRawJson hub}}
     {{hub end hub}}
+    {{hub end hub}}
+---
+apiVersion: policy.open-cluster-management.io/v1
+kind: ConfigurationPolicy
+metadata:
+  name: delete-signatures
+spec:
+  remediationAction: enforce
+  severity: high
+  object-templates-raw: |
     {{- range $cm := (lookup "v1" "ConfigMap" "openshift-config-managed" "" "release.openshift.io/verification-signatures").items }}
     {{- if ne $cm.metadata.name "signatures-managed" }}
     {{- $not_exist := true }}
+    {{hub if ne "" (index .ManagedClusterLabels "policies.osus") hub}}
     {{hub range $hcm := (lookup "v1" "ConfigMap" "policies" "" "release.openshift.io/verification-signatures").items hub}}
-    {{- if eq $cm.metadata.name "{{hub $hcm.metadata.name hub}}" }} {{- $not_exist := false }} {{- break }} {{- end }}
+    {{- if eq $cm.metadata.name "{{hub $hcm.metadata.name hub}}" }} {{ $not_exist := false }} {{ continue }} {{ end }}
+    {{hub end hub}}
+    {{hub end hub}}
     {{- if $not_exist }}
     - complianceType: mustnothave
       objectDefinition:
@@ -33,7 +47,6 @@ spec:
           name: {{ $cm.metadata.name }}
           namespace: openshift-config-managed
     {{- end }}
-    {{hub end hub}}
     {{- end }}
     {{- end }}
 ---
