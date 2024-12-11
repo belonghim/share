@@ -10,4 +10,4 @@ spec:
         matchExpressions:
           - {key: vendor, operator: In, values: ["OpenShift"]}
           - {key: "policies.undeploy", operator: DoesNotExist}
-          - {key: "policies.sub-approval", operator: In, values: ["automatic"]}
+          - {key: "policies.sub-approval", operator: In, values: ["automatic","Automatic"]}
