@@ -9,7 +9,7 @@ spec:
   object-templates-raw: |
     {{- if eq (lookup "cluster.open-cluster-management.io/v1alpha1" "ClusterClaim" "" "policies.release-repo").kind "ClusterClaim" }}
     {{hub $cm := (cat "upgrade-osus-" (index .ManagedClusterLabels "policies.release-repo") | replace " " "") hub}}
-    {{hub if eq (lookup "v1" "ConfigMap" "policies" $cm).kind "ConfigMap" hub}}
+    {{hub $gr := fromConfigMap "policies" $cm "graphUrl" hub}}
     - complianceType: musthave
       objectDefinition:
         apiVersion: config.openshift.io/v1
@@ -17,11 +17,10 @@ spec:
         metadata:
           name: version
         spec:
-          upstream: {{hub fromConfigMap "policies" $cm "graphUrl" hub}}
+          upstream: {{hub $gr hub}}
         status:
           conditions:
           - status: 'True'
             type: RetrievedUpdates
-    {{hub end hub}}
     {{- end }}
 ---
