@@ -33,6 +33,37 @@ spec:
 apiVersion: v1
 kind: Namespace
 metadata:
+  name: multicluster-engine
+---
+apiVersion: operators.coreos.com/v1
+kind: OperatorGroup
+metadata:
+  name: default
+  namespace: multicluster-engine
+spec:
+  targetNamespaces:
+  - multicluster-engine
+---
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  name: multicluster-engine
+  namespace: multicluster-engine
+spec:
+  config:
+    nodeSelector:
+      node-role.kubernetes.io/acm: ""
+    tolerations:
+    - effect: NoSchedule
+      key: node-role.kubernetes.io/infra
+      operator: Exists
+  name: multicluster-engine
+  source: cs-redhat-operator-index
+  sourceNamespace: openshift-marketplace
+---
+apiVersion: v1
+kind: Namespace
+metadata:
   name: openshift-update-service
   labels:
     openshift.io/cluster-monitoring: "true"
