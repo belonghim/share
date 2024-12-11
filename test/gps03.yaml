@@ -1270,6 +1270,7 @@ spec:
       spec:
         evaluationInterval:
           compliant: 1m
+          noncompliant: 1m
         object-templates-raw: |
           {{- range $sub := (lookup "operators.coreos.com/v1alpha1" "Subscription" "" "" "!policies.ignore").items }}
           - complianceType: musthave

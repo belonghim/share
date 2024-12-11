@@ -26,6 +26,7 @@ metadata:
 spec:
   evaluationInterval:
     compliant: 1m
+    noncompliant: 1m
   remediationAction: enforce
   severity: high
   object-templates-raw: |
