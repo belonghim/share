@@ -25,8 +25,8 @@ metadata:
   name: sub-channel-reset
 spec:
   evaluationInterval:
-    compliant: 1m
-    noncompliant: 1m
+    compliant: 5m
+    noncompliant: 5m
   remediationAction: enforce
   severity: high
   object-templates-raw: |

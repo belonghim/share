@@ -27,6 +27,9 @@ kind: ConfigurationPolicy
 metadata:
   name: delete-signatures
 spec:
+  evaluationInterval:
+    compliant: 5m
+    noncompliant: 5m
   remediationAction: enforce
   severity: high
   object-templates-raw: |

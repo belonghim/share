@@ -773,6 +773,9 @@ spec:
       metadata:
         name: remove-worker-label
       spec:
+        evaluationInterval:
+          compliant: 1m
+          noncompliant: 1m
         object-templates-raw: |
           {{- range $no := (lookup "v1" "Node" "" "" "!node-role.kubernetes.io/master").items }}
           {{- if (hasPrefix "infra" $no.metadata.name) }}
@@ -1202,6 +1205,9 @@ spec:
       metadata:
         name: delete-signatures
       spec:
+        evaluationInterval:
+          compliant: 5m
+          noncompliant: 5m
         object-templates-raw: |
           {{- range $cm := (lookup "v1" "ConfigMap" "openshift-config-managed" "" "release.openshift.io/verification-signatures").items }}
           {{- if ne $cm.metadata.name "signatures-managed" }}
@@ -1269,8 +1275,8 @@ spec:
         name: sub-channel-reset
       spec:
         evaluationInterval:
-          compliant: 1m
-          noncompliant: 1m
+          compliant: 5m
+          noncompliant: 5m
         object-templates-raw: |
           {{- range $sub := (lookup "operators.coreos.com/v1alpha1" "Subscription" "" "" "!policies.ignore").items }}
           - complianceType: musthave
