@@ -203,7 +203,7 @@ $ oc create -f - <<EOF
 apiVersion: addon.open-cluster-management.io/v1alpha1
 kind: AddOnDeploymentConfig
 metadata:
-  name: global
+  name: managed
   namespace: open-cluster-management-hub
 spec:
   nodePlacement:
@@ -211,6 +211,22 @@ spec:
       - key: node-role.kubernetes.io/infra
         operator: Exists
         effect: NoSchedule
+    nodeSelector:
+      node-role.kubernetes.io/infra: ""
+---
+apiVersion: addon.open-cluster-management.io/v1alpha1
+kind: AddOnDeploymentConfig
+metadata:
+  name: hub
+  namespace: open-cluster-management-hub
+spec:
+  nodePlacement:
+    tolerations:
+      - key: node-role.kubernetes.io/infra
+        operator: Exists
+        effect: NoSchedule
+    nodeSelector:
+      node-role.kubernetes.io/acm: ""
 EOF
 
 ## Update ClusterManagementAddon
