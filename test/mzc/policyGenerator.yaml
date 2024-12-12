@@ -77,16 +77,21 @@ policies:
   policySets:
   - managed
 # Proxy Router Bundle Policies - end
-# Remediation config Policies - start
+# Config  operators Policies - start
 - name: config-operators
-  evaluationInterval:
-    compliant: never
   manifests:
   - path: config/config-operators.yaml
   policySets:
   - hub
   - managed
-# Remediation config Policies - end
+# Config operators Policies - end
+# Config operators hub Policies - start
+- name: config-operators-hub
+  manifests:
+  - path: config/config-operators-hub.yaml
+  policySets:
+  - hub
+# Config operators hub Policies - end
 # CV check Policies - start
 - name: check-cv
   complianceType: mustnothave

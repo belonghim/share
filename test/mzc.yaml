@@ -333,8 +333,6 @@ spec:
       metadata:
         name: config-operators
       spec:
-        evaluationInterval:
-          compliant: never
         object-templates:
         - complianceType: musthave
           objectDefinition:
@@ -398,6 +396,67 @@ spec:
                 type: Ready
         remediationAction: enforce
         severity: medium
+  remediationAction: enforce
+---
+apiVersion: policy.open-cluster-management.io/v1
+kind: Policy
+metadata:
+  annotations:
+    argocd.argoproj.io/compare-options: IgnoreExtraneous
+    policy.open-cluster-management.io/categories: CM Configuration Management
+    policy.open-cluster-management.io/controls: CM-2 Baseline Configuration
+    policy.open-cluster-management.io/description: ""
+    policy.open-cluster-management.io/standards: NIST SP 800-53
+  labels:
+    open-cluster-management.io/policy-set: opp
+  name: config-operators-hub
+  namespace: policies
+spec:
+  disabled: false
+  policy-templates:
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: config-cluster-management-addon
+      spec:
+        evaluationInterval:
+          compliant: 10m
+          noncompliant: 10m
+        object-templates-raw: |
+          {{- range $mca := (lookup "addon.open-cluster-management.io/v1alpha1" "ManagedClusterAddOn" "" "").items }}
+          {{- if ne "local-cluster" $mca.metadata.namespace }}
+          - complianceType: musthave
+            objectDefinition:
+              apiVersion: addon.open-cluster-management.io/v1alpha1
+              kind: ManagedClusterAddOn
+              metadata:
+                name: {{ $mca.metadata.name }}
+                namespace: {{ $mca.metadata.namespace }}
+              spec:
+                configs:
+                - name: managed
+                  namespace: open-cluster-management-hub
+                  group: addon.open-cluster-management.io
+                  resource: addondeploymentconfigs
+          {{- else }}
+          - complianceType: musthave
+            objectDefinition:
+              apiVersion: addon.open-cluster-management.io/v1alpha1
+              kind: ManagedClusterAddOn
+              metadata:
+                name: {{ $mca.metadata.name }}
+                namespace: {{ $mca.metadata.namespace }}
+              spec:
+                configs:
+                - name: hub
+                  namespace: open-cluster-management-hub
+                  group: addon.open-cluster-management.io
+                  resource: addondeploymentconfigs
+          {{- end }}
+          {{- end }}
+        remediationAction: enforce
+        severity: high
   remediationAction: enforce
 ---
 apiVersion: policy.open-cluster-management.io/v1
@@ -1413,6 +1472,7 @@ spec:
   - check-csv
   - check-cv
   - config-operators
+  - config-operators-hub
   - install-operators
   - install-operators-hub
   - node-infra-label

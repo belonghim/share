@@ -1,0 +1,44 @@
+---
+apiVersion: policy.open-cluster-management.io/v1
+kind: ConfigurationPolicy
+metadata:
+  name: config-cluster-management-addon
+spec:
+  remediationAction: enforce
+  severity: high
+  evaluationInterval:
+    compliant: 10m
+    noncompliant: 10m
+  object-templates-raw: |
+    {{- range $mca := (lookup "addon.open-cluster-management.io/v1alpha1" "ManagedClusterAddOn" "" "").items }}
+    {{- if ne "local-cluster" $mca.metadata.namespace }}
+    - complianceType: musthave
+      objectDefinition:
+        apiVersion: addon.open-cluster-management.io/v1alpha1
+        kind: ManagedClusterAddOn
+        metadata:
+          name: {{ $mca.metadata.name }}
+          namespace: {{ $mca.metadata.namespace }}
+        spec:
+          configs:
+          - name: managed
+            namespace: open-cluster-management-hub
+            group: addon.open-cluster-management.io
+            resource: addondeploymentconfigs
+    {{- else }}
+    - complianceType: musthave
+      objectDefinition:
+        apiVersion: addon.open-cluster-management.io/v1alpha1
+        kind: ManagedClusterAddOn
+        metadata:
+          name: {{ $mca.metadata.name }}
+          namespace: {{ $mca.metadata.namespace }}
+        spec:
+          configs:
+          - name: hub
+            namespace: open-cluster-management-hub
+            group: addon.open-cluster-management.io
+            resource: addondeploymentconfigs
+    {{- end }}
+    {{- end }}
+---
