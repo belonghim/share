@@ -190,6 +190,10 @@ EOF
 
 ## Wait until the MCH is running
 $ oc -n open-cluster-management wait --timeout=10m mch/multiclusterhub --for=jsonpath={.status.phase}=Running
+
+## Wait until the MCE is available
+$ oc wait --timeout=10m mce/multiclusterengine --for=jsonpath={.status.phase}=Available
+
 ```
 
 ### Update ClusterManagementAddon 
