@@ -104,12 +104,9 @@ spec:
       - key: node-role.kubernetes.io/infra
         operator: Exists
         effect: NoSchedule
+    nodeSelector:
+      node-role.kubernetes.io/infra: ""
 EOF
-
-## Update ClusterManagementAddon
-$ for f in $(oc get clustermanagementaddon -oname);do
-oc patch $f --type='json' -p='[{"op":"add", "path":"/spec/supportedConfigs", "value":[{"group":"addon.open-cluster-management.io","resource":"addondeploymentconfigs", "defaultConfig":{"name":"global","namespace":"open-cluster-management-hub"}}]}]'
-done
 
 ```
 
