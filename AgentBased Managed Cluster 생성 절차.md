@@ -1161,7 +1161,7 @@ spec:
   certPolicyController:
     enabled: true
   iamPolicyController:
-    enabled: false
+    enabled: true
   policyController:
     enabled: true
   searchCollector:
