@@ -329,15 +329,15 @@ metadata:
   namespace: ${ManagedCluster}
 spec:
   applicationManager:
-    enabled: false
+    enabled: true
   certPolicyController:
-    enabled: false
+    enabled: true
   iamPolicyController:
     enabled: false
   policyController:
     enabled: true
   searchCollector:
-    enabled: false
+    enabled: true
 EOF
 
 ## Validate the JOINED and AVAILABLE status of the managed cluster
