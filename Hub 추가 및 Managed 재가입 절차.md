@@ -190,6 +190,10 @@ EOF
 
 ## Wait until the MCH is running
 $ oc -n open-cluster-management wait --timeout=10m mch/multiclusterhub --for=jsonpath={.status.phase}=Running
+
+## Wait until the MCE is available
+$ oc wait --timeout=10m mce/multiclusterengine --for=jsonpath={.status.phase}=Available
+
 ```
 
 ### Update ClusterManagementAddon 
@@ -199,7 +203,7 @@ $ oc create -f - <<EOF
 apiVersion: addon.open-cluster-management.io/v1alpha1
 kind: AddOnDeploymentConfig
 metadata:
-  name: global
+  name: managed
   namespace: open-cluster-management-hub
 spec:
   nodePlacement:
@@ -207,6 +211,22 @@ spec:
       - key: node-role.kubernetes.io/infra
         operator: Exists
         effect: NoSchedule
+    nodeSelector:
+      node-role.kubernetes.io/infra: ""
+---
+apiVersion: addon.open-cluster-management.io/v1alpha1
+kind: AddOnDeploymentConfig
+metadata:
+  name: hub
+  namespace: open-cluster-management-hub
+spec:
+  nodePlacement:
+    tolerations:
+      - key: node-role.kubernetes.io/infra
+        operator: Exists
+        effect: NoSchedule
+    nodeSelector:
+      node-role.kubernetes.io/acm: ""
 EOF
 
 ## Update ClusterManagementAddon
@@ -284,6 +304,9 @@ apiVersion: cluster.open-cluster-management.io/v1
 kind: ManagedCluster
 metadata:
   name: ${ManagedCluster}
+  annotations:
+    open-cluster-management/nodeSelector: '{"node-role.kubernetes.io/infra":""}'
+    open-cluster-management/tolerations: '[{"key":"node-role.kubernetes.io/infra","operator":"Exists","effect":"NoSchedule"}]'
   labels:
     cloud: auto-detect
     vendor: OpenShift
@@ -322,15 +345,15 @@ metadata:
   namespace: ${ManagedCluster}
 spec:
   applicationManager:
-    enabled: false
+    enabled: true
   certPolicyController:
-    enabled: false
+    enabled: true
   iamPolicyController:
-    enabled: false
+    enabled: true
   policyController:
     enabled: true
   searchCollector:
-    enabled: false
+    enabled: true
 EOF
 
 ## Validate the JOINED and AVAILABLE status of the managed cluster

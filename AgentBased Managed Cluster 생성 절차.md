@@ -1116,6 +1116,9 @@ apiVersion: cluster.open-cluster-management.io/v1
 kind: ManagedCluster
 metadata:
   name: ${ManagedCluster}
+  annotations:
+    open-cluster-management/nodeSelector: '{"node-role.kubernetes.io/infra":""}'
+    open-cluster-management/tolerations: '[{"key":"node-role.kubernetes.io/infra","operator":"Exists","effect":"NoSchedule"}]'
   labels:
     cloud: auto-detect
     vendor: OpenShift
@@ -1154,15 +1157,15 @@ metadata:
   namespace: ${ManagedCluster}
 spec:
   applicationManager:
-    enabled: false
+    enabled: true
   certPolicyController:
-    enabled: false
+    enabled: true
   iamPolicyController:
-    enabled: false
+    enabled: true
   policyController:
     enabled: true
   searchCollector:
-    enabled: false
+    enabled: true
 EOF
 
 ## Validate the JOINED and AVAILABLE status of the managed cluster
