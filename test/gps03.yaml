@@ -866,7 +866,7 @@ spec:
         name: add-infra-label
       spec:
         object-templates-raw: |
-          {{- range $no := (lookup "v1" "Node" "" "" "!node-role.kubernetes.io/master,!policies.ignore").items }}
+          {{- range $no := (lookup "v1" "Node" "" "" "!node-role.kubernetes.io/master").items }}
           {{- if (hasPrefix "infra" $no.metadata.name) }}
           {{- if not (hasKey $no.metadata.annotations "policies.done") }}
           {{- if and (not (hasKey $no.metadata.labels "node-role.kubernetes.io/worker")) (not (hasKey $no.metadata.labels "kubernetes.io/hostname")) }}
@@ -877,7 +877,7 @@ spec:
               metadata:
                 name: {{ $no.metadata.name }}
                 annotations:
-                  policies.done: {{ now | date }}
+                  policies.done: {{ now }}
                 labels:
                   kubernetes.io/hostname: {{ $no.metadata.name }}
                   node-role.kubernetes.io/infra: ""
