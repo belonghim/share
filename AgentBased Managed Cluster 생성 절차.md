@@ -851,6 +851,9 @@ spec:
       filesystems:
         - device: /dev/disk/by-partlabel/data-1
           format: xfs
+          mountOptions:
+            - defaults
+            - prjquota
           path: /var/lib/containers
           wipeFilesystem: true
     systemd:
@@ -865,6 +868,7 @@ spec:
             Where=/var/lib/containers
             What=/dev/disk/by-partlabel/data-1
             Type=xfs
+            Options=defaults,prjquota
 
             [Install]
             RequiredBy=local-fs.target
