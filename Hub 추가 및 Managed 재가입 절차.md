@@ -211,7 +211,8 @@ metadata:
 spec:
   nodePlacement:
     tolerations:
-    - operator: Exists
+    - key: node-role.kubernetes.io/infra
+      operator: Exists
       effect: NoSchedule
 ---
 apiVersion: addon.open-cluster-management.io/v1alpha1
