@@ -199,6 +199,39 @@ $ oc -n open-cluster-management wait --timeout=10m mch/multiclusterhub --for=jso
 
 ```
 
+### Update ClusterManagementAddon 
+```
+## Create AddOnDeploymentConfig
+$ oc create -f - <<EOF
+apiVersion: addon.open-cluster-management.io/v1alpha1
+kind: AddOnDeploymentConfig
+metadata:
+  name: managed
+  namespace: open-cluster-management-hub
+spec:
+  nodePlacement:
+    tolerations:
+      - key: node-role.kubernetes.io/infra
+        operator: Exists
+        effect: NoSchedule
+---
+apiVersion: addon.open-cluster-management.io/v1alpha1
+kind: AddOnDeploymentConfig
+metadata:
+  name: hub
+  namespace: open-cluster-management-hub
+spec:
+  nodePlacement:
+    tolerations:
+      - key: node-role.kubernetes.io/infra
+        operator: Exists
+        effect: NoSchedule
+    nodeSelector:
+      node-role.kubernetes.io/acm: ""
+EOF
+
+```
+
 ### Create Namespace/policies
 ```
 ## Create Namespace, ManagedClusterSetBinding
