@@ -387,6 +387,8 @@ spec:
                 matchExpressions:
                 - key: node-role.kubernetes.io/infra
                   operator: Exists
+                - key: node-role.kubernetes.io/worker
+                  operator: DoesNotExist
               unhealthyConditions:
               - duration: 300s
                 status: "False"

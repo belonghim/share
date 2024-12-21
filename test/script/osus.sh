@@ -1,4 +1,5 @@
-REGISTRY=gps03.redhat.lab:5000
+if [ "$REGISTRY" = "" ];then REGISTRY=$1;fi
+if [ "$REGISTRY" = "" ];then echo "Example: osus.sh <registry>";exit 1;fi
 REPO=ocp4
 
 cat <<EOF
