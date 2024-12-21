@@ -174,10 +174,11 @@ $ oc apply -f ../mzc.yaml
 $ cd ../script
 
 ## Test osus policy
-$ sh hub-osus.sh
+$ export REGISTRY=gps03.redhat.lab:5000
+$ sh osus.sh
 
 ## Apply osus policy
-$ sh hub-osus.sh | oc create -f -
+$ sh osus.sh | oc create -f -
 
 ```
 
