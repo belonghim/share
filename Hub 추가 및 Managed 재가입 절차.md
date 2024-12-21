@@ -194,43 +194,8 @@ $ oc -n open-cluster-management wait --timeout=10m mch/multiclusterhub --for=jso
 ## Wait until the MCE is available
 $ oc wait --timeout=10m mce/multiclusterengine --for=jsonpath={.status.phase}=Available
 
-```
-
-### Update ClusterManagementAddon 
-```
-## Create AddOnDeploymentConfig
-$ oc create -f - <<EOF
-apiVersion: addon.open-cluster-management.io/v1alpha1
-kind: AddOnDeploymentConfig
-metadata:
-  name: managed
-  namespace: open-cluster-management-hub
-spec:
-  nodePlacement:
-    tolerations:
-      - key: node-role.kubernetes.io/infra
-        operator: Exists
-        effect: NoSchedule
----
-apiVersion: addon.open-cluster-management.io/v1alpha1
-kind: AddOnDeploymentConfig
-metadata:
-  name: hub
-  namespace: open-cluster-management-hub
-spec:
-  nodePlacement:
-    tolerations:
-      - key: node-role.kubernetes.io/infra
-        operator: Exists
-        effect: NoSchedule
-    nodeSelector:
-      node-role.kubernetes.io/acm: ""
-EOF
-
-## Update ClusterManagementAddon
-$ for f in $(oc get clustermanagementaddon -oname);do
-oc patch $f --type='json' -p='[{"op":"add", "path":"/spec/supportedConfigs", "value":[{"group":"addon.open-cluster-management.io","resource":"addondeploymentconfigs", "defaultConfig":{"name":"global","namespace":"open-cluster-management-hub"}}]}]'
-done
+## Wait until the MCH is running
+$ oc -n open-cluster-management wait --timeout=10m mch/multiclusterhub --for=jsonpath={.status.phase}=Running
 
 ```
 
