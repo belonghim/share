@@ -59,7 +59,7 @@ spec:
 EOF
 
 ## Wait until the CSV is succeeded
-$ while ! oc -n open-cluster-management wait csv -l \!olm.copiedFrom --for=jsonpath={.status.phase}=Succeeded;do echo sleep 10;done
+$ while ! oc -n open-cluster-management wait csv -l \!olm.copiedFrom --for=jsonpath={.status.phase}=Succeeded;do sleep 10;done
 ```
 
 ## Create MultiClusterHub
