@@ -346,13 +346,12 @@ spec:
               - effect: NoSchedule
                 key: node-role.kubernetes.io/infra
                 operator: Exists
-              isSoftwareRebootEnabled: false
         - complianceType: musthave
           objectDefinition:
             apiVersion: remediation.medik8s.io/v1alpha1
             kind: NodeHealthCheck
             metadata:
-              name: nodehealthcheck-sample-worker
+              name: nodehealthcheck-master
             spec:
               minHealthy: 51%
               remediationTemplate:
@@ -362,7 +361,7 @@ spec:
                 namespace: openshift-workload-availability
               selector:
                 matchExpressions:
-                - key: node-role.kubernetes.io/worker
+                - key: node-role.kubernetes.io/master
                   operator: Exists
               unhealthyConditions:
               - duration: 300s
@@ -376,7 +375,33 @@ spec:
             apiVersion: remediation.medik8s.io/v1alpha1
             kind: NodeHealthCheck
             metadata:
-              name: nodehealthcheck-sample-infra
+              name: nodehealthcheck-worker
+            spec:
+              minHealthy: 51%
+              remediationTemplate:
+                apiVersion: self-node-remediation.medik8s.io/v1alpha1
+                kind: SelfNodeRemediationTemplate
+                name: self-node-remediation-automatic-strategy-template
+                namespace: openshift-workload-availability
+              selector:
+                matchExpressions:
+                - key: node-role.kubernetes.io/worker
+                  operator: Exists
+                - key: node-role.kubernetes.io/master
+                  operator: DoesNotExist
+              unhealthyConditions:
+              - duration: 300s
+                status: "False"
+                type: Ready
+              - duration: 300s
+                status: Unknown
+                type: Ready
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: remediation.medik8s.io/v1alpha1
+            kind: NodeHealthCheck
+            metadata:
+              name: nodehealthcheck-infra
             spec:
               minHealthy: 51%
               remediationTemplate:
