@@ -9,13 +9,16 @@ spec:
   - effect: NoSchedule
     operator: Exists
     key: node-role.kubernetes.io/infra
+  peerApiServerTimeout: 30s
+  peerDialTimeout: 30s
+  peerRequestTimeout: 30s
 ---
 apiVersion: remediation.medik8s.io/v1alpha1
 kind: NodeHealthCheck
 metadata:
   name: nodehealthcheck-master
 spec:
-  minHealthy: 51%
+  minHealthy: 90%
   remediationTemplate:
     apiVersion: self-node-remediation.medik8s.io/v1alpha1
     name: self-node-remediation-automatic-strategy-template

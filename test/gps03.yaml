@@ -346,6 +346,9 @@ spec:
               - effect: NoSchedule
                 key: node-role.kubernetes.io/infra
                 operator: Exists
+              peerApiServerTimeout: 30s
+              peerDialTimeout: 30s
+              peerRequestTimeout: 30s
         - complianceType: musthave
           objectDefinition:
             apiVersion: remediation.medik8s.io/v1alpha1
@@ -353,7 +356,7 @@ spec:
             metadata:
               name: nodehealthcheck-master
             spec:
-              minHealthy: 51%
+              minHealthy: 90%
               remediationTemplate:
                 apiVersion: self-node-remediation.medik8s.io/v1alpha1
                 kind: SelfNodeRemediationTemplate
@@ -542,6 +545,13 @@ spec:
               name: cluster-logging
               namespace: openshift-logging
             spec:
+              config:
+                nodeSelector:
+                  node-role.kubernetes.io/infra: ""
+                tolerations:
+                - effect: NoSchedule
+                  key: node-role.kubernetes.io/infra
+                  operator: Exists
               name: cluster-logging
               source: cs-redhat-operator-index
               sourceNamespace: openshift-marketplace
@@ -571,6 +581,13 @@ spec:
               name: kubernetes-nmstate-operator
               namespace: openshift-nmstate
             spec:
+              config:
+                nodeSelector:
+                  node-role.kubernetes.io/infra: ""
+                tolerations:
+                - effect: NoSchedule
+                  key: node-role.kubernetes.io/infra
+                  operator: Exists
               name: kubernetes-nmstate-operator
               source: cs-redhat-operator-index
               sourceNamespace: openshift-marketplace
@@ -597,6 +614,13 @@ spec:
               name: node-healthcheck-operator
               namespace: openshift-workload-availability
             spec:
+              config:
+                nodeSelector:
+                  node-role.kubernetes.io/infra: ""
+                tolerations:
+                - effect: NoSchedule
+                  key: node-role.kubernetes.io/infra
+                  operator: Exists
               name: node-healthcheck-operator
               source: cs-redhat-operator-index
               sourceNamespace: openshift-marketplace
@@ -608,6 +632,13 @@ spec:
               name: self-node-remediation
               namespace: openshift-workload-availability
             spec:
+              config:
+                nodeSelector:
+                  node-role.kubernetes.io/infra: ""
+                tolerations:
+                - effect: NoSchedule
+                  key: node-role.kubernetes.io/infra
+                  operator: Exists
               name: self-node-remediation
               source: cs-redhat-operator-index
               sourceNamespace: openshift-marketplace
@@ -634,6 +665,13 @@ spec:
               name: metallb-operator
               namespace: metallb-system
             spec:
+              config:
+                nodeSelector:
+                  node-role.kubernetes.io/infra: ""
+                tolerations:
+                - effect: NoSchedule
+                  key: node-role.kubernetes.io/infra
+                  operator: Exists
               name: metallb-operator
               source: cs-redhat-operator-index
               sourceNamespace: openshift-marketplace
@@ -663,6 +701,13 @@ spec:
               name: redhat-oadp-operator
               namespace: openshift-adp
             spec:
+              config:
+                nodeSelector:
+                  node-role.kubernetes.io/infra: ""
+                tolerations:
+                - effect: NoSchedule
+                  key: node-role.kubernetes.io/infra
+                  operator: Exists
               name: redhat-oadp-operator
               source: cs-redhat-operator-index
               sourceNamespace: openshift-marketplace
