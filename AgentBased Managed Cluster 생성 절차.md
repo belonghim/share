@@ -1296,6 +1296,9 @@ $ govc vm.power -on=true $VM
 ```
 ## approval the node csr
 $ NODE=worker2.ocp4.example.com
+$ while ! oc get csr | grep kube-apiserver-client-kubelet | grep Pending;do sleep 10;done
+$ for f in $(oc get csr | grep Pending | awk '{print $1}');do echo $f;oc get csr $f -o jsonpath='{.spec.request}'|base64 --decode|openssl req -noout -text|grep $NODE && oc adm certificate approve $f;done
+$ while ! oc get csr | grep kubelet-serving | grep Pending;do sleep 10;done
 $ for f in $(oc get csr | grep Pending | awk '{print $1}');do echo $f;oc get csr $f -o jsonpath='{.spec.request}'|base64 --decode|openssl req -noout -text|grep $NODE && oc adm certificate approve $f;done
 
 ```
