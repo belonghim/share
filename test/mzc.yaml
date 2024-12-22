@@ -346,6 +346,7 @@ spec:
               - effect: NoSchedule
                 key: node-role.kubernetes.io/infra
                 operator: Exists
+              isSoftwareRebootEnabled: false
         - complianceType: musthave
           objectDefinition:
             apiVersion: remediation.medik8s.io/v1alpha1
