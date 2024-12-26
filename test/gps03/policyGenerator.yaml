@@ -92,6 +92,13 @@ policies:
   policySets:
   - hub
 # Config operators hub Policies - end
+# Config operators managed Policies - start
+- name: config-operators-managed
+  manifests:
+  - path: config/config-operators-managed.yaml
+  policySets:
+  - managed
+# Config operators managed Policies - end
 # CV check Policies - start
 - name: check-cv
   complianceType: mustnothave

@@ -501,6 +501,49 @@ metadata:
     policy.open-cluster-management.io/standards: NIST SP 800-53
   labels:
     open-cluster-management.io/policy-set: opp
+  name: config-operators-managed
+  namespace: policies
+spec:
+  disabled: false
+  policy-templates:
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: config-operators-managed
+      spec:
+        object-templates:
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: v1
+            kind: Namespace
+            metadata:
+              annotations:
+                openshift.io/node-selector: node-role.kubernetes.io/infra=""
+              name: open-cluster-management-agent
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: v1
+            kind: Namespace
+            metadata:
+              annotations:
+                openshift.io/node-selector: node-role.kubernetes.io/infra=""
+              name: open-cluster-management-agent-addon
+        remediationAction: enforce
+        severity: medium
+  remediationAction: enforce
+---
+apiVersion: policy.open-cluster-management.io/v1
+kind: Policy
+metadata:
+  annotations:
+    argocd.argoproj.io/compare-options: IgnoreExtraneous
+    policy.open-cluster-management.io/categories: CM Configuration Management
+    policy.open-cluster-management.io/controls: CM-2 Baseline Configuration
+    policy.open-cluster-management.io/description: ""
+    policy.open-cluster-management.io/standards: NIST SP 800-53
+  labels:
+    open-cluster-management.io/policy-set: opp
   name: install-operators
   namespace: policies
 spec:
@@ -519,6 +562,64 @@ spec:
         name: install-operators
       spec:
         object-templates:
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: v1
+            kind: Namespace
+            metadata:
+              annotations:
+                scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator":"Exists","effect":"NoSchedule","key":"node-role.kubernetes.io/infra"}]'
+              name: openshift-storage
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: operators.coreos.com/v1
+            kind: OperatorGroup
+            metadata:
+              name: openshift-storage
+              namespace: openshift-storage
+            spec:
+              targetNamespaces:
+              - openshift-storage
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: operators.coreos.com/v1alpha1
+            kind: Subscription
+            metadata:
+              name: lvms-operator
+              namespace: openshift-storage
+            spec:
+              name: lvms-operator
+              source: cs-redhat-operator-index
+              sourceNamespace: openshift-marketplace
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: v1
+            kind: Namespace
+            metadata:
+              annotations:
+                scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator":"Exists","effect":"NoSchedule","key":"node-role.kubernetes.io/infra"}]'
+              name: openshift-local-storage
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: operators.coreos.com/v1
+            kind: OperatorGroup
+            metadata:
+              name: openshift-local-storage
+              namespace: openshift-local-storage
+            spec:
+              targetNamespaces:
+              - openshift-local-storage
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: operators.coreos.com/v1alpha1
+            kind: Subscription
+            metadata:
+              name: local-storage-operator
+              namespace: openshift-local-storage
+            spec:
+              name: local-storage-operator
+              source: cs-redhat-operator-index
+              sourceNamespace: openshift-marketplace
         - complianceType: musthave
           objectDefinition:
             apiVersion: v1
@@ -584,6 +685,33 @@ spec:
             metadata:
               annotations:
                 scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator":"Exists","effect":"NoSchedule","key":"node-role.kubernetes.io/infra"}]'
+              name: openshift-gitops-operator
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: operators.coreos.com/v1
+            kind: OperatorGroup
+            metadata:
+              name: openshift-gitops-operator
+              namespace: openshift-gitops-operator
+            spec: null
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: operators.coreos.com/v1alpha1
+            kind: Subscription
+            metadata:
+              name: openshift-gitops-operator
+              namespace: openshift-gitops-operator
+            spec:
+              name: openshift-gitops-operator
+              source: cs-redhat-operator-index
+              sourceNamespace: openshift-marketplace
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: v1
+            kind: Namespace
+            metadata:
+              annotations:
+                scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator":"Exists","effect":"NoSchedule","key":"node-role.kubernetes.io/infra"}]'
               name: openshift-workload-availability
         - complianceType: musthave
           objectDefinition:
@@ -612,6 +740,17 @@ spec:
               namespace: openshift-workload-availability
             spec:
               name: self-node-remediation
+              source: cs-redhat-operator-index
+              sourceNamespace: openshift-marketplace
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: operators.coreos.com/v1alpha1
+            kind: Subscription
+            metadata:
+              name: node-maintenance-operator
+              namespace: openshift-workload-availability
+            spec:
+              name: node-maintenance-operator
               source: cs-redhat-operator-index
               sourceNamespace: openshift-marketplace
         - complianceType: musthave
@@ -638,6 +777,225 @@ spec:
               namespace: metallb-system
             spec:
               name: metallb-operator
+              source: cs-redhat-operator-index
+              sourceNamespace: openshift-marketplace
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: v1
+            kind: Namespace
+            metadata:
+              annotations:
+                scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator":"Exists","effect":"NoSchedule","key":"node-role.kubernetes.io/infra"}]'
+              name: openshift-operators
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: operators.coreos.com/v1alpha1
+            kind: Subscription
+            metadata:
+              name: servicemeshoperator
+              namespace: openshift-operators
+            spec:
+              name: servicemeshoperator
+              source: cs-redhat-operator-index
+              sourceNamespace: openshift-marketplace
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: operators.coreos.com/v1alpha1
+            kind: Subscription
+            metadata:
+              name: kiali-ossm
+              namespace: openshift-operators
+            spec:
+              name: kiali-ossm
+              source: cs-redhat-operator-index
+              sourceNamespace: openshift-marketplace
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: operators.coreos.com/v1alpha1
+            kind: Subscription
+            metadata:
+              name: jaeger-product
+              namespace: openshift-operators
+            spec:
+              name: jaeger-product
+              source: cs-redhat-operator-index
+              sourceNamespace: openshift-marketplace
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: operators.coreos.com/v1alpha1
+            kind: Subscription
+            metadata:
+              name: web-terminal
+              namespace: openshift-operators
+            spec:
+              name: web-terminal
+              source: cs-redhat-operator-index
+              sourceNamespace: openshift-marketplace
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: operators.coreos.com/v1alpha1
+            kind: Subscription
+            metadata:
+              name: devworkspace-operator
+              namespace: openshift-operators
+            spec:
+              name: devworkspace-operator
+              source: cs-redhat-operator-index
+              sourceNamespace: openshift-marketplace
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: v1
+            kind: Namespace
+            metadata:
+              annotations:
+                scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator":"Exists","effect":"NoSchedule","key":"node-role.kubernetes.io/infra"}]'
+              name: openshift-tempo-operator
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: operators.coreos.com/v1
+            kind: OperatorGroup
+            metadata:
+              name: openshift-tempo-operator
+              namespace: openshift-tempo-operator
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: operators.coreos.com/v1alpha1
+            kind: Subscription
+            metadata:
+              name: tempo-product
+              namespace: openshift-tempo-operator
+            spec:
+              name: tempo-product
+              source: cs-redhat-operator-index
+              sourceNamespace: openshift-marketplace
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: v1
+            kind: Namespace
+            metadata:
+              annotations:
+                scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator":"Exists","effect":"NoSchedule","key":"node-role.kubernetes.io/infra"}]'
+              name: openshift-opentelemetry-operator
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: operators.coreos.com/v1
+            kind: OperatorGroup
+            metadata:
+              name: openshift-opentelemetry-operator
+              namespace: openshift-opentelemetry-operator
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: operators.coreos.com/v1alpha1
+            kind: Subscription
+            metadata:
+              name: opentelemetry-product
+              namespace: openshift-opentelemetry-operator
+            spec:
+              name: opentelemetry-product
+              source: cs-redhat-operator-index
+              sourceNamespace: openshift-marketplace
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: v1
+            kind: Namespace
+            metadata:
+              annotations:
+                scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator":"Exists","effect":"NoSchedule","key":"node-role.kubernetes.io/infra"}]'
+              name: openshift-netobserv-operator
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: operators.coreos.com/v1
+            kind: OperatorGroup
+            metadata:
+              name: openshift-netobserv-operator
+              namespace: openshift-netobserv-operator
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: operators.coreos.com/v1alpha1
+            kind: Subscription
+            metadata:
+              name: netobserv-operator
+              namespace: openshift-netobserv-operator
+            spec:
+              name: netobserv-operator
+              source: cs-redhat-operator-index
+              sourceNamespace: openshift-marketplace
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: v1
+            kind: Namespace
+            metadata:
+              annotations:
+                scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator":"Exists","effect":"NoSchedule","key":"node-role.kubernetes.io/infra"}]'
+              name: node-observability-operator
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: operators.coreos.com/v1
+            kind: OperatorGroup
+            metadata:
+              name: node-observability-operator
+              namespace: node-observability-operator
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: operators.coreos.com/v1alpha1
+            kind: Subscription
+            metadata:
+              name: node-observability-operator
+              namespace: node-observability-operator
+            spec:
+              name: node-observability-operator
+              source: cs-redhat-operator-index
+              sourceNamespace: openshift-marketplace
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: v1
+            kind: Namespace
+            metadata:
+              annotations:
+                scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator":"Exists","effect":"NoSchedule","key":"node-role.kubernetes.io/infra"}]'
+              name: openshift-keda
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: operators.coreos.com/v1
+            kind: OperatorGroup
+            metadata:
+              name: openshift-keda
+              namespace: openshift-keda
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: operators.coreos.com/v1alpha1
+            kind: Subscription
+            metadata:
+              name: openshift-custom-metrics-autoscaler-operator
+              namespace: openshift-keda
+            spec:
+              name: openshift-custom-metrics-autoscaler-operator
+              source: cs-redhat-operator-index
+              sourceNamespace: openshift-marketplace
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: v1
+            kind: Namespace
+            metadata:
+              annotations:
+                scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator":"Exists","effect":"NoSchedule","key":"node-role.kubernetes.io/infra"}]'
+              name: openshift-vertical-pod-autoscaler
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: operators.coreos.com/v1
+            kind: OperatorGroup
+            metadata:
+              name: openshift-vertical-pod-autoscaler
+              namespace: openshift-vertical-pod-autoscaler
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: operators.coreos.com/v1alpha1
+            kind: Subscription
+            metadata:
+              name: vertical-pod-autoscaler
+              namespace: openshift-vertical-pod-autoscaler
+            spec:
+              name: vertical-pod-autoscaler
               source: cs-redhat-operator-index
               sourceNamespace: openshift-marketplace
         - complianceType: musthave
@@ -676,26 +1034,26 @@ spec:
             metadata:
               annotations:
                 scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator":"Exists","effect":"NoSchedule","key":"node-role.kubernetes.io/infra"}]'
-              name: openshift-compliance
+              name: cert-manager-operator
         - complianceType: musthave
           objectDefinition:
             apiVersion: operators.coreos.com/v1
             kind: OperatorGroup
             metadata:
-              name: openshift-compliance
-              namespace: openshift-compliance
+              name: cert-manager-operator
+              namespace: cert-manager-operator
             spec:
               targetNamespaces:
-              - openshift-compliance
+              - cert-manager-operator
         - complianceType: musthave
           objectDefinition:
             apiVersion: operators.coreos.com/v1alpha1
             kind: Subscription
             metadata:
-              name: compliance-operator
-              namespace: openshift-compliance
+              name: openshift-cert-manager-operator
+              namespace: cert-manager-operator
             spec:
-              name: compliance-operator
+              name: openshift-cert-manager-operator
               source: cs-redhat-operator-index
               sourceNamespace: openshift-marketplace
         remediationAction: enforce
@@ -868,7 +1226,7 @@ spec:
           noncompliant: 1m
         object-templates-raw: |
           {{- range $no := (lookup "v1" "Node" "" "" "!node-role.kubernetes.io/master").items }}
-          {{- if (hasPrefix "infra" $no.metadata.name) }}
+          {{- if (regexMatch "^[a-z]{5}inf[0-9]" $no.metadata.name) }}
           {{- if not (hasKey $no.metadata.annotations "policies.done") }}
           {{- if (hasKey $no.metadata.labels "node-role.kubernetes.io/worker") }}
           - complianceType: musthave
@@ -898,7 +1256,7 @@ spec:
       spec:
         object-templates-raw: |
           {{- range $no := (lookup "v1" "Node" "" "" "!node-role.kubernetes.io/master").items }}
-          {{- if (hasPrefix "infra" $no.metadata.name) }}
+          {{- if (regexMatch "^[a-z]{5}inf[0-9]" $no.metadata.name) }}
           {{- if not (hasKey $no.metadata.annotations "policies.done") }}
           {{- if and (not (hasKey $no.metadata.labels "node-role.kubernetes.io/worker")) (not (hasKey $no.metadata.labels "kubernetes.io/hostname")) }}
           - complianceType: musthave
@@ -1528,6 +1886,7 @@ spec:
   - check-csv
   - check-cv
   - config-operators
+  - config-operators-managed
   - install-operators
   - node-infra-label
   - node-infra-toleration
