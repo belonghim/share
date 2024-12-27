@@ -501,6 +501,49 @@ metadata:
     policy.open-cluster-management.io/standards: NIST SP 800-53
   labels:
     open-cluster-management.io/policy-set: opp
+  name: config-operators-managed
+  namespace: policies
+spec:
+  disabled: false
+  policy-templates:
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: config-operators-managed
+      spec:
+        object-templates:
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: v1
+            kind: Namespace
+            metadata:
+              annotations:
+                openshift.io/node-selector: node-role.kubernetes.io/infra=""
+              name: open-cluster-management-agent
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: v1
+            kind: Namespace
+            metadata:
+              annotations:
+                openshift.io/node-selector: node-role.kubernetes.io/infra=""
+              name: open-cluster-management-agent-addon
+        remediationAction: enforce
+        severity: medium
+  remediationAction: enforce
+---
+apiVersion: policy.open-cluster-management.io/v1
+kind: Policy
+metadata:
+  annotations:
+    argocd.argoproj.io/compare-options: IgnoreExtraneous
+    policy.open-cluster-management.io/categories: CM Configuration Management
+    policy.open-cluster-management.io/controls: CM-2 Baseline Configuration
+    policy.open-cluster-management.io/description: ""
+    policy.open-cluster-management.io/standards: NIST SP 800-53
+  labels:
+    open-cluster-management.io/policy-set: opp
   name: install-operators
   namespace: policies
 spec:
@@ -910,7 +953,7 @@ spec:
           noncompliant: 1m
         object-templates-raw: |
           {{- range $no := (lookup "v1" "Node" "" "" "!node-role.kubernetes.io/master").items }}
-          {{- if (hasPrefix "infra" $no.metadata.name) }}
+          {{- if (regexMatch "infra" $no.metadata.name) }}
           {{- if not (hasKey $no.metadata.annotations "policies.done") }}
           {{- if (hasKey $no.metadata.labels "node-role.kubernetes.io/worker") }}
           - complianceType: musthave
@@ -940,7 +983,7 @@ spec:
       spec:
         object-templates-raw: |
           {{- range $no := (lookup "v1" "Node" "" "" "!node-role.kubernetes.io/master").items }}
-          {{- if (hasPrefix "infra" $no.metadata.name) }}
+          {{- if (regexMatch "infra" $no.metadata.name) }}
           {{- if not (hasKey $no.metadata.annotations "policies.done") }}
           {{- if and (not (hasKey $no.metadata.labels "node-role.kubernetes.io/worker")) (not (hasKey $no.metadata.labels "kubernetes.io/hostname")) }}
           - complianceType: musthave
@@ -1570,6 +1613,7 @@ spec:
   - check-csv
   - check-cv
   - config-operators
+  - config-operators-managed
   - install-operators
   - node-infra-label
   - node-infra-toleration
