@@ -1226,7 +1226,7 @@ spec:
           noncompliant: 1m
         object-templates-raw: |
           {{- range $no := (lookup "v1" "Node" "" "" "!node-role.kubernetes.io/master").items }}
-          {{- if (regexMatch "^[a-z]{5}inf[0-9]" $no.metadata.name) }}
+          {{- if (regexMatch "inf[0-9]{2}" $no.metadata.name) }}
           {{- if not (hasKey $no.metadata.annotations "policies.done") }}
           {{- if (hasKey $no.metadata.labels "node-role.kubernetes.io/worker") }}
           - complianceType: musthave
@@ -1256,7 +1256,7 @@ spec:
       spec:
         object-templates-raw: |
           {{- range $no := (lookup "v1" "Node" "" "" "!node-role.kubernetes.io/master").items }}
-          {{- if (regexMatch "^[a-z]{5}inf[0-9]" $no.metadata.name) }}
+          {{- if (regexMatch "inf[0-9]{2}" $no.metadata.name) }}
           {{- if not (hasKey $no.metadata.annotations "policies.done") }}
           {{- if and (not (hasKey $no.metadata.labels "node-role.kubernetes.io/worker")) (not (hasKey $no.metadata.labels "kubernetes.io/hostname")) }}
           - complianceType: musthave
