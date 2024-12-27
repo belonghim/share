@@ -24,6 +24,13 @@ spec:
   name: lvms-operator
   source: cs-redhat-operator-index
   sourceNamespace: openshift-marketplace
+  config:
+    nodeSelector:
+      node-role.kubernetes.io/infra: ""
+    tolerations:
+    - effect: NoSchedule
+      operator: Exists
+      key: node-role.kubernetes.io/infra
 ---
 apiVersion: v1
 kind: Namespace
@@ -50,6 +57,13 @@ spec:
   name: local-storage-operator
   source: cs-redhat-operator-index
   sourceNamespace: openshift-marketplace
+  config:
+    nodeSelector:
+      node-role.kubernetes.io/infra: ""
+    tolerations:
+    - effect: NoSchedule
+      operator: Exists
+      key: node-role.kubernetes.io/infra
 ---
 apiVersion: v1
 kind: Namespace
@@ -76,6 +90,13 @@ spec:
   name: cluster-logging
   source: cs-redhat-operator-index
   sourceNamespace: openshift-marketplace
+  config:
+    nodeSelector:
+      node-role.kubernetes.io/infra: ""
+    tolerations:
+    - effect: NoSchedule
+      operator: Exists
+      key: node-role.kubernetes.io/infra
 ---
 apiVersion: v1
 kind: Namespace
@@ -102,6 +123,13 @@ spec:
   name: kubernetes-nmstate-operator
   source: cs-redhat-operator-index
   sourceNamespace: openshift-marketplace
+  config:
+    nodeSelector:
+      node-role.kubernetes.io/infra: ""
+    tolerations:
+    - effect: NoSchedule
+      operator: Exists
+      key: node-role.kubernetes.io/infra
 ---
 apiVersion: v1
 kind: Namespace
@@ -126,6 +154,13 @@ spec:
   name: openshift-gitops-operator
   source: cs-redhat-operator-index
   sourceNamespace: openshift-marketplace
+  config:
+    nodeSelector:
+      node-role.kubernetes.io/infra: ""
+    tolerations:
+    - effect: NoSchedule
+      operator: Exists
+      key: node-role.kubernetes.io/infra
 ---
 apiVersion: v1
 kind: Namespace
@@ -149,6 +184,13 @@ spec:
   name: node-healthcheck-operator
   source: cs-redhat-operator-index
   sourceNamespace: openshift-marketplace
+  config:
+    nodeSelector:
+      node-role.kubernetes.io/infra: ""
+    tolerations:
+    - effect: NoSchedule
+      operator: Exists
+      key: node-role.kubernetes.io/infra
 ---
 apiVersion: operators.coreos.com/v1alpha1
 kind: Subscription
@@ -159,6 +201,13 @@ spec:
   name: self-node-remediation
   source: cs-redhat-operator-index
   sourceNamespace: openshift-marketplace
+  config:
+    nodeSelector:
+      node-role.kubernetes.io/infra: ""
+    tolerations:
+    - effect: NoSchedule
+      operator: Exists
+      key: node-role.kubernetes.io/infra
 ---
 apiVersion: operators.coreos.com/v1alpha1
 kind: Subscription
@@ -169,6 +218,13 @@ spec:
   name: node-maintenance-operator
   source: cs-redhat-operator-index
   sourceNamespace: openshift-marketplace
+  config:
+    nodeSelector:
+      node-role.kubernetes.io/infra: ""
+    tolerations:
+    - effect: NoSchedule
+      operator: Exists
+      key: node-role.kubernetes.io/infra
 ---
 apiVersion: v1
 kind: Namespace
@@ -192,6 +248,13 @@ spec:
   name: metallb-operator
   source: cs-redhat-operator-index
   sourceNamespace: openshift-marketplace
+  config:
+    nodeSelector:
+      node-role.kubernetes.io/infra: ""
+    tolerations:
+    - effect: NoSchedule
+      operator: Exists
+      key: node-role.kubernetes.io/infra
 ---
 apiVersion: v1
 kind: Namespace
@@ -209,6 +272,13 @@ spec:
   name: servicemeshoperator
   source: cs-redhat-operator-index
   sourceNamespace: openshift-marketplace
+  config:
+    nodeSelector:
+      node-role.kubernetes.io/infra: ""
+    tolerations:
+    - effect: NoSchedule
+      operator: Exists
+      key: node-role.kubernetes.io/infra
 ---
 apiVersion: operators.coreos.com/v1alpha1
 kind: Subscription
@@ -219,6 +289,13 @@ spec:
   name: kiali-ossm
   source: cs-redhat-operator-index
   sourceNamespace: openshift-marketplace
+  config:
+    nodeSelector:
+      node-role.kubernetes.io/infra: ""
+    tolerations:
+    - effect: NoSchedule
+      operator: Exists
+      key: node-role.kubernetes.io/infra
 ---
 apiVersion: operators.coreos.com/v1alpha1
 kind: Subscription
@@ -229,6 +306,13 @@ spec:
   name: jaeger-product
   source: cs-redhat-operator-index
   sourceNamespace: openshift-marketplace
+  config:
+    nodeSelector:
+      node-role.kubernetes.io/infra: ""
+    tolerations:
+    - effect: NoSchedule
+      operator: Exists
+      key: node-role.kubernetes.io/infra
 ---
 apiVersion: operators.coreos.com/v1alpha1
 kind: Subscription
@@ -239,6 +323,13 @@ spec:
   name: web-terminal
   source: cs-redhat-operator-index
   sourceNamespace: openshift-marketplace
+  config:
+    nodeSelector:
+      node-role.kubernetes.io/infra: ""
+    tolerations:
+    - effect: NoSchedule
+      operator: Exists
+      key: node-role.kubernetes.io/infra
 ---
 apiVersion: operators.coreos.com/v1alpha1
 kind: Subscription
@@ -249,6 +340,13 @@ spec:
   name: devworkspace-operator
   source: cs-redhat-operator-index
   sourceNamespace: openshift-marketplace
+  config:
+    nodeSelector:
+      node-role.kubernetes.io/infra: ""
+    tolerations:
+    - effect: NoSchedule
+      operator: Exists
+      key: node-role.kubernetes.io/infra
 ---
 apiVersion: v1
 kind: Namespace
@@ -272,6 +370,13 @@ spec:
   name: tempo-product
   source: cs-redhat-operator-index
   sourceNamespace: openshift-marketplace
+  config:
+    nodeSelector:
+      node-role.kubernetes.io/infra: ""
+    tolerations:
+    - effect: NoSchedule
+      operator: Exists
+      key: node-role.kubernetes.io/infra
 ---
 apiVersion: v1
 kind: Namespace
@@ -295,6 +400,13 @@ spec:
   name: opentelemetry-product
   source: cs-redhat-operator-index
   sourceNamespace: openshift-marketplace
+  config:
+    nodeSelector:
+      node-role.kubernetes.io/infra: ""
+    tolerations:
+    - effect: NoSchedule
+      operator: Exists
+      key: node-role.kubernetes.io/infra
 ---
 apiVersion: v1
 kind: Namespace
@@ -318,6 +430,13 @@ spec:
   name: netobserv-operator
   source: cs-redhat-operator-index
   sourceNamespace: openshift-marketplace
+  config:
+    nodeSelector:
+      node-role.kubernetes.io/infra: ""
+    tolerations:
+    - effect: NoSchedule
+      operator: Exists
+      key: node-role.kubernetes.io/infra
 ---
 apiVersion: v1
 kind: Namespace
@@ -341,6 +460,13 @@ spec:
   name: node-observability-operator
   source: cs-redhat-operator-index
   sourceNamespace: openshift-marketplace
+  config:
+    nodeSelector:
+      node-role.kubernetes.io/infra: ""
+    tolerations:
+    - effect: NoSchedule
+      operator: Exists
+      key: node-role.kubernetes.io/infra
 ---
 apiVersion: v1
 kind: Namespace
@@ -364,6 +490,13 @@ spec:
   name: openshift-custom-metrics-autoscaler-operator
   source: cs-redhat-operator-index
   sourceNamespace: openshift-marketplace
+  config:
+    nodeSelector:
+      node-role.kubernetes.io/infra: ""
+    tolerations:
+    - effect: NoSchedule
+      operator: Exists
+      key: node-role.kubernetes.io/infra
 ---
 apiVersion: v1
 kind: Namespace
@@ -387,6 +520,13 @@ spec:
   name: vertical-pod-autoscaler
   source: cs-redhat-operator-index
   sourceNamespace: openshift-marketplace
+  config:
+    nodeSelector:
+      node-role.kubernetes.io/infra: ""
+    tolerations:
+    - effect: NoSchedule
+      operator: Exists
+      key: node-role.kubernetes.io/infra
 ---
 apiVersion: v1
 kind: Namespace
@@ -413,6 +553,13 @@ spec:
   name: redhat-oadp-operator
   source: cs-redhat-operator-index
   sourceNamespace: openshift-marketplace
+  config:
+    nodeSelector:
+      node-role.kubernetes.io/infra: ""
+    tolerations:
+    - effect: NoSchedule
+      operator: Exists
+      key: node-role.kubernetes.io/infra
 ---
 apiVersion: v1
 kind: Namespace
@@ -439,4 +586,11 @@ spec:
   name: openshift-cert-manager-operator
   source: cs-redhat-operator-index
   sourceNamespace: openshift-marketplace
+  config:
+    nodeSelector:
+      node-role.kubernetes.io/infra: ""
+    tolerations:
+    - effect: NoSchedule
+      operator: Exists
+      key: node-role.kubernetes.io/infra
 ---

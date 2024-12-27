@@ -754,35 +754,6 @@ spec:
               name: redhat-oadp-operator
               source: cs-redhat-operator-index
               sourceNamespace: openshift-marketplace
-        - complianceType: musthave
-          objectDefinition:
-            apiVersion: v1
-            kind: Namespace
-            metadata:
-              annotations:
-                scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator":"Exists","effect":"NoSchedule","key":"node-role.kubernetes.io/infra"}]'
-              name: openshift-compliance
-        - complianceType: musthave
-          objectDefinition:
-            apiVersion: operators.coreos.com/v1
-            kind: OperatorGroup
-            metadata:
-              name: openshift-compliance
-              namespace: openshift-compliance
-            spec:
-              targetNamespaces:
-              - openshift-compliance
-        - complianceType: musthave
-          objectDefinition:
-            apiVersion: operators.coreos.com/v1alpha1
-            kind: Subscription
-            metadata:
-              name: compliance-operator
-              namespace: openshift-compliance
-            spec:
-              name: compliance-operator
-              source: cs-redhat-operator-index
-              sourceNamespace: openshift-marketplace
         remediationAction: enforce
         severity: medium
   remediationAction: enforce
