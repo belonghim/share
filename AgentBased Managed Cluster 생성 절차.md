@@ -69,7 +69,7 @@ done; unset IFS
 ## Set mac address
 $ IFS=$'\n'; for VM in $(govc ls /<datacenter>/vm/<folder_name>)
 do
-  eval Mac_$(basename ${f##*-})=$(govc device.info -json -vm "$VM" ethernet-0 | jq -r '.devices[].macAddress')
+  eval Mac_$(basename ${VM##*-})=$(govc device.info -json -vm "$VM" ethernet-0 | jq -r '.devices[].macAddress')
 done; unset IFS
 
 ## Set DeviceName by-path pci
