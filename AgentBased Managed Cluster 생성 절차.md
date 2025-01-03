@@ -212,7 +212,7 @@ $ cat ${additionalTrustBundle}
 
 ```
 ## image repository 접근 확인
-$ Repository="registry.example.com:5000/release416-12-12"
+$ Repository="registry.example.com:5000/ocp4"
 $ pullSecret="/root/pull-secret" ## registry authentication 파일
 $ cat ${pullSecret}
 $ ReleaseVersion="4.16.12"
@@ -1051,6 +1051,19 @@ data:
       - key: node-role.kubernetes.io/infra
         operator: Exists
         effect: NoSchedule
+EOF
+
+## image-tag-mirror-set-support-tools 설정
+cat > ${INSTALL_DIR}/openshift/image-tag-mirror-set-support-tools.yml<<EOF
+apiVersion: config.openshift.io/v1
+kind: ImageTagMirrorSet
+metadata:
+    name: support-tools
+spec:
+  imageTagMirrors:
+  - mirrors:
+    - ${Repository}/rhel9/support-tools
+    source: registry.redhat.io/rhel9/support-tools
 EOF
 
 ```
