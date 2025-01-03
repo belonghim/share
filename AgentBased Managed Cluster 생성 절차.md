@@ -1218,6 +1218,7 @@ $ mkdir add ;cd add
 $ cat > nodes-config.yaml<<EOF
 hosts:
 - hostname: worker2.ocp4.example.com
+  role: worker
   rootDeviceHints:
     deviceName: /dev/disk/by-path/pci-0000:05:00.0
   interfaces:
