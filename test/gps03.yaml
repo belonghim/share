@@ -754,6 +754,42 @@ spec:
               name: redhat-oadp-operator
               source: cs-redhat-operator-index
               sourceNamespace: openshift-marketplace
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: v1
+            kind: Namespace
+            metadata:
+              annotations:
+                scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator":"Exists","effect":"NoSchedule","key":"node-role.kubernetes.io/infra"}]'
+              name: openshift-storage
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: operators.coreos.com/v1
+            kind: OperatorGroup
+            metadata:
+              name: openshift-storage
+              namespace: openshift-storage
+            spec:
+              targetNamespaces:
+              - openshift-storage
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: operators.coreos.com/v1alpha1
+            kind: Subscription
+            metadata:
+              name: lvms-operator
+              namespace: openshift-storage
+            spec:
+              config:
+                nodeSelector:
+                  node-role.kubernetes.io/infra: ""
+                tolerations:
+                - effect: NoSchedule
+                  key: node-role.kubernetes.io/infra
+                  operator: Exists
+              name: lvms-operator
+              source: cs-redhat-operator-index
+              sourceNamespace: openshift-marketplace
         remediationAction: enforce
         severity: medium
   remediationAction: enforce
