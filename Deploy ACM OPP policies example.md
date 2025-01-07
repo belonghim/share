@@ -147,7 +147,7 @@ spec:
 EOF
 ```
 
-## Install PolicyGenerator
+### Install PolicyGenerator
 ```
 ## download & install PolicyGenerator
 $ wget https://github.com/open-cluster-management-io/policy-generator-plugin/releases/download/v1.16.0/linux-amd64-PolicyGenerator
@@ -157,7 +157,7 @@ $ mkdir -p ${HOME}/.config/kustomize/plugin/policy.open-cluster-management.io/v1
 $ mv linux-amd64-PolicyGenerator ${HOME}/.config/kustomize/plugin/policy.open-cluster-management.io/v1/policygenerator/PolicyGenerator
 ```
 
-## Apply the policies
+### Apply the policies
 ```
 ## Download the git repo
 $ git clone https://github.com/belonghim/share
@@ -182,7 +182,12 @@ $ sh osus.sh | oc create -f -
 
 ```
 
-## Check the policies & operators
+### Apply osus
+```
+$ oc label mcl local-cluster policies.osus=ocp4
+```
+
+### Check the policies & operators
 ```
 ## Check the policies and operators
 $ oc get policy,sub,csv,ip -A -l \!olm.copiedFrom
