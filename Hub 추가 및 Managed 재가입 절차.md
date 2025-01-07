@@ -264,8 +264,13 @@ $ Registry=gps03.redhat.lab:5000
 $ sh script/osus.sh ${Registry}
 
 ## Apply osus policy
-$ sh script/osus.sh | oc create -f -
+$ sh script/osus.sh ${Registry} | oc create -f -
 
+```
+
+### Apply osus
+```
+$ oc label mcl local-cluster policies.osus=ocp4
 ```
 
 ### Check the policies & operators
