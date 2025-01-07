@@ -260,10 +260,11 @@ $ oc apply -f mzc.yaml
 #### Additional policies
 
 ## Test osus policy
-$ sh script/hub-osus.sh
+$ Registry=gps03.redhat.lab:5000
+$ sh script/osus.sh ${Registry}
 
 ## Apply osus policy
-$ sh script/hub-osus.sh | oc create -f -
+$ sh script/osus.sh | oc create -f -
 
 ```
 
