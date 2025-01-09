@@ -229,36 +229,6 @@ spec:
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: metallb-system
-  annotations:
-    scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator":"Exists","effect":"NoSchedule","key":"node-role.kubernetes.io/infra"}]'
----
-apiVersion: operators.coreos.com/v1
-kind: OperatorGroup
-metadata:
-  name: metallb-system
-  namespace: metallb-system
----
-apiVersion: operators.coreos.com/v1alpha1
-kind: Subscription
-metadata:
-  name: metallb-operator
-  namespace: metallb-system
-spec:
-  name: metallb-operator
-  source: cs-redhat-operator-index
-  sourceNamespace: openshift-marketplace
-  config:
-    nodeSelector:
-      node-role.kubernetes.io/infra: ""
-    tolerations:
-    - effect: NoSchedule
-      operator: Exists
-      key: node-role.kubernetes.io/infra
----
-apiVersion: v1
-kind: Namespace
-metadata:
   name: openshift-operators
   annotations:
     scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator":"Exists","effect":"NoSchedule","key":"node-role.kubernetes.io/infra"}]'
@@ -518,72 +488,6 @@ metadata:
   namespace: openshift-vertical-pod-autoscaler
 spec:
   name: vertical-pod-autoscaler
-  source: cs-redhat-operator-index
-  sourceNamespace: openshift-marketplace
-  config:
-    nodeSelector:
-      node-role.kubernetes.io/infra: ""
-    tolerations:
-    - effect: NoSchedule
-      operator: Exists
-      key: node-role.kubernetes.io/infra
----
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: openshift-adp
-  annotations:
-    scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator":"Exists","effect":"NoSchedule","key":"node-role.kubernetes.io/infra"}]'
----
-apiVersion: operators.coreos.com/v1
-kind: OperatorGroup
-metadata:
-  name: openshift-adp
-  namespace: openshift-adp
-spec:
-  targetNamespaces:
-  - openshift-adp
----
-apiVersion: operators.coreos.com/v1alpha1
-kind: Subscription
-metadata:
-  name: redhat-oadp-operator
-  namespace: openshift-adp
-spec:
-  name: redhat-oadp-operator
-  source: cs-redhat-operator-index
-  sourceNamespace: openshift-marketplace
-  config:
-    nodeSelector:
-      node-role.kubernetes.io/infra: ""
-    tolerations:
-    - effect: NoSchedule
-      operator: Exists
-      key: node-role.kubernetes.io/infra
----
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: cert-manager-operator
-  annotations:
-    scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator":"Exists","effect":"NoSchedule","key":"node-role.kubernetes.io/infra"}]'
----
-apiVersion: operators.coreos.com/v1
-kind: OperatorGroup
-metadata:
-  name: cert-manager-operator
-  namespace: cert-manager-operator
-spec:
-  targetNamespaces:
-  - cert-manager-operator
----
-apiVersion: operators.coreos.com/v1alpha1
-kind: Subscription
-metadata:
-  name: openshift-cert-manager-operator
-  namespace: cert-manager-operator
-spec:
-  name: openshift-cert-manager-operator
   source: cs-redhat-operator-index
   sourceNamespace: openshift-marketplace
   config:
