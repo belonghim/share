@@ -86,93 +86,6 @@ spec:
     status: Unknown
     duration: 300s
 ---
-kind: ServiceAccount
-apiVersion: v1
-metadata:
-  name: eventrouter
-  namespace: ${NAMESPACE}
----
-kind: ClusterRole
-apiVersion: rbac.authorization.k8s.io/v1
-metadata:
-  name: event-reader
-rules:
-- apiGroups: [""]
-  resources: ["events"]
-  verbs: ["get", "watch", "list"]
----
-kind: ClusterRoleBinding
-apiVersion: rbac.authorization.k8s.io/v1
-metadata:
-  name: event-reader-binding
-subjects:
-- kind: ServiceAccount
-  name: eventrouter
-  namespace: ${NAMESPACE}
-roleRef:
-  kind: ClusterRole
-  name: event-reader
----
-kind: ConfigMap
-apiVersion: v1
-metadata:
-  name: eventrouter
-  namespace: ${NAMESPACE}
-data:
-  config.json: |-
-    {
-      "sink": "stdout"
-    }
----
-kind: Deployment
-apiVersion: apps/v1
-metadata:
-  name: eventrouter
-  namespace: ${NAMESPACE}
-  labels:
-    component: "eventrouter"
-    logging-infra: "eventrouter"
-    provider: "openshift"
-spec:
-  selector:
-    matchLabels:
-      component: "eventrouter"
-      logging-infra: "eventrouter"
-      provider: "openshift"
-  replicas: 1
-  template:
-    metadata:
-      labels:
-        component: "eventrouter"
-        logging-infra: "eventrouter"
-        provider: "openshift"
-      name: eventrouter
-    spec:
-      serviceAccount: eventrouter
-      containers:
-      - name: kube-eventrouter
-        image: ${IMAGE}
-        imagePullPolicy: IfNotPresent
-        resources:
-          requests:
-            cpu: ${CPU}
-            memory: ${MEMORY}
-        volumeMounts:
-        - name: config-volume
-          mountPath: /etc/eventrouter
-        securityContext:
-          allowPrivilegeEscalation: false
-          capabilities:
-            drop: ["ALL"]
-      securityContext:
-        runAsNonRoot: true
-        seccompProfile:
-          type: RuntimeDefault
-      volumes:
-      - name: config-volume
-        configMap:
-          name: eventrouter
----
 apiVersion: argoproj.io/v1beta1
 kind: ArgoCD
 metadata:
@@ -191,10 +104,6 @@ spec:
       replicas: 2
   grafana:
     enabled: false
-    ingress:
-      enabled: false
-    route:
-      enabled: false
   ha:
     enabled: false
   monitoring:
@@ -203,10 +112,6 @@ spec:
     enabled: false
   prometheus:
     enabled: false
-    ingress:
-      enabled: false
-    route:
-      enabled: false
   rbac:
     defaultPolicy: ""
     scopes: '[groups]'
@@ -227,4 +132,197 @@ spec:
     dex:
       openShiftOAuth: true
     provider: dex
+---
+kind: ServiceAccount
+apiVersion: v1
+metadata:
+  name: eventrouter
+  namespace: openshift-logging
+---
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: event-reader
+rules:
+- apiGroups: [""]
+  resources: ["events"]
+  verbs: ["get", "watch", "list"]
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: event-reader-binding
+subjects:
+- kind: ServiceAccount
+  name: eventrouter
+  namespace: openshift-logging
+roleRef:
+  kind: ClusterRole
+  name: event-reader
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: eventrouter
+  namespace: openshift-logging
+data:
+  config.json: |-
+    {
+      "sink": "stdout"
+    }
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: eventrouter
+  namespace: openshift-logging
+  labels:
+    component: "eventrouter"
+    logging-infra: "eventrouter"
+    provider: "openshift"
+spec:
+  selector:
+    matchLabels:
+      component: "eventrouter"
+      logging-infra: "eventrouter"
+      provider: "openshift"
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        component: "eventrouter"
+        logging-infra: "eventrouter"
+        provider: "openshift"
+      name: eventrouter
+    spec:
+      nodeSelector:
+        node-role.kubernetes.io/infra: ""
+      serviceAccount: eventrouter
+      containers:
+      - name: kube-eventrouter
+        image: registry.redhat.io/openshift-logging/eventrouter-rhel9@sha256:3e52d76f25d4e6ee2b5323871292ab4814438132503052839715a15c677f32d9
+        imagePullPolicy: IfNotPresent
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+        volumeMounts:
+        - name: config-volume
+          mountPath: /etc/eventrouter
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: ["ALL"]
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      volumes:
+      - name: config-volume
+        configMap:
+          name: eventrouter
+---
+kind: ServiceAccount
+apiVersion: v1
+metadata:
+  name: log-collector
+  namespace: openshift-logging
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: collect-application-logs
+subjects:
+- kind: ServiceAccount
+  name: log-collector
+  namespace: openshift-logging
+roleRef:
+  kind: ClusterRole
+  name: collect-application-logs
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: collect-audit-logs
+subjects:
+- kind: ServiceAccount
+  name: log-collector
+  namespace: openshift-logging
+roleRef:
+  kind: ClusterRole
+  name: collect-audit-logs
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: collect-infrastructure-logs
+subjects:
+- kind: ServiceAccount
+  name: log-collector
+  namespace: openshift-logging
+roleRef:
+  kind: ClusterRole
+  name: collect-infrastructure-logs
+---
+apiVersion: policy.open-cluster-management.io/v1
+kind: ConfigurationPolicy
+metadata:
+  name: cluster-log-forwarder
+spec:
+  remediationAction: enforce
+  severity: high
+  object-templates-raw: |
+    {{hub if ne "" (index .PolicyMetadata.annotations "policies.log-brokers") hub}}
+    {{hub if ne "" (index .PolicyMetadata.annotations "policies.log-topic") hub}}
+    - complianceType: musthave
+      objectDefinition:
+        apiVersion: observability.openshift.io/v1
+        kind: ClusterLogForwarder
+        metadata:
+          name: log-forwarder
+          namespace: openshift-logging
+        spec:
+          managementState: Managed
+          collector:
+            resources:
+              limits:
+                cpu: "1"
+                memory: 2Gi
+              requests:
+                cpu: "1"
+                memory: 2Gi
+          serviceAccount:
+            name: log-collector
+          outputs:
+          - name: kafka-receiver
+            type: kafka
+            kafka:
+              brokers: {{hub index .PolicyMetadata.annotations "policies.log-brokers" hub}}
+              topic: {{hub index .PolicyMetadata.annotations "policies.log-topic" hub}}
+              tuning:
+                deliveryMode: AtLeastOnce
+                maxWrite: 10M
+                compression: none
+          pipelines:
+          - name: audit-log
+            inputRefs:
+            - audit
+            outputRefs:
+            - kafka-receiver
+            filterRefs:
+            - add-cluster-name
+          - name: infra-log
+            inputRefs:
+            - infrastructure
+            outputRefs:
+            - kafka-receiver
+            filterRefs:
+            - add-cluster-name
+          filters:
+          - name: add-cluster-name
+            type: openshiftLabels
+            openshiftLabels:
+              cluster-name: {{ fromClusterClaim "name" }}
+    {{hub end hub}}
+    {{hub end hub}}
 ---

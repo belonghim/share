@@ -331,6 +331,68 @@ spec:
       apiVersion: policy.open-cluster-management.io/v1
       kind: ConfigurationPolicy
       metadata:
+        name: cluster-log-forwarder
+      spec:
+        object-templates-raw: |
+          {{hub if ne "" (index .PolicyMetadata.annotations "policies.log-brokers") hub}}
+          {{hub if ne "" (index .PolicyMetadata.annotations "policies.log-topic") hub}}
+          - complianceType: musthave
+            objectDefinition:
+              apiVersion: observability.openshift.io/v1
+              kind: ClusterLogForwarder
+              metadata:
+                name: log-forwarder
+                namespace: openshift-logging
+              spec:
+                managementState: Managed
+                collector:
+                  resources:
+                    limits:
+                      cpu: "1"
+                      memory: 2Gi
+                    requests:
+                      cpu: "1"
+                      memory: 2Gi
+                serviceAccount:
+                  name: log-collector
+                outputs:
+                - name: kafka-receiver
+                  type: kafka
+                  kafka:
+                    brokers: {{hub index .PolicyMetadata.annotations "policies.log-brokers" hub}}
+                    topic: {{hub index .PolicyMetadata.annotations "policies.log-topic" hub}}
+                    tuning:
+                      deliveryMode: AtLeastOnce
+                      maxWrite: 10M
+                      compression: none
+                pipelines:
+                - name: audit-log
+                  inputRefs:
+                  - audit
+                  outputRefs:
+                  - kafka-receiver
+                  filterRefs:
+                  - add-cluster-name
+                - name: infra-log
+                  inputRefs:
+                  - infrastructure
+                  outputRefs:
+                  - kafka-receiver
+                  filterRefs:
+                  - add-cluster-name
+                filters:
+                - name: add-cluster-name
+                  type: openshiftLabels
+                  openshiftLabels:
+                    cluster-name: {{ fromClusterClaim "name" }}
+          {{hub end hub}}
+          {{hub end hub}}
+        remediationAction: enforce
+        severity: high
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
         name: config-operators
       spec:
         object-templates:
@@ -425,6 +487,200 @@ spec:
               - duration: 300s
                 status: Unknown
                 type: Ready
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: argoproj.io/v1beta1
+            kind: ArgoCD
+            metadata:
+              name: openshift-gitops
+              namespace: openshift-gitops
+            spec:
+              applicationSet:
+                webhookServer:
+                  ingress:
+                    enabled: false
+                  route:
+                    enabled: false
+              controller:
+                sharding:
+                  enabled: true
+                  replicas: 2
+              grafana:
+                enabled: false
+              ha:
+                enabled: false
+              monitoring:
+                enabled: false
+              notifications:
+                enabled: false
+              prometheus:
+                enabled: false
+              rbac:
+                defaultPolicy: ""
+                scopes: '[groups]'
+              repo:
+                replicas: 2
+              server:
+                autoscale:
+                  enabled: false
+                grpc:
+                  ingress:
+                    enabled: false
+                ingress:
+                  enabled: false
+                replicas: 2
+                route:
+                  enabled: true
+              sso:
+                dex:
+                  openShiftOAuth: true
+                provider: dex
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: v1
+            kind: ServiceAccount
+            metadata:
+              name: eventrouter
+              namespace: openshift-logging
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: rbac.authorization.k8s.io/v1
+            kind: ClusterRole
+            metadata:
+              name: event-reader
+            rules:
+            - apiGroups:
+              - ""
+              resources:
+              - events
+              verbs:
+              - get
+              - watch
+              - list
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: rbac.authorization.k8s.io/v1
+            kind: ClusterRoleBinding
+            metadata:
+              name: event-reader-binding
+            roleRef:
+              kind: ClusterRole
+              name: event-reader
+            subjects:
+            - kind: ServiceAccount
+              name: eventrouter
+              namespace: openshift-logging
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: v1
+            data:
+              config.json: |-
+                {
+                  "sink": "stdout"
+                }
+            kind: ConfigMap
+            metadata:
+              name: eventrouter
+              namespace: openshift-logging
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: apps/v1
+            kind: Deployment
+            metadata:
+              labels:
+                component: eventrouter
+                logging-infra: eventrouter
+                provider: openshift
+              name: eventrouter
+              namespace: openshift-logging
+            spec:
+              replicas: 1
+              selector:
+                matchLabels:
+                  component: eventrouter
+                  logging-infra: eventrouter
+                  provider: openshift
+              template:
+                metadata:
+                  labels:
+                    component: eventrouter
+                    logging-infra: eventrouter
+                    provider: openshift
+                  name: eventrouter
+                spec:
+                  containers:
+                  - image: registry.redhat.io/openshift-logging/eventrouter-rhel9@sha256:3e52d76f25d4e6ee2b5323871292ab4814438132503052839715a15c677f32d9
+                    imagePullPolicy: IfNotPresent
+                    name: kube-eventrouter
+                    resources:
+                      requests:
+                        cpu: 100m
+                        memory: 128Mi
+                    securityContext:
+                      allowPrivilegeEscalation: false
+                      capabilities:
+                        drop:
+                        - ALL
+                    volumeMounts:
+                    - mountPath: /etc/eventrouter
+                      name: config-volume
+                  nodeSelector:
+                    node-role.kubernetes.io/infra: ""
+                  securityContext:
+                    runAsNonRoot: true
+                    seccompProfile:
+                      type: RuntimeDefault
+                  serviceAccount: eventrouter
+                  volumes:
+                  - configMap:
+                      name: eventrouter
+                    name: config-volume
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: v1
+            kind: ServiceAccount
+            metadata:
+              name: log-collector
+              namespace: openshift-logging
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: rbac.authorization.k8s.io/v1
+            kind: ClusterRoleBinding
+            metadata:
+              name: collect-application-logs
+            roleRef:
+              kind: ClusterRole
+              name: collect-application-logs
+            subjects:
+            - kind: ServiceAccount
+              name: log-collector
+              namespace: openshift-logging
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: rbac.authorization.k8s.io/v1
+            kind: ClusterRoleBinding
+            metadata:
+              name: collect-audit-logs
+            roleRef:
+              kind: ClusterRole
+              name: collect-audit-logs
+            subjects:
+            - kind: ServiceAccount
+              name: log-collector
+              namespace: openshift-logging
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: rbac.authorization.k8s.io/v1
+            kind: ClusterRoleBinding
+            metadata:
+              name: collect-infrastructure-logs
+            roleRef:
+              kind: ClusterRole
+              name: collect-infrastructure-logs
+            subjects:
+            - kind: ServiceAccount
+              name: log-collector
+              namespace: openshift-logging
         remediationAction: enforce
         severity: medium
   remediationAction: enforce
@@ -716,6 +972,14 @@ spec:
               name: openshift-gitops-operator
         - complianceType: musthave
           objectDefinition:
+            apiVersion: v1
+            kind: Namespace
+            metadata:
+              annotations:
+                scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator":"Exists","effect":"NoSchedule","key":"node-role.kubernetes.io/infra"}]'
+              name: openshift-gitops
+        - complianceType: musthave
+          objectDefinition:
             apiVersion: operators.coreos.com/v1
             kind: OperatorGroup
             metadata:
@@ -807,39 +1071,6 @@ spec:
                   key: node-role.kubernetes.io/infra
                   operator: Exists
               name: node-maintenance-operator
-              source: cs-redhat-operator-index
-              sourceNamespace: openshift-marketplace
-        - complianceType: musthave
-          objectDefinition:
-            apiVersion: v1
-            kind: Namespace
-            metadata:
-              annotations:
-                scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator":"Exists","effect":"NoSchedule","key":"node-role.kubernetes.io/infra"}]'
-              name: metallb-system
-        - complianceType: musthave
-          objectDefinition:
-            apiVersion: operators.coreos.com/v1
-            kind: OperatorGroup
-            metadata:
-              name: metallb-system
-              namespace: metallb-system
-        - complianceType: musthave
-          objectDefinition:
-            apiVersion: operators.coreos.com/v1alpha1
-            kind: Subscription
-            metadata:
-              name: metallb-operator
-              namespace: metallb-system
-            spec:
-              config:
-                nodeSelector:
-                  node-role.kubernetes.io/infra: ""
-                tolerations:
-                - effect: NoSchedule
-                  key: node-role.kubernetes.io/infra
-                  operator: Exists
-              name: metallb-operator
               source: cs-redhat-operator-index
               sourceNamespace: openshift-marketplace
         - complianceType: musthave
@@ -1136,78 +1367,6 @@ spec:
                   key: node-role.kubernetes.io/infra
                   operator: Exists
               name: vertical-pod-autoscaler
-              source: cs-redhat-operator-index
-              sourceNamespace: openshift-marketplace
-        - complianceType: musthave
-          objectDefinition:
-            apiVersion: v1
-            kind: Namespace
-            metadata:
-              annotations:
-                scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator":"Exists","effect":"NoSchedule","key":"node-role.kubernetes.io/infra"}]'
-              name: openshift-adp
-        - complianceType: musthave
-          objectDefinition:
-            apiVersion: operators.coreos.com/v1
-            kind: OperatorGroup
-            metadata:
-              name: openshift-adp
-              namespace: openshift-adp
-            spec:
-              targetNamespaces:
-              - openshift-adp
-        - complianceType: musthave
-          objectDefinition:
-            apiVersion: operators.coreos.com/v1alpha1
-            kind: Subscription
-            metadata:
-              name: redhat-oadp-operator
-              namespace: openshift-adp
-            spec:
-              config:
-                nodeSelector:
-                  node-role.kubernetes.io/infra: ""
-                tolerations:
-                - effect: NoSchedule
-                  key: node-role.kubernetes.io/infra
-                  operator: Exists
-              name: redhat-oadp-operator
-              source: cs-redhat-operator-index
-              sourceNamespace: openshift-marketplace
-        - complianceType: musthave
-          objectDefinition:
-            apiVersion: v1
-            kind: Namespace
-            metadata:
-              annotations:
-                scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator":"Exists","effect":"NoSchedule","key":"node-role.kubernetes.io/infra"}]'
-              name: cert-manager-operator
-        - complianceType: musthave
-          objectDefinition:
-            apiVersion: operators.coreos.com/v1
-            kind: OperatorGroup
-            metadata:
-              name: cert-manager-operator
-              namespace: cert-manager-operator
-            spec:
-              targetNamespaces:
-              - cert-manager-operator
-        - complianceType: musthave
-          objectDefinition:
-            apiVersion: operators.coreos.com/v1alpha1
-            kind: Subscription
-            metadata:
-              name: openshift-cert-manager-operator
-              namespace: cert-manager-operator
-            spec:
-              config:
-                nodeSelector:
-                  node-role.kubernetes.io/infra: ""
-                tolerations:
-                - effect: NoSchedule
-                  key: node-role.kubernetes.io/infra
-                  operator: Exists
-              name: openshift-cert-manager-operator
               source: cs-redhat-operator-index
               sourceNamespace: openshift-marketplace
         remediationAction: enforce
