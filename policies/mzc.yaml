@@ -932,6 +932,8 @@ spec:
             apiVersion: operators.coreos.com/v1alpha1
             kind: Subscription
             metadata:
+              labels:
+                policies.install-operators: ""
               name: lvms-operator
               namespace: openshift-storage
             spec:
@@ -968,6 +970,8 @@ spec:
             apiVersion: operators.coreos.com/v1alpha1
             kind: Subscription
             metadata:
+              labels:
+                policies.install-operators: ""
               name: local-storage-operator
               namespace: openshift-local-storage
             spec:
@@ -1004,6 +1008,8 @@ spec:
             apiVersion: operators.coreos.com/v1alpha1
             kind: Subscription
             metadata:
+              labels:
+                policies.install-operators: ""
               name: cluster-logging
               namespace: openshift-logging
             spec:
@@ -1040,6 +1046,8 @@ spec:
             apiVersion: operators.coreos.com/v1alpha1
             kind: Subscription
             metadata:
+              labels:
+                policies.install-operators: ""
               name: kubernetes-nmstate-operator
               namespace: openshift-nmstate
             spec:
@@ -1082,6 +1090,8 @@ spec:
             apiVersion: operators.coreos.com/v1alpha1
             kind: Subscription
             metadata:
+              labels:
+                policies.install-operators: ""
               name: openshift-gitops-operator
               namespace: openshift-gitops-operator
             spec:
@@ -1115,6 +1125,8 @@ spec:
             apiVersion: operators.coreos.com/v1alpha1
             kind: Subscription
             metadata:
+              labels:
+                policies.install-operators: ""
               name: node-healthcheck-operator
               namespace: openshift-workload-availability
             spec:
@@ -1133,6 +1145,8 @@ spec:
             apiVersion: operators.coreos.com/v1alpha1
             kind: Subscription
             metadata:
+              labels:
+                policies.install-operators: ""
               name: self-node-remediation
               namespace: openshift-workload-availability
             spec:
@@ -1151,6 +1165,8 @@ spec:
             apiVersion: operators.coreos.com/v1alpha1
             kind: Subscription
             metadata:
+              labels:
+                policies.install-operators: ""
               name: node-maintenance-operator
               namespace: openshift-workload-availability
             spec:
@@ -1177,6 +1193,8 @@ spec:
             apiVersion: operators.coreos.com/v1alpha1
             kind: Subscription
             metadata:
+              labels:
+                policies.install-operators: ""
               name: servicemeshoperator
               namespace: openshift-operators
             spec:
@@ -1195,6 +1213,8 @@ spec:
             apiVersion: operators.coreos.com/v1alpha1
             kind: Subscription
             metadata:
+              labels:
+                policies.install-operators: ""
               name: kiali-ossm
               namespace: openshift-operators
             spec:
@@ -1213,6 +1233,8 @@ spec:
             apiVersion: operators.coreos.com/v1alpha1
             kind: Subscription
             metadata:
+              labels:
+                policies.install-operators: ""
               name: jaeger-product
               namespace: openshift-operators
             spec:
@@ -1231,6 +1253,8 @@ spec:
             apiVersion: operators.coreos.com/v1alpha1
             kind: Subscription
             metadata:
+              labels:
+                policies.install-operators: ""
               name: web-terminal
               namespace: openshift-operators
             spec:
@@ -1249,6 +1273,8 @@ spec:
             apiVersion: operators.coreos.com/v1alpha1
             kind: Subscription
             metadata:
+              labels:
+                policies.install-operators: ""
               name: devworkspace-operator
               namespace: openshift-operators
             spec:
@@ -1282,6 +1308,8 @@ spec:
             apiVersion: operators.coreos.com/v1alpha1
             kind: Subscription
             metadata:
+              labels:
+                policies.install-operators: ""
               name: tempo-product
               namespace: openshift-tempo-operator
             spec:
@@ -1315,6 +1343,8 @@ spec:
             apiVersion: operators.coreos.com/v1alpha1
             kind: Subscription
             metadata:
+              labels:
+                policies.install-operators: ""
               name: opentelemetry-product
               namespace: openshift-opentelemetry-operator
             spec:
@@ -1348,6 +1378,8 @@ spec:
             apiVersion: operators.coreos.com/v1alpha1
             kind: Subscription
             metadata:
+              labels:
+                policies.install-operators: ""
               name: netobserv-operator
               namespace: openshift-netobserv-operator
             spec:
@@ -1381,6 +1413,8 @@ spec:
             apiVersion: operators.coreos.com/v1alpha1
             kind: Subscription
             metadata:
+              labels:
+                policies.install-operators: ""
               name: node-observability-operator
               namespace: node-observability-operator
             spec:
@@ -1414,6 +1448,8 @@ spec:
             apiVersion: operators.coreos.com/v1alpha1
             kind: Subscription
             metadata:
+              labels:
+                policies.install-operators: ""
               name: openshift-custom-metrics-autoscaler-operator
               namespace: openshift-keda
             spec:
@@ -1447,6 +1483,8 @@ spec:
             apiVersion: operators.coreos.com/v1alpha1
             kind: Subscription
             metadata:
+              labels:
+                policies.install-operators: ""
               name: vertical-pod-autoscaler
               namespace: openshift-vertical-pod-autoscaler
             spec:
@@ -1514,6 +1552,8 @@ spec:
             apiVersion: operators.coreos.com/v1alpha1
             kind: Subscription
             metadata:
+              labels:
+                policies.install-operators: ""
               name: advanced-cluster-management
               namespace: open-cluster-management
             spec:
@@ -1548,6 +1588,8 @@ spec:
             apiVersion: operators.coreos.com/v1alpha1
             kind: Subscription
             metadata:
+              labels:
+                policies.install-operators: ""
               name: multicluster-engine
               namespace: multicluster-engine
             spec:
@@ -1586,6 +1628,8 @@ spec:
             apiVersion: operators.coreos.com/v1alpha1
             kind: Subscription
             metadata:
+              labels:
+                policies.install-operators: ""
               name: cincinnati-operator
               namespace: openshift-update-service
             spec:

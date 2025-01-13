@@ -18,6 +18,8 @@ kind: Subscription
 metadata:
   name: advanced-cluster-management
   namespace: open-cluster-management
+  labels:
+    policies.install-operators: ""
 spec:
   name: advanced-cluster-management
   source: cs-redhat-operator-index
@@ -49,6 +51,8 @@ kind: Subscription
 metadata:
   name: multicluster-engine
   namespace: multicluster-engine
+  labels:
+    policies.install-operators: ""
 spec:
   config:
     nodeSelector:
@@ -84,6 +88,8 @@ kind: Subscription
 metadata:
   name: cincinnati-operator
   namespace: openshift-update-service
+  labels:
+    policies.install-operators: ""
 spec:
   name: cincinnati-operator
   source: cs-redhat-operator-index

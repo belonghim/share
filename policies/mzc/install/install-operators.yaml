@@ -20,6 +20,8 @@ kind: Subscription
 metadata:
   name: lvms-operator
   namespace: openshift-storage
+  labels:
+    policies.install-operators: ""
 spec:
   name: lvms-operator
   source: cs-redhat-operator-index
@@ -53,6 +55,8 @@ kind: Subscription
 metadata:
   name: local-storage-operator
   namespace: openshift-local-storage
+  labels:
+    policies.install-operators: ""
 spec:
   name: local-storage-operator
   source: cs-redhat-operator-index
@@ -86,6 +90,8 @@ kind: Subscription
 metadata:
   name: cluster-logging
   namespace: openshift-logging
+  labels:
+    policies.install-operators: ""
 spec:
   name: cluster-logging
   source: cs-redhat-operator-index
@@ -119,6 +125,8 @@ kind: Subscription
 metadata:
   name: kubernetes-nmstate-operator
   namespace: openshift-nmstate
+  labels:
+    policies.install-operators: ""
 spec:
   name: kubernetes-nmstate-operator
   source: cs-redhat-operator-index
@@ -157,6 +165,8 @@ kind: Subscription
 metadata:
   name: openshift-gitops-operator
   namespace: openshift-gitops-operator
+  labels:
+    policies.install-operators: ""
 spec:
   name: openshift-gitops-operator
   source: cs-redhat-operator-index
@@ -187,6 +197,8 @@ kind: Subscription
 metadata:
   name: node-healthcheck-operator
   namespace: openshift-workload-availability
+  labels:
+    policies.install-operators: ""
 spec:
   name: node-healthcheck-operator
   source: cs-redhat-operator-index
@@ -204,6 +216,8 @@ kind: Subscription
 metadata:
   name: self-node-remediation
   namespace: openshift-workload-availability
+  labels:
+    policies.install-operators: ""
 spec:
   name: self-node-remediation
   source: cs-redhat-operator-index
@@ -221,6 +235,8 @@ kind: Subscription
 metadata:
   name: node-maintenance-operator
   namespace: openshift-workload-availability
+  labels:
+    policies.install-operators: ""
 spec:
   name: node-maintenance-operator
   source: cs-redhat-operator-index
@@ -245,6 +261,8 @@ kind: Subscription
 metadata:
   name: servicemeshoperator
   namespace: openshift-operators
+  labels:
+    policies.install-operators: ""
 spec:
   name: servicemeshoperator
   source: cs-redhat-operator-index
@@ -262,6 +280,8 @@ kind: Subscription
 metadata:
   name: kiali-ossm
   namespace: openshift-operators
+  labels:
+    policies.install-operators: ""
 spec:
   name: kiali-ossm
   source: cs-redhat-operator-index
@@ -279,6 +299,8 @@ kind: Subscription
 metadata:
   name: jaeger-product
   namespace: openshift-operators
+  labels:
+    policies.install-operators: ""
 spec:
   name: jaeger-product
   source: cs-redhat-operator-index
@@ -296,6 +318,8 @@ kind: Subscription
 metadata:
   name: web-terminal
   namespace: openshift-operators
+  labels:
+    policies.install-operators: ""
 spec:
   name: web-terminal
   source: cs-redhat-operator-index
@@ -313,6 +337,8 @@ kind: Subscription
 metadata:
   name: devworkspace-operator
   namespace: openshift-operators
+  labels:
+    policies.install-operators: ""
 spec:
   name: devworkspace-operator
   source: cs-redhat-operator-index
@@ -343,6 +369,8 @@ kind: Subscription
 metadata:
   name: tempo-product
   namespace: openshift-tempo-operator
+  labels:
+    policies.install-operators: ""
 spec:
   name: tempo-product
   source: cs-redhat-operator-index
@@ -373,6 +401,8 @@ kind: Subscription
 metadata:
   name: opentelemetry-product
   namespace: openshift-opentelemetry-operator
+  labels:
+    policies.install-operators: ""
 spec:
   name: opentelemetry-product
   source: cs-redhat-operator-index
@@ -403,6 +433,8 @@ kind: Subscription
 metadata:
   name: netobserv-operator
   namespace: openshift-netobserv-operator
+  labels:
+    policies.install-operators: ""
 spec:
   name: netobserv-operator
   source: cs-redhat-operator-index
@@ -433,6 +465,8 @@ kind: Subscription
 metadata:
   name: node-observability-operator
   namespace: node-observability-operator
+  labels:
+    policies.install-operators: ""
 spec:
   name: node-observability-operator
   source: cs-redhat-operator-index
@@ -463,6 +497,8 @@ kind: Subscription
 metadata:
   name: openshift-custom-metrics-autoscaler-operator
   namespace: openshift-keda
+  labels:
+    policies.install-operators: ""
 spec:
   name: openshift-custom-metrics-autoscaler-operator
   source: cs-redhat-operator-index
@@ -493,6 +529,8 @@ kind: Subscription
 metadata:
   name: vertical-pod-autoscaler
   namespace: openshift-vertical-pod-autoscaler
+  labels:
+    policies.install-operators: ""
 spec:
   name: vertical-pod-autoscaler
   source: cs-redhat-operator-index
