@@ -933,7 +933,7 @@ spec:
             kind: Subscription
             metadata:
               labels:
-                policies.install-operators: ""
+                policies.install: ""
               name: cluster-logging
               namespace: openshift-logging
             spec:
@@ -971,7 +971,7 @@ spec:
             kind: Subscription
             metadata:
               labels:
-                policies.install-operators: ""
+                policies.install: ""
               name: kubernetes-nmstate-operator
               namespace: openshift-nmstate
             spec:
@@ -1006,7 +1006,7 @@ spec:
             kind: Subscription
             metadata:
               labels:
-                policies.install-operators: ""
+                policies.install: ""
               name: node-healthcheck-operator
               namespace: openshift-workload-availability
             spec:
@@ -1026,7 +1026,7 @@ spec:
             kind: Subscription
             metadata:
               labels:
-                policies.install-operators: ""
+                policies.install: ""
               name: self-node-remediation
               namespace: openshift-workload-availability
             spec:
@@ -1064,7 +1064,7 @@ spec:
             kind: Subscription
             metadata:
               labels:
-                policies.install-operators: ""
+                policies.install: ""
               name: lvms-operator
               namespace: openshift-storage
             spec:
@@ -1108,7 +1108,7 @@ spec:
             kind: Subscription
             metadata:
               labels:
-                policies.install-operators: ""
+                policies.install: ""
               name: openshift-gitops-operator
               namespace: openshift-gitops-operator
             spec:
@@ -1177,7 +1177,7 @@ spec:
             kind: Subscription
             metadata:
               labels:
-                policies.install-operators: ""
+                policies.install: ""
               name: advanced-cluster-management
               namespace: open-cluster-management
             spec:
@@ -1213,7 +1213,7 @@ spec:
             kind: Subscription
             metadata:
               labels:
-                policies.install-operators: ""
+                policies.install: ""
               name: multicluster-engine
               namespace: multicluster-engine
             spec:
@@ -1253,7 +1253,7 @@ spec:
             kind: Subscription
             metadata:
               labels:
-                policies.install-operators: ""
+                policies.install: ""
               name: cincinnati-operator
               namespace: openshift-update-service
             spec:
@@ -1775,7 +1775,7 @@ spec:
         name: sub-approval-automatic
       spec:
         object-templates-raw: |
-          {{- range $sub := (lookup "operators.coreos.com/v1alpha1" "Subscription" "" "" "!policies.ignore").items }}
+          {{- range $sub := (lookup "operators.coreos.com/v1alpha1" "Subscription" "" "" "!policies.ignore,policies.install").items }}
           - complianceType: musthave
             objectDefinition:
               apiVersion: operators.coreos.com/v1alpha1
@@ -1798,7 +1798,7 @@ spec:
           compliant: 5m
           noncompliant: 5m
         object-templates-raw: |
-          {{- range $sub := (lookup "operators.coreos.com/v1alpha1" "Subscription" "" "" "!policies.ignore").items }}
+          {{- range $sub := (lookup "operators.coreos.com/v1alpha1" "Subscription" "" "" "!policies.ignore,policies.install").items }}
           - complianceType: musthave
             objectDefinition:
               apiVersion: operators.coreos.com/v1alpha1
@@ -1818,7 +1818,7 @@ spec:
         name: install-plan-approved
       spec:
         object-templates-raw: |
-          {{- range $sb := (lookup "operators.coreos.com/v1alpha1" "Subscription" "" "" "!policies.ignore").items }}
+          {{- range $sb := (lookup "operators.coreos.com/v1alpha1" "Subscription" "" "" "!policies.ignore,policies.install").items }}
           {{- range $ip := (lookup "operators.coreos.com/v1alpha1" "InstallPlan" $sb.metadata.namespace "").items }}
           {{- if contains $sb.spec.name (index $ip.spec.clusterServiceVersionNames 0) }}
           - complianceType: musthave
@@ -1860,7 +1860,7 @@ spec:
         name: sub-approval-manual
       spec:
         object-templates-raw: |
-          {{- range $sub := (lookup "operators.coreos.com/v1alpha1" "Subscription" "" "" "!policies.ignore").items }}
+          {{- range $sub := (lookup "operators.coreos.com/v1alpha1" "Subscription" "" "" "!policies.ignore,policies.install").items }}
           - complianceType: musthave
             objectDefinition:
               apiVersion: operators.coreos.com/v1alpha1

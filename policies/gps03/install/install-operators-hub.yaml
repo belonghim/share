@@ -19,7 +19,7 @@ metadata:
   name: advanced-cluster-management
   namespace: open-cluster-management
   labels:
-    policies.install-operators: ""
+    policies.install: ""
 spec:
   name: advanced-cluster-management
   source: cs-redhat-operator-index
@@ -52,7 +52,7 @@ metadata:
   name: multicluster-engine
   namespace: multicluster-engine
   labels:
-    policies.install-operators: ""
+    policies.install: ""
 spec:
   config:
     nodeSelector:
@@ -89,7 +89,7 @@ metadata:
   name: cincinnati-operator
   namespace: openshift-update-service
   labels:
-    policies.install-operators: ""
+    policies.install: ""
 spec:
   name: cincinnati-operator
   source: cs-redhat-operator-index
