@@ -504,34 +504,88 @@ spec:
               namespace: openshift-gitops
             spec:
               applicationSet:
+                resources:
+                  limits:
+                    cpu: "2"
+                    memory: 1Gi
+                  requests:
+                    cpu: 250m
+                    memory: 512Mi
                 webhookServer:
                   ingress:
                     enabled: false
                   route:
                     enabled: false
+              controller:
+                processors: {}
+                resources:
+                  limits:
+                    cpu: "2"
+                    memory: 2Gi
+                  requests:
+                    cpu: 250m
+                    memory: 1Gi
               extraConfig:
                 accounts.admin: apiKey
               grafana:
                 enabled: false
+                ingress:
+                  enabled: false
+                resources:
+                  limits:
+                    cpu: 500m
+                    memory: 256Mi
+                  requests:
+                    cpu: 250m
+                    memory: 128Mi
+                route:
+                  enabled: false
               ha:
                 enabled: false
+                resources:
+                  limits:
+                    cpu: 500m
+                    memory: 256Mi
+                  requests:
+                    cpu: 250m
+                    memory: 128Mi
+              initialSSHKnownHosts: {}
               monitoring:
                 enabled: false
               nodePlacement:
                 nodeSelector:
                   node-role.kubernetes.io/infra: ""
               notifications:
-                enabled: false
+                enabled: true
               prometheus:
                 enabled: false
+                ingress:
+                  enabled: false
+                route:
+                  enabled: false
               rbac:
                 defaultPolicy: ""
                 policy: |
                   g, system:cluster-admins, role:admin
                   g, cluster-admins, role:admin
                 scopes: '[groups]'
+              redis:
+                resources:
+                  limits:
+                    cpu: 500m
+                    memory: 256Mi
+                  requests:
+                    cpu: 250m
+                    memory: 128Mi
               repo:
                 replicas: 2
+                resources:
+                  limits:
+                    cpu: "1"
+                    memory: 1Gi
+                  requests:
+                    cpu: 250m
+                    memory: 256Mi
               resourceExclusions: |
                 - apiGroups:
                   - tekton.dev
@@ -549,12 +603,30 @@ spec:
                 ingress:
                   enabled: false
                 replicas: 2
+                resources:
+                  limits:
+                    cpu: 500m
+                    memory: 256Mi
+                  requests:
+                    cpu: 125m
+                    memory: 128Mi
                 route:
                   enabled: true
+                service:
+                  type: ""
               sso:
                 dex:
                   openShiftOAuth: true
+                  resources:
+                    limits:
+                      cpu: 500m
+                      memory: 256Mi
+                    requests:
+                      cpu: 250m
+                      memory: 128Mi
                 provider: dex
+              tls:
+                ca: {}
         - complianceType: musthave
           objectDefinition:
             apiVersion: v1
