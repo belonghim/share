@@ -28,8 +28,8 @@ spec:
   severity: high
   object-templates-raw: |
     {{- range $sb := (lookup "operators.coreos.com/v1alpha1" "Subscription" "" "" "!policies.ignore").items }}
-    {{- range $ip := (lookup "operators.coreos.com/v1alpha1" "InstallPlan" $sb.metadata.namespace "").items }}
-    {{- if contains $sb.spec.name (index $ip.spec.clusterServiceVersionNames 0) }}
+    {{- if eq "InstallPlan" (lookup "operators.coreos.com/v1alpha1" "InstallPlan" $sb.metadata.namespace $sb.status.installPlanRef.name).kind }}
+    {{- $ip := (lookup "operators.coreos.com/v1alpha1" "InstallPlan" $sb.metadata.namespace $sb.status.installPlanRef.name) }}
     - complianceType: musthave
       objectDefinition:
         apiVersion: operators.coreos.com/v1alpha1
@@ -41,7 +41,6 @@ spec:
           approved: true
         status:
           phase: Complete
-    {{- end }}
     {{- end }}
     {{- end }}
 ---
