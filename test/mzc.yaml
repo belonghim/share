@@ -293,6 +293,14 @@ spec:
                 type: Degraded
         - complianceType: mustnothave
           objectDefinition:
+            apiVersion: machineconfiguration.openshift.io/v1
+            kind: MachineConfigPool
+            status:
+              conditions:
+              - status: "True"
+                type: Progressing
+        - complianceType: mustnothave
+          objectDefinition:
             apiVersion: config.openshift.io/v1
             kind: ClusterVersion
             status:
