@@ -513,18 +513,26 @@ spec:
                 sharding:
                   enabled: true
                   replicas: 2
+              extraConfig:
+                accounts.admin: apiKey
               grafana:
                 enabled: false
               ha:
                 enabled: false
               monitoring:
                 enabled: false
+              nodePlacement:
+                nodeSelector:
+                  node-role.kubernetes.io/infra: ""
               notifications:
                 enabled: false
               prometheus:
                 enabled: false
               rbac:
                 defaultPolicy: ""
+                policy: |
+                  g, system:cluster-admins, role:admin
+                  g, cluster-admins, role:admin
                 scopes: '[groups]'
               repo:
                 replicas: 2
