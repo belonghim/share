@@ -509,10 +509,6 @@ spec:
                     enabled: false
                   route:
                     enabled: false
-              controller:
-                sharding:
-                  enabled: true
-                  replicas: 2
               extraConfig:
                 accounts.admin: apiKey
               grafana:
@@ -536,6 +532,14 @@ spec:
                 scopes: '[groups]'
               repo:
                 replicas: 2
+              resourceExclusions: |
+                - apiGroups:
+                  - tekton.dev
+                  clusters:
+                  - '*'
+                  kinds:
+                  - TaskRun
+                  - PipelineRun
               server:
                 autoscale:
                   enabled: false
