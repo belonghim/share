@@ -7,7 +7,7 @@ spec:
   remediationAction: inform
   severity: high
   object-templates-raw: |
-    {{- range $sub := (lookup "operators.coreos.com/v1alpha1" "Subscription" "" "" "!policies.ignore").items }}
+    {{- range $sub := (lookup "operators.coreos.com/v1alpha1" "Subscription" "" "" "!policies.ignore,policies.install").items }}
     - complianceType: musthave
       objectDefinition:
         apiVersion: operators.coreos.com/v1alpha1
@@ -27,7 +27,7 @@ spec:
   remediationAction: inform
   severity: high
   object-templates-raw: |
-    {{- range $sb := (lookup "operators.coreos.com/v1alpha1" "Subscription" "" "" "!policies.ignore").items }}
+    {{- range $sb := (lookup "operators.coreos.com/v1alpha1" "Subscription" "" "" "!policies.ignore,policies.install").items }}
     {{- if eq "InstallPlan" (lookup "operators.coreos.com/v1alpha1" "InstallPlan" $sb.metadata.namespace $sb.status.installPlanRef.name).kind }}
     {{- $ip := (lookup "operators.coreos.com/v1alpha1" "InstallPlan" $sb.metadata.namespace $sb.status.installPlanRef.name) }}
     - complianceType: musthave
