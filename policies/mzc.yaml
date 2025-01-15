@@ -613,19 +613,6 @@ spec:
                   enabled: true
                 service:
                   type: ""
-              sso:
-                dex:
-                  openShiftOAuth: true
-                  resources:
-                    limits:
-                      cpu: 500m
-                      memory: 256Mi
-                    requests:
-                      cpu: 250m
-                      memory: 128Mi
-                provider: dex
-              tls:
-                ca: {}
         - complianceType: musthave
           objectDefinition:
             apiVersion: v1
