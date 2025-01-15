@@ -297,7 +297,7 @@ spec:
             status:
               conditions:
               - status: "True"
-                type: Progressing
+                type: Updating
         - complianceType: mustnothave
           objectDefinition:
             apiVersion: config.openshift.io/v1
