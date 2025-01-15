@@ -823,6 +823,7 @@ spec:
             Where=/var/lib/containers
             What=/dev/disk/by-partlabel/data-1
             Type=xfs
+            Options=defaults,prjquota
 
             [Install]
             RequiredBy=local-fs.target
