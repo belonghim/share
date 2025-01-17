@@ -1054,17 +1054,21 @@ data:
         effect: NoSchedule
 EOF
 
-## image-tag-mirror-set-support-tools 설정
+## image-tag-mirror-set-rhel9 설정
 cat > ${INSTALL_DIR}/openshift/image-tag-mirror-set-support-tools.yml<<EOF
 apiVersion: config.openshift.io/v1
 kind: ImageTagMirrorSet
 metadata:
-    name: support-tools
+    name: rhel9
 spec:
   imageTagMirrors:
   - mirrors:
     - ${Repository}/rhel9/support-tools
     source: registry.redhat.io/rhel9/support-tools
+  imageTagMirrors:
+  - mirrors:
+    - ${Repository}/openshift-logging/eventrouter-rhel9
+    source: registry.redhat.io/openshift-logging/eventrouter-rhel9
 EOF
 
 ```
