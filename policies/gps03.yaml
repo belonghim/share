@@ -853,7 +853,7 @@ spec:
             kind: Namespace
             metadata:
               annotations:
-                openshift.io/node-selector: node-role.kubernetes.io/infra=""
+                openshift.io/node-selector: node-role.kubernetes.io/infra=
               name: open-cluster-management-agent
         - complianceType: musthave
           objectDefinition:
@@ -861,7 +861,7 @@ spec:
             kind: Namespace
             metadata:
               annotations:
-                openshift.io/node-selector: node-role.kubernetes.io/infra=""
+                openshift.io/node-selector: node-role.kubernetes.io/infra=
               name: open-cluster-management-agent-addon
         remediationAction: enforce
         severity: medium

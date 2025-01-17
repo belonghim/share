@@ -4,12 +4,12 @@ kind: Namespace
 metadata:
   name: open-cluster-management-agent
   annotations:
-    openshift.io/node-selector: node-role.kubernetes.io/infra=""
+    openshift.io/node-selector: node-role.kubernetes.io/infra=
 ---
 apiVersion: v1
 kind: Namespace
 metadata:
   name: open-cluster-management-agent-addon
   annotations:
-    openshift.io/node-selector: node-role.kubernetes.io/infra=""
+    openshift.io/node-selector: node-role.kubernetes.io/infra=
 ---
