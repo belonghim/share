@@ -1065,7 +1065,6 @@ spec:
   - mirrors:
     - ${Repository}/rhel9/support-tools
     source: registry.redhat.io/rhel9/support-tools
-  imageTagMirrors:
   - mirrors:
     - ${Repository}/openshift-logging/eventrouter-rhel9
     source: registry.redhat.io/openshift-logging/eventrouter-rhel9
