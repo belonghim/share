@@ -271,7 +271,7 @@ spec:
       serviceAccount: eventrouter
       containers:
       - name: kube-eventrouter
-        image: registry.redhat.io/openshift-logging/eventrouter-rhel9@sha256:3e52d76f25d4e6ee2b5323871292ab4814438132503052839715a15c677f32d9
+        image: registry.redhat.io/openshift-logging/eventrouter-rhel9:v0.4
         imagePullPolicy: IfNotPresent
         resources:
           requests:
