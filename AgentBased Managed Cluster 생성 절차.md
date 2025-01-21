@@ -1138,7 +1138,6 @@ kind: ManagedCluster
 metadata:
   name: ${ManagedCluster}
   annotations:
-    open-cluster-management/nodeSelector: '{"node-role.kubernetes.io/infra":""}'
     open-cluster-management/tolerations: '[{"key":"node-role.kubernetes.io/infra","operator":"Exists","effect":"NoSchedule"}]'
   labels:
     cloud: auto-detect
