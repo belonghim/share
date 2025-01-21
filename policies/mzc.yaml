@@ -848,6 +848,8 @@ spec:
                   operator: Exists
                 - key: node-role.kubernetes.io/worker
                   operator: DoesNotExist
+                - key: node-role.kubernetes.io/infra
+                  operator: DoesNotExist
               unhealthyConditions:
               - duration: 300s
                 status: "False"
