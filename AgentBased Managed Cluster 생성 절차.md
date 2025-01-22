@@ -1074,7 +1074,7 @@ EOF
 
 ### agent image 생성
 ```
-$ openshift-install agent create image --dir ${INSTALL_DIR} --log-level debug
+$ XDG_CACHE_HOME=$HOME/.cache/${ReleaseVersion} openshift-install agent create image --dir ${INSTALL_DIR} --log-level debug
 
 ```
 
