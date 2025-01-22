@@ -5,6 +5,27 @@ metadata:
     argocd.argoproj.io/compare-options: IgnoreExtraneous
   labels:
     open-cluster-management.io/policy-set: opp
+  name: placement-base
+  namespace: policies
+spec:
+  predicates:
+  - requiredClusterSelector:
+      labelSelector:
+        matchExpressions:
+        - key: vendor
+          operator: In
+          values:
+          - OpenShift
+        - key: policies.undeploy
+          operator: DoesNotExist
+---
+apiVersion: cluster.open-cluster-management.io/v1beta1
+kind: Placement
+metadata:
+  annotations:
+    argocd.argoproj.io/compare-options: IgnoreExtraneous
+  labels:
+    open-cluster-management.io/policy-set: opp
   name: placement-hub
   namespace: policies
 spec:
@@ -50,27 +71,6 @@ spec:
         - key: policies.undeploy
           operator: DoesNotExist
         - key: policies.lite
-          operator: DoesNotExist
----
-apiVersion: cluster.open-cluster-management.io/v1beta1
-kind: Placement
-metadata:
-  annotations:
-    argocd.argoproj.io/compare-options: IgnoreExtraneous
-  labels:
-    open-cluster-management.io/policy-set: opp
-  name: placement-managed-lite
-  namespace: policies
-spec:
-  predicates:
-  - requiredClusterSelector:
-      labelSelector:
-        matchExpressions:
-        - key: vendor
-          operator: In
-          values:
-          - OpenShift
-        - key: policies.undeploy
           operator: DoesNotExist
 ---
 apiVersion: cluster.open-cluster-management.io/v1beta1
@@ -137,11 +137,11 @@ metadata:
 placementRef:
   apiGroup: cluster.open-cluster-management.io
   kind: Placement
-  name: placement-hub
+  name: placement-base
 subjects:
 - apiGroup: policy.open-cluster-management.io
   kind: PolicySet
-  name: hub
+  name: base
 ---
 apiVersion: policy.open-cluster-management.io/v1
 kind: PlacementBinding
@@ -155,11 +155,11 @@ metadata:
 placementRef:
   apiGroup: cluster.open-cluster-management.io
   kind: Placement
-  name: placement-managed
+  name: placement-hub
 subjects:
 - apiGroup: policy.open-cluster-management.io
   kind: PolicySet
-  name: managed
+  name: hub
 ---
 apiVersion: policy.open-cluster-management.io/v1
 kind: PlacementBinding
@@ -173,11 +173,11 @@ metadata:
 placementRef:
   apiGroup: cluster.open-cluster-management.io
   kind: Placement
-  name: placement-managed-lite
+  name: placement-managed
 subjects:
 - apiGroup: policy.open-cluster-management.io
   kind: PolicySet
-  name: base
+  name: managed
 ---
 apiVersion: policy.open-cluster-management.io/v1
 kind: PlacementBinding
