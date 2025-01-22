@@ -1,7 +1,7 @@
 apiVersion: cluster.open-cluster-management.io/v1beta1
 kind: Placement
 metadata:
-  name: placement-managed
+  name: placement-managed-lite
   namespace: policies
 spec:
   predicates:
@@ -9,5 +9,4 @@ spec:
       labelSelector:
         matchExpressions:
           - {key: vendor, operator: In, values: ["OpenShift"]}
-          - {key: "local-cluster", operator: NotIn, values: ["true"]}
           - {key: "policies.undeploy", operator: DoesNotExist}

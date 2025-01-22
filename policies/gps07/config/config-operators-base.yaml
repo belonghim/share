@@ -86,123 +86,32 @@ spec:
     status: Unknown
     duration: 300s
 ---
-apiVersion: argoproj.io/v1beta1
-kind: ArgoCD
+apiVersion: remediation.medik8s.io/v1alpha1
+kind: NodeHealthCheck
 metadata:
-  name: openshift-gitops
-  namespace: openshift-gitops
+  name: nodehealthcheck-acm
 spec:
-  applicationSet:
-    resources:
-      limits:
-        cpu: "2"
-        memory: 1Gi
-      requests:
-        cpu: 250m
-        memory: 512Mi
-    webhookServer:
-      ingress:
-        enabled: false
-      route:
-        enabled: false
-  controller:
-    processors: {}
-    resources:
-      limits:
-        cpu: "2"
-        memory: 2Gi
-      requests:
-        cpu: 250m
-        memory: 1Gi
-  extraConfig:
-    accounts.admin: apiKey
-  grafana:
-    enabled: false
-    ingress:
-      enabled: false
-    resources:
-      limits:
-        cpu: 500m
-        memory: 256Mi
-      requests:
-        cpu: 250m
-        memory: 128Mi
-    route:
-      enabled: false
-  ha:
-    enabled: true
-    resources:
-      limits:
-        cpu: 500m
-        memory: 256Mi
-      requests:
-        cpu: 250m
-        memory: 128Mi
-  initialSSHKnownHosts: {}
-  monitoring:
-    enabled: false
-  nodePlacement:
-    nodeSelector:
-      node-role.kubernetes.io/infra: ""
-  notifications:
-    enabled: true
-  prometheus:
-    enabled: false
-    ingress:
-      enabled: false
-    route:
-      enabled: false
-  rbac:
-    defaultPolicy: ""
-    policy: |
-      g, system:cluster-admins, role:admin
-      g, cluster-admins, role:admin
-    scopes: '[groups]'
-  redis:
-    resources:
-      limits:
-        cpu: 500m
-        memory: 256Mi
-      requests:
-        cpu: 250m
-        memory: 128Mi
-  repo:
-    replicas: 2
-    resources:
-      limits:
-        cpu: "1"
-        memory: 1Gi
-      requests:
-        cpu: 250m
-        memory: 256Mi
-  resourceExclusions: |
-    - apiGroups:
-      - tekton.dev
-      clusters:
-      - '*'
-      kinds:
-      - TaskRun
-      - PipelineRun
-  server:
-    autoscale:
-      enabled: false
-    grpc:
-      ingress:
-        enabled: false
-    ingress:
-      enabled: false
-    replicas: 2
-    resources:
-      limits:
-        cpu: 500m
-        memory: 256Mi
-      requests:
-        cpu: 125m
-        memory: 128Mi
-    route:
-      enabled: true
-    service:
-      type: ""
+  minHealthy: 51%
+  remediationTemplate:
+    apiVersion: self-node-remediation.medik8s.io/v1alpha1
+    name: self-node-remediation-automatic-strategy-template
+    namespace: openshift-workload-availability
+    kind: SelfNodeRemediationTemplate
+  selector:
+    matchExpressions:
+    - key: node-role.kubernetes.io/acm
+      operator: Exists
+    - key: node-role.kubernetes.io/worker
+      operator: DoesNotExist
+    - key: node-role.kubernetes.io/infra
+      operator: DoesNotExist
+  unhealthyConditions:
+  - type: Ready
+    status: "False"
+    duration: 300s
+  - type: Ready
+    status: Unknown
+    duration: 300s
 ---
 kind: ServiceAccount
 apiVersion: v1

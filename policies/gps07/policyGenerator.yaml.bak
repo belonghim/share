@@ -76,6 +76,7 @@ policies:
   - path: proxy/proxy-sync-managed.yaml
   policySets:
   - managed
+  - managed-lite
 # Proxy Router Bundle Policies - end
 # Config  operators Policies - start
 - name: config-operators
@@ -98,6 +99,7 @@ policies:
   - path: config/config-operators-managed.yaml
   policySets:
   - managed
+  - managed-lite
 # Config operators managed Policies - end
 # CV check Policies - start
 - name: check-cv
@@ -107,6 +109,7 @@ policies:
   policySets:
   - hub
   - managed
+  - managed-lite
   remediationAction: inform
 # CV check Policies - end
 # CSV check Policies - start
@@ -116,6 +119,7 @@ policies:
   policySets:
   - hub
   - managed
+  - managed-lite
   remediationAction: inform
 # CSV check Policies - end
 # infra label Policies - start
@@ -125,6 +129,7 @@ policies:
   policySets:
   - hub
   - managed
+  - managed-lite
   remediationAction: enforce
 # infra label Policies - end
 # infra toleration Policies - start
@@ -136,6 +141,7 @@ policies:
   policySets:
   - hub
   - managed
+  - managed-lite
   remediationAction: enforce
 # infra toleration Policies - end
 # signature cm Policies - start
@@ -145,6 +151,7 @@ policies:
   policySets:
   - hub
   - managed
+  - managed-lite
   remediationAction: enforce
 # signature cm Policies - end
 # marketplace jobs Policies - start
@@ -165,6 +172,7 @@ policies:
   policySets:
   - hub
   - managed
+  - managed-lite
   remediationAction: enforce
 # upgrade upstream Policies - end
 # upgrade release channel Policies - start
@@ -174,6 +182,7 @@ policies:
   policySets:
   - hub
   - managed
+  - managed-lite
   remediationAction: enforce
 # upgrade release channel Policies - end
 policySets:
@@ -183,6 +192,9 @@ policySets:
   - name: managed
     placement:
       placementPath: placement/placement-managed.yaml
+  - name: managed-lite
+    placement:
+      placementPath: placement/placement-managed-lite.yaml
   - name: sub-manual
     placement:
       placementPath: placement/placement-sub-manual.yaml
