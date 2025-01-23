@@ -93,7 +93,7 @@ spec:
   remediationAction: inform
   severity: high
   object-templates-raw: |
-    {{hub if eq "none" (index .ManagedClusterLabels "policies.extra") hub}}
+    {{hub if ne "none" (index .ManagedClusterLabels "policies.extra") hub}}
     - complianceType: musthave
       objectDefinition:
         apiVersion: v1
