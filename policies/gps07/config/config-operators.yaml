@@ -311,7 +311,7 @@ kind: ConfigurationPolicy
 metadata:
   name: config-operators-extra
 spec:
-  remediationAction: inform
+  remediationAction: enforce
   severity: high
   object-templates-raw: |
     {{hub if ne "none" (index .ManagedClusterLabels "policies.extra") hub}}

@@ -524,7 +524,7 @@ spec:
                   service:
                     type: ""
           {{hub end hub}}
-        remediationAction: inform
+        remediationAction: enforce
         severity: high
   - objectDefinition:
       apiVersion: policy.open-cluster-management.io/v1
@@ -800,6 +800,7 @@ spec:
               namespace: openshift-logging
         remediationAction: enforce
         severity: medium
+  remediationAction: enforce
 ---
 apiVersion: policy.open-cluster-management.io/v1
 kind: Policy
@@ -1055,7 +1056,7 @@ spec:
                     operator: Exists
                     key: node-role.kubernetes.io/infra
           {{hub end hub}}
-        remediationAction: inform
+        remediationAction: enforce
         severity: high
   - objectDefinition:
       apiVersion: policy.open-cluster-management.io/v1
@@ -1159,6 +1160,7 @@ spec:
               sourceNamespace: openshift-marketplace
         remediationAction: enforce
         severity: medium
+  remediationAction: enforce
 ---
 apiVersion: policy.open-cluster-management.io/v1
 kind: Policy
