@@ -2,28 +2,28 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: openshift-nmstate
+  name: openshift-logging
   annotations:
     scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator":"Exists","effect":"NoSchedule","key":"node-role.kubernetes.io/infra"}]'
 ---
 apiVersion: operators.coreos.com/v1
 kind: OperatorGroup
 metadata:
-  name: openshift-nmstate
-  namespace: openshift-nmstate
+  name: openshift-logging
+  namespace: openshift-logging
 spec:
   targetNamespaces:
-  - openshift-nmstate
+  - openshift-logging
 ---
 apiVersion: operators.coreos.com/v1alpha1
 kind: Subscription
 metadata:
-  name: kubernetes-nmstate-operator
-  namespace: openshift-nmstate
+  name: cluster-logging
+  namespace: openshift-logging
   labels:
     policies.install: ""
 spec:
-  name: kubernetes-nmstate-operator
+  name: cluster-logging
   source: cs-redhat-operator-index
   sourceNamespace: openshift-marketplace
   config:
@@ -37,28 +37,25 @@ spec:
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: openshift-storage
+  name: openshift-workload-availability
   annotations:
     scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator":"Exists","effect":"NoSchedule","key":"node-role.kubernetes.io/infra"}]'
 ---
 apiVersion: operators.coreos.com/v1
 kind: OperatorGroup
 metadata:
-  name: openshift-storage
-  namespace: openshift-storage
-spec:
-  targetNamespaces:
-  - openshift-storage
+  name: openshift-workload-availability
+  namespace: openshift-workload-availability
 ---
 apiVersion: operators.coreos.com/v1alpha1
 kind: Subscription
 metadata:
-  name: lvms-operator
-  namespace: openshift-storage
+  name: node-healthcheck-operator
+  namespace: openshift-workload-availability
   labels:
     policies.install: ""
 spec:
-  name: lvms-operator
+  name: node-healthcheck-operator
   source: cs-redhat-operator-index
   sourceNamespace: openshift-marketplace
   config:
@@ -69,36 +66,15 @@ spec:
       operator: Exists
       key: node-role.kubernetes.io/infra
 ---
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: openshift-gitops-operator
-  annotations:
-    scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator":"Exists","effect":"NoSchedule","key":"node-role.kubernetes.io/infra"}]'
----
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: openshift-gitops
-  annotations:
-    scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator":"Exists","effect":"NoSchedule","key":"node-role.kubernetes.io/infra"}]'
----
-apiVersion: operators.coreos.com/v1
-kind: OperatorGroup
-metadata:
-  name: openshift-gitops-operator
-  namespace: openshift-gitops-operator
-spec:
----
 apiVersion: operators.coreos.com/v1alpha1
 kind: Subscription
 metadata:
-  name: openshift-gitops-operator
-  namespace: openshift-gitops-operator
+  name: self-node-remediation
+  namespace: openshift-workload-availability
   labels:
     policies.install: ""
 spec:
-  name: openshift-gitops-operator
+  name: self-node-remediation
   source: cs-redhat-operator-index
   sourceNamespace: openshift-marketplace
   config:
@@ -108,4 +84,134 @@ spec:
     - effect: NoSchedule
       operator: Exists
       key: node-role.kubernetes.io/infra
+---
+apiVersion: policy.open-cluster-management.io/v1
+kind: ConfigurationPolicy
+metadata:
+  name: install-operators-extra
+spec:
+  remediationAction: inform
+  severity: high
+  object-templates-raw: |
+    {{hub if eq "none" (index .ManagedClusterLabels "policies.extra") hub}}
+    - complianceType: musthave
+      objectDefinition:
+        apiVersion: v1
+        kind: Namespace
+        metadata:
+          name: openshift-nmstate
+          annotations:
+            scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator":"Exists","effect":"NoSchedule","key":"node-role.kubernetes.io/infra"}]'
+    - complianceType: musthave
+      objectDefinition:
+        apiVersion: operators.coreos.com/v1
+        kind: OperatorGroup
+        metadata:
+          name: openshift-nmstate
+          namespace: openshift-nmstate
+        spec:
+          targetNamespaces:
+          - openshift-nmstate
+    - complianceType: musthave
+      objectDefinition:
+        apiVersion: operators.coreos.com/v1alpha1
+        kind: Subscription
+        metadata:
+          name: kubernetes-nmstate-operator
+          namespace: openshift-nmstate
+          labels:
+            policies.install: ""
+        spec:
+          name: kubernetes-nmstate-operator
+          source: cs-redhat-operator-index
+          sourceNamespace: openshift-marketplace
+          config:
+            nodeSelector:
+              node-role.kubernetes.io/infra: ""
+            tolerations:
+            - effect: NoSchedule
+              operator: Exists
+              key: node-role.kubernetes.io/infra
+    - complianceType: musthave
+      objectDefinition:
+        apiVersion: v1
+        kind: Namespace
+        metadata:
+          name: openshift-storage
+          annotations:
+            scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator":"Exists","effect":"NoSchedule","key":"node-role.kubernetes.io/infra"}]'
+    - complianceType: musthave
+      objectDefinition:
+        apiVersion: operators.coreos.com/v1
+        kind: OperatorGroup
+        metadata:
+          name: openshift-storage
+          namespace: openshift-storage
+        spec:
+          targetNamespaces:
+          - openshift-storage
+    - complianceType: musthave
+      objectDefinition:
+        apiVersion: operators.coreos.com/v1alpha1
+        kind: Subscription
+        metadata:
+          name: lvms-operator
+          namespace: openshift-storage
+          labels:
+            policies.install: ""
+        spec:
+          name: lvms-operator
+          source: cs-redhat-operator-index
+          sourceNamespace: openshift-marketplace
+          config:
+            nodeSelector:
+              node-role.kubernetes.io/infra: ""
+            tolerations:
+            - effect: NoSchedule
+              operator: Exists
+              key: node-role.kubernetes.io/infra
+    - complianceType: musthave
+      objectDefinition:
+        apiVersion: v1
+        kind: Namespace
+        metadata:
+          name: openshift-gitops-operator
+          annotations:
+            scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator":"Exists","effect":"NoSchedule","key":"node-role.kubernetes.io/infra"}]'
+    - complianceType: musthave
+      objectDefinition:
+        apiVersion: v1
+        kind: Namespace
+        metadata:
+          name: openshift-gitops
+          annotations:
+            scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator":"Exists","effect":"NoSchedule","key":"node-role.kubernetes.io/infra"}]'
+    - complianceType: musthave
+      objectDefinition:
+        apiVersion: operators.coreos.com/v1
+        kind: OperatorGroup
+        metadata:
+          name: openshift-gitops-operator
+          namespace: openshift-gitops-operator
+    - complianceType: musthave
+      objectDefinition:
+        apiVersion: operators.coreos.com/v1alpha1
+        kind: Subscription
+        metadata:
+          name: openshift-gitops-operator
+          namespace: openshift-gitops-operator
+          labels:
+            policies.install: ""
+        spec:
+          name: openshift-gitops-operator
+          source: cs-redhat-operator-index
+          sourceNamespace: openshift-marketplace
+          config:
+            nodeSelector:
+              node-role.kubernetes.io/infra: ""
+            tolerations:
+            - effect: NoSchedule
+              operator: Exists
+              key: node-role.kubernetes.io/infra
+    {{hub end hub}}
 ---

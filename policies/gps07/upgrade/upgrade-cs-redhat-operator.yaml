@@ -2,7 +2,7 @@
 apiVersion: policy.open-cluster-management.io/v1
 kind: ConfigurationPolicy
 metadata:
-  name: cs-redhat-operator-update
+  name: upgrade-cs-redhat-operator
 spec:
   remediationAction: enforce
   severity: high

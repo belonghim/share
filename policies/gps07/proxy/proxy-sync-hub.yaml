@@ -2,7 +2,7 @@
 apiVersion: policy.open-cluster-management.io/v1
 kind: ConfigurationPolicy
 metadata:
-  name: proxy-router-bundle
+  name: proxy-sync-hub-cm
 spec:
   remediationAction: enforce
   severity: high

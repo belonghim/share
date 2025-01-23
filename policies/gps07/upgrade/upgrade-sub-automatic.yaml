@@ -2,7 +2,7 @@
 apiVersion: policy.open-cluster-management.io/v1
 kind: ConfigurationPolicy
 metadata:
-  name: sub-approval-automatic
+  name: upgrade-sub-automatic
 spec:
   remediationAction: enforce
   severity: high
@@ -22,7 +22,7 @@ spec:
 apiVersion: policy.open-cluster-management.io/v1
 kind: ConfigurationPolicy
 metadata:
-  name: sub-channel-reset
+  name: upgrade-sub-reset
 spec:
   evaluationInterval:
     compliant: 5m
@@ -45,7 +45,7 @@ spec:
 apiVersion: policy.open-cluster-management.io/v1
 kind: ConfigurationPolicy
 metadata:
-  name: install-plan-approved
+  name: upgrade-sub-approval
 spec:
   remediationAction: enforce
   severity: high

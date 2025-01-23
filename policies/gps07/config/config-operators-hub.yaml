@@ -2,7 +2,7 @@
 apiVersion: policy.open-cluster-management.io/v1
 kind: ConfigurationPolicy
 metadata:
-  name: config-cluster-management-addon
+  name: config-operators-hub
 spec:
   remediationAction: enforce
   severity: high

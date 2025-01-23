@@ -2,7 +2,7 @@
 apiVersion: policy.open-cluster-management.io/v1
 kind: ConfigurationPolicy
 metadata:
-  name: marketplace-jobs
+  name: upgrade-marketplace-job
 spec:
   remediationAction: enforce
   severity: high

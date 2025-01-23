@@ -2,7 +2,7 @@
 apiVersion: policy.open-cluster-management.io/v1
 kind: ConfigurationPolicy
 metadata:
-  name: remove-worker-label
+  name: node-infra-label-remove
 spec:
   evaluationInterval:
     compliant: 1m
@@ -35,7 +35,7 @@ spec:
 apiVersion: policy.open-cluster-management.io/v1
 kind: ConfigurationPolicy
 metadata:
-  name: add-infra-label
+  name: node-infra-label-add
 spec:
   remediationAction: enforce
   severity: high

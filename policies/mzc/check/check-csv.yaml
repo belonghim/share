@@ -2,7 +2,7 @@
 apiVersion: policy.open-cluster-management.io/v1
 kind: ConfigurationPolicy
 metadata:
-  name: csv-check
+  name: check-csv
 spec:
   remediationAction: inform
   severity: high
@@ -22,7 +22,7 @@ spec:
 apiVersion: policy.open-cluster-management.io/v1
 kind: ConfigurationPolicy
 metadata:
-  name: install-plan-check
+  name: check-csv-ip
 spec:
   remediationAction: inform
   severity: high

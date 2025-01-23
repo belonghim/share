@@ -2,7 +2,7 @@
 apiVersion: policy.open-cluster-management.io/v1
 kind: ConfigurationPolicy
 metadata:
-  name: create-signatures
+  name: upgrade-signatures-create
 spec:
   remediationAction: enforce
   severity: high
@@ -25,7 +25,7 @@ spec:
 apiVersion: policy.open-cluster-management.io/v1
 kind: ConfigurationPolicy
 metadata:
-  name: delete-signatures
+  name: upgrade-signatures-delete
 spec:
   evaluationInterval:
     compliant: 5m

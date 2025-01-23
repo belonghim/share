@@ -33,15 +33,6 @@ policies:
   - hub
   - managed
 # All Operators Policies - end
-# All Operators base Policies - start
-- name: install-operators-base
-  dependencies:
-  - name: check-cv
-  manifests:
-  - path: install/install-operators-base.yaml
-  policySets:
-  - base
-# All Operators base Policies - end
 # Manual Subscription Policies - start
 - name: upgrade-sub-manual
   evaluationInterval:
@@ -84,7 +75,7 @@ policies:
   manifests:
   - path: proxy/proxy-sync-managed.yaml
   policySets:
-  - base
+  - managed
 # Proxy Router Bundle Policies - end
 # Config  operators Policies - start
 - name: config-operators
@@ -94,13 +85,6 @@ policies:
   - hub
   - managed
 # Config operators Policies - end
-# Config  operators base Policies - start
-- name: config-operators-base
-  manifests:
-  - path: config/config-operators-base.yaml
-  policySets:
-  - base
-# Config operators base Policies - end
 # Config operators hub Policies - start
 - name: config-operators-hub
   manifests:
@@ -121,7 +105,8 @@ policies:
   manifests:
   - path: check/check-cv.yaml
   policySets:
-  - base
+  - hub
+  - managed
   remediationAction: inform
 # CV check Policies - end
 # CSV check Policies - start
@@ -129,7 +114,8 @@ policies:
   manifests:
   - path: check/check-csv.yaml
   policySets:
-  - base
+  - hub
+  - managed
   remediationAction: inform
 # CSV check Policies - end
 # infra label Policies - start
@@ -137,7 +123,8 @@ policies:
   manifests:
   - path: node/node-infra-label.yaml
   policySets:
-  - base
+  - hub
+  - managed
   remediationAction: enforce
 # infra label Policies - end
 # infra toleration Policies - start
@@ -147,7 +134,8 @@ policies:
   manifests:
   - path: node/node-infra-toleration.yaml
   policySets:
-  - base
+  - hub
+  - managed
   remediationAction: enforce
 # infra toleration Policies - end
 # signature cm Policies - start
@@ -155,7 +143,8 @@ policies:
   manifests:
   - path: upgrade/upgrade-signatures.yaml
   policySets:
-  - base
+  - hub
+  - managed
   remediationAction: enforce
 # signature cm Policies - end
 # marketplace jobs Policies - start
@@ -174,7 +163,8 @@ policies:
   manifests:
   - path: upgrade/upgrade-upstream.yaml
   policySets:
-  - base
+  - hub
+  - managed
   remediationAction: enforce
 # upgrade upstream Policies - end
 # upgrade release channel Policies - start
@@ -182,7 +172,8 @@ policies:
   manifests:
   - path: upgrade/upgrade-release-channel.yaml
   policySets:
-  - base
+  - hub
+  - managed
   remediationAction: enforce
 # upgrade release channel Policies - end
 policySets:
@@ -192,9 +183,6 @@ policySets:
   - name: managed
     placement:
       placementPath: placement/placement-managed.yaml
-  - name: base
-    placement:
-      placementPath: placement/placement-base.yaml
   - name: sub-manual
     placement:
       placementPath: placement/placement-sub-manual.yaml

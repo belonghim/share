@@ -2,7 +2,7 @@
 apiVersion: policy.open-cluster-management.io/v1
 kind: ConfigurationPolicy
 metadata:
-  name: sub-approval-manual
+  name: upgrade-sub-manual
 spec:
   remediationAction: enforce
   severity: high

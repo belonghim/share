@@ -48,7 +48,7 @@ spec:
       apiVersion: policy.open-cluster-management.io/v1
       kind: ConfigurationPolicy
       metadata:
-        name: graph-data-tag-digest
+        name: upgrade-osus-digest
       spec:
         evaluationInterval:
           comliant: 10m
