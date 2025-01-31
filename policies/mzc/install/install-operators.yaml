@@ -301,11 +301,26 @@ spec:
               key: node-role.kubernetes.io/infra
     - complianceType: musthave
       objectDefinition:
+        apiVersion: v1
+        kind: Namespace
+        metadata:
+          name: openshift-distributed-tracing
+          annotations:
+            scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator":"Exists","effect":"NoSchedule","key":"node-role.kubernetes.io/infra"}]'
+    - complianceType: musthave
+      objectDefinition:
+        apiVersion: operators.coreos.com/v1
+        kind: OperatorGroup
+        metadata:
+          name: openshift-distributed-tracing
+          namespace: openshift-distributed-tracing
+    - complianceType: musthave
+      objectDefinition:
         apiVersion: operators.coreos.com/v1alpha1
         kind: Subscription
         metadata:
           name: jaeger-product
-          namespace: openshift-operators
+          namespace: openshift-distributed-tracing
           labels:
             policies.install: ""
         spec:
