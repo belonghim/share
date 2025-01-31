@@ -7,7 +7,7 @@ spec:
   remediationAction: enforce
   severity: high
   object-templates-raw: |
-    {{- if eq (lookup "cluster.open-cluster-management.io/v1alpha1" "ClusterClaim" "" "policies.release-channel").kind "ClusterClaim" }}
+    {{hub if ne "" (index .ManagedClusterLabels "policies.release-channel") hub}}
     - complianceType: musthave
       objectDefinition:
         apiVersion: config.openshift.io/v1
@@ -15,6 +15,6 @@ spec:
         metadata:
           name: version
         spec:
-          channel: {{ fromClusterClaim "policies.release-channel" }}
-    {{- end }}
+          channel: {{hub index .ManagedClusterLabels "policies.release-channel" hub}}
+    {{hub end hub}}
 ---

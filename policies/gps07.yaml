@@ -391,7 +391,7 @@ spec:
                 - name: add-cluster-name
                   type: openshiftLabels
                   openshiftLabels:
-                    cluster-name: {{ fromClusterClaim "name" }}
+                    cluster-name: {{hub .ManagedClusterName hub}}
           {{hub end hub}}
           {{hub end hub}}
         remediationAction: enforce
@@ -1703,7 +1703,7 @@ spec:
         name: upgrade-release-channel
       spec:
         object-templates-raw: |
-          {{- if eq (lookup "cluster.open-cluster-management.io/v1alpha1" "ClusterClaim" "" "policies.release-channel").kind "ClusterClaim" }}
+          {{hub if ne "" (index .ManagedClusterLabels "policies.release-channel") hub}}
           - complianceType: musthave
             objectDefinition:
               apiVersion: config.openshift.io/v1
@@ -1711,8 +1711,8 @@ spec:
               metadata:
                 name: version
               spec:
-                channel: {{ fromClusterClaim "policies.release-channel" }}
-          {{- end }}
+                channel: {{hub index .ManagedClusterLabels "policies.release-channel" hub}}
+          {{hub end hub}}
         remediationAction: enforce
         severity: high
   remediationAction: enforce

@@ -302,7 +302,7 @@ spec:
           - name: add-cluster-name
             type: openshiftLabels
             openshiftLabels:
-              cluster-name: {{ fromClusterClaim "name" }}
+              cluster-name: {{hub .ManagedClusterName hub}}
     {{hub end hub}}
     {{hub end hub}}
 ---
