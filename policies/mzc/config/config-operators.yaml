@@ -361,7 +361,7 @@ spec:
             route:
               enabled: false
           ha:
-            enabled: true
+            enabled: {{hub if eq "dev" (index .ManagedClusterLabels "policies.extra") hub}}false{{hub else hub}}true{{hub end hub}}
             resources:
               limits:
                 cpu: 500m
