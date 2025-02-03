@@ -117,9 +117,9 @@ $ openshift-install agent wait-for bootstrap-complete --dir ${Install_Dir} --log
 $ DOMAIN=new-hub.woorifg.lab
 
 ## Set acm node labels
-$ oc label node acm-0.$DOMAIN node-role.kubernetes.io/acm= 
-$ oc label node acm-1.$DOMAIN node-role.kubernetes.io/acm= 
-$ oc label node acm-2.$DOMAIN node-role.kubernetes.io/acm= 
+$ oc label node infra-0.$DOMAIN node-role.kubernetes.io/acm= 
+$ oc label node infra-1.$DOMAIN node-role.kubernetes.io/acm= 
+$ oc label node infra-2.$DOMAIN node-role.kubernetes.io/acm= 
 
 ## Set quay node labels
 $ oc label node infra-0.$DOMAIN node-role.kubernetes.io/infra= 
@@ -128,7 +128,7 @@ $ oc label node infra-2.$DOMAIN node-role.kubernetes.io/infra=
 
 ```
 
-### Delete ACM MCP
+### Delete acm MCP (for extra hub)
 ```
 ## Delete mcp/acm 
 $ oc delete mcp/acm
@@ -137,7 +137,7 @@ $ oc delete mcp/acm
 
 ### Deploy ACM operator
 ```
-## create Namespace, OperatorGroup, Subscription for ACM operator
+## create Namespace, OperatorGroup, Subscription for  operator
 $ oc create -f -<<EOF
 apiVersion: v1
 kind: Namespace
