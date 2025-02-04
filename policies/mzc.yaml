@@ -1407,6 +1407,9 @@ spec:
               metadata:
                 name: openshift-vertical-pod-autoscaler
                 namespace: openshift-vertical-pod-autoscaler
+              spec:
+                targetNamespaces:
+                - openshift-vertical-pod-autoscaler
           - complianceType: musthave
             objectDefinition:
               apiVersion: operators.coreos.com/v1alpha1
