@@ -33,13 +33,13 @@ spec:
   remediationAction: enforce
   severity: high
   object-templates-raw: |
+    {{hub if ne "" (index .ManagedClusterLabels "policies.osus") hub}}
+    {{hub if gt (len (lookup "v1" "ConfigMap" "policies" "" "release.openshift.io/verification-signatures").items) 0 hub}}
     {{- range $cm := (lookup "v1" "ConfigMap" "openshift-config-managed" "" "release.openshift.io/verification-signatures").items }}
     {{- if ne $cm.metadata.name "signatures-managed" }}
     {{- $not_exist := true }}
-    {{hub if ne "" (index .ManagedClusterLabels "policies.osus") hub}}
     {{hub range $hcm := (lookup "v1" "ConfigMap" "policies" "" "release.openshift.io/verification-signatures").items hub}}
     {{- if eq $cm.metadata.name "{{hub $hcm.metadata.name hub}}" }} {{ $not_exist := false }} {{ continue }} {{ end }}
-    {{hub end hub}}
     {{hub end hub}}
     {{- if $not_exist }}
     - complianceType: mustnothave
@@ -52,4 +52,6 @@ spec:
     {{- end }}
     {{- end }}
     {{- end }}
+    {{hub end hub}}
+    {{hub end hub}}
 ---
