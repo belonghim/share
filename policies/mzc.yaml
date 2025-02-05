@@ -1854,6 +1854,7 @@ spec:
         name: proxy-sync-hub-cm
       spec:
         object-templates-raw: |
+          {{- if ne "custom-ca" (lookup "config.openshift.io/v1" "Proxy" "" "cluster").spec.trustCA.name }}
           {{ $mt := "# hub openshift-ingress-operator router-ca tls.crt" }}
           {{ $rc := (fromSecret "openshift-ingress-operator" "router-ca" "tls.crt") | base64dec }}
           {{- if eq (lookup "v1" "ConfigMap" "openshift-config" "router-bundle").kind "ConfigMap" }}{{ $ca := fromConfigMap "openshift-config" "router-bundle" "ca-bundle.crt" }}
@@ -1888,39 +1889,39 @@ spec:
                 name: router-bundle
                 namespace: openshift-config
           {{- end }}
+          - complianceType: musthave
+            objectDefinition:
+              apiVersion: config.openshift.io/v1
+              kind: Proxy
+              metadata:
+                name: cluster
+              spec:
+                trustedCA:
+                  name: router-bundle
+          - complianceType: musthave
+            objectDefinition:
+              apiVersion: v1
+              data:
+                ca-bundle.crt: |
+                  {{ ( fromConfigMap "openshift-config" "router-bundle" "ca-bundle.crt" ) | autoindent }}
+              kind: ConfigMap
+              metadata:
+                name: hub-ca
+                namespace: policies
+          {{- else }}
+          - complianceType: musthave
+            objectDefinition:
+              apiVersion: v1
+              data:
+                ca-bundle.crt: |
+                  {{ ( fromConfigMap "openshift-config" "custom-ca" "ca-bundle.crt" ) | autoindent }}
+              kind: ConfigMap
+              metadata:
+                name: hub-ca
+                namespace: policies
+          {{- end }}
         remediationAction: enforce
         severity: high
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1
-      kind: ConfigurationPolicy
-      metadata:
-        name: proxy-sync-hub
-      spec:
-        evaluationInterval:
-          compliant: 1m
-          noncompliant: 1m
-        object-templates:
-        - complianceType: musthave
-          objectDefinition:
-            apiVersion: v1
-            data:
-              ca-bundle.crt: |
-                {{ ( fromConfigMap "openshift-config" "router-bundle" "ca-bundle.crt" ) | autoindent }}
-            kind: ConfigMap
-            metadata:
-              name: router-bundle
-              namespace: policies
-        - complianceType: musthave
-          objectDefinition:
-            apiVersion: config.openshift.io/v1
-            kind: Proxy
-            metadata:
-              name: cluster
-            spec:
-              trustedCA:
-                name: router-bundle
-        remediationAction: enforce
-        severity: medium
   remediationAction: enforce
 ---
 apiVersion: policy.open-cluster-management.io/v1
@@ -1945,28 +1946,54 @@ spec:
       metadata:
         name: proxy-sync-managed
       spec:
-        object-templates:
-        - complianceType: musthave
-          objectDefinition:
-            apiVersion: v1
-            data:
-              ca-bundle.crt: |
-                {{hub fromConfigMap "policies" "router-bundle" "ca-bundle.crt" | autoindent hub}}
-            kind: ConfigMap
-            metadata:
-              name: router-bundle
-              namespace: openshift-config
-        - complianceType: musthave
-          objectDefinition:
-            apiVersion: config.openshift.io/v1
-            kind: Proxy
-            metadata:
-              name: cluster
-            spec:
-              trustedCA:
-                name: router-bundle
+        object-templates-raw: |
+          {{hub if eq "ConfigMap" (lookup "v1" "ConfigMap" "policies" "hub-ca").kind hub}}
+          {{ $mt := "# custom-ca copied from hub-ca" }}
+          {{ $rc := base64dec "{{hub fromConfigMap "policies" "hub-ca" "ca-bundle.crt" | base64enc hub}}" }}
+          {{- if eq (lookup "v1" "ConfigMap" "openshift-config" "custom-ca").kind "ConfigMap" }}{{ $ca := fromConfigMap "openshift-config" "custom-ca" "ca-bundle.crt" }}
+          {{- if not (contains $rc $ca) }}
+          {{- if contains $mt $ca }}
+          {{- $pr := (splitn $mt 2 $ca)._0 }}{{ if ne "" $pr }}{{ $mt = cat $pr $mt  }}{{ end }}
+          {{- $ca = (splitn "-----END CERTIFICATE-----" 2 (splitn $mt 2 $ca)._1)._1 }}
+          {{- end }}
+          - complianceType: musthave
+            objectDefinition:
+              apiVersion: v1
+              data:
+                ca-bundle.crt: |
+                  {{ $mt }}
+                  {{ $rc | autoindent }}
+                  {{ $ca | autoindent }}
+              kind: ConfigMap
+              metadata:
+                name: custom-ca
+                namespace: openshift-config
+          {{- end }}
+          {{- else }}
+          - complianceType: musthave
+            objectDefinition:
+              apiVersion: v1
+              data:
+                ca-bundle.crt: |
+                  {{ $mt }}
+                  {{ $rc | autoindent }}
+              kind: ConfigMap
+              metadata:
+                name: custom-ca
+                namespace: openshift-config
+          {{- end }}
+          - complianceType: musthave
+            objectDefinition:
+              apiVersion: config.openshift.io/v1
+              kind: Proxy
+              metadata:
+                name: cluster
+              spec:
+                trustedCA:
+                  name: custom-ca
+          {{hub end hub}}
         remediationAction: enforce
-        severity: medium
+        severity: high
   remediationAction: enforce
 ---
 apiVersion: policy.open-cluster-management.io/v1
