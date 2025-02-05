@@ -30,7 +30,7 @@ spec:
             spec:
               replicas: 2
               releases: $REGISTRY/$REPO/openshift/release-images
-              graphDataImage: $REGISTRY/$REPO/openshift/graph-data:latest
+              graphDataImage: $REGISTRY/openshift/graph-data:latest
             status:
               conditions:
               - status: "True"
