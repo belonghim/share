@@ -683,8 +683,6 @@ spec:
     matchExpressions:
       - {key: machineconfiguration.openshift.io/role, operator: In, values: [worker,acm]}
   nodeSelector:
-    matchLabels:
-      node-role.kubernetes.io/infra: ""
     matchExpressions:
     - key: node-role.kubernetes.io/acm
       operator: Exists
