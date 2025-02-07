@@ -1532,7 +1532,6 @@ spec:
               nodePlacement:
                 tolerations:
                 - effect: NoSchedule
-                  key: node-role.kubernetes.io/infra
                   operator: Exists
         remediationAction: enforce
         severity: medium
