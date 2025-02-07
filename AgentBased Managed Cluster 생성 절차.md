@@ -998,7 +998,6 @@ spec:
     tolerations:
     - effect: NoSchedule
       operator: Exists
-      key: node-role.kubernetes.io/infra
 EOF
 
 ## cluster-monitoring-config 설정
