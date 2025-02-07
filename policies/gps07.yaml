@@ -1453,6 +1453,18 @@ spec:
               annotations:
                 scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator":"Exists","effect":"NoSchedule","key":"node-role.kubernetes.io/infra"}]'
               name: openshift-network-diagnostics
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: operator.openshift.io/v1
+            kind: DNS
+            metadata:
+              name: default
+            spec:
+              nodePlacement:
+                tolerations:
+                - effect: NoSchedule
+                  key: node-role.kubernetes.io/infra
+                  operator: Exists
         remediationAction: enforce
         severity: medium
   remediationAction: enforce
