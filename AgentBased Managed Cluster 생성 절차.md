@@ -668,8 +668,29 @@ spec:
     matchExpressions:
       - {key: machineconfiguration.openshift.io/role, operator: In, values: [worker,infra]}
   nodeSelector:
-    matchLabels:
-      node-role.kubernetes.io/infra: ""
+    matchExpressions:
+    - key: node-role.kubernetes.io/infra
+      operator: Exists
+    - key: node-role.kubernetes.io/acm
+      operator: DoesNotExist
+EOF
+
+## acm mcp 생성
+cat > ${INSTALL_DIR}/openshift/mcp-acm.yaml<<EOF
+apiVersion: machineconfiguration.openshift.io/v1
+kind: MachineConfigPool
+metadata:
+  name: acm
+spec:
+  machineConfigSelector:
+    matchExpressions:
+      - {key: machineconfiguration.openshift.io/role, operator: In, values: [worker,acm]}
+  nodeSelector:
+    matchExpressions:
+    - key: node-role.kubernetes.io/acm
+      operator: Exists
+    - key: node-role.kubernetes.io/infra
+      operator: DoesNotExist
 EOF
 
 ## master 에 kernel arguments 추가
