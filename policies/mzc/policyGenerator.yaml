@@ -138,6 +138,17 @@ policies:
   - managed
   remediationAction: enforce
 # infra toleration Policies - end
+# infra mcp Policies - start
+- name: node-infra-mcp
+  evaluationInterval:
+    compliant: never
+  manifests:
+  - path: node/node-infra-mcp.yaml
+  policySets:
+  - hub
+  - managed
+  remediationAction: enforce
+# infra mcp Policies - end
 # signature cm Policies - start
 - name: upgrade-signatures
   manifests:

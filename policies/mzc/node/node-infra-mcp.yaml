@@ -1,0 +1,39 @@
+---
+apiVersion: machineconfiguration.openshift.io/v1
+kind: MachineConfigPool
+metadata:
+  name: infra
+spec:
+  machineConfigSelector:
+    matchExpressions:
+    - key: machineconfiguration.openshift.io/role
+      operator: In
+      values:
+      - worker
+      - infra
+  nodeSelector:
+    matchExpressions:
+    - key: node-role.kubernetes.io/infra
+      operator: Exists
+    - key: node-role.kubernetes.io/acm
+      operator: DoesNotExist
+---
+apiVersion: machineconfiguration.openshift.io/v1
+kind: MachineConfigPool
+metadata:
+  name: acm
+spec:
+  machineConfigSelector:
+    matchExpressions:
+    - key: machineconfiguration.openshift.io/role
+      operator: In
+      values:
+      - worker
+      - acm
+  nodeSelector:
+    matchExpressions:
+    - key: node-role.kubernetes.io/acm
+      operator: Exists
+    - key: node-role.kubernetes.io/infra
+      operator: DoesNotExist
+---

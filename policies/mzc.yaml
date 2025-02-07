@@ -1773,6 +1773,75 @@ metadata:
     policy.open-cluster-management.io/standards: NIST SP 800-53
   labels:
     open-cluster-management.io/policy-set: opp
+  name: node-infra-mcp
+  namespace: policies
+spec:
+  disabled: false
+  policy-templates:
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: node-infra-mcp
+      spec:
+        evaluationInterval:
+          compliant: never
+        object-templates:
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: machineconfiguration.openshift.io/v1
+            kind: MachineConfigPool
+            metadata:
+              name: infra
+            spec:
+              machineConfigSelector:
+                matchExpressions:
+                - key: machineconfiguration.openshift.io/role
+                  operator: In
+                  values:
+                  - worker
+                  - infra
+              nodeSelector:
+                matchExpressions:
+                - key: node-role.kubernetes.io/infra
+                  operator: Exists
+                - key: node-role.kubernetes.io/acm
+                  operator: DoesNotExist
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: machineconfiguration.openshift.io/v1
+            kind: MachineConfigPool
+            metadata:
+              name: acm
+            spec:
+              machineConfigSelector:
+                matchExpressions:
+                - key: machineconfiguration.openshift.io/role
+                  operator: In
+                  values:
+                  - worker
+                  - acm
+              nodeSelector:
+                matchExpressions:
+                - key: node-role.kubernetes.io/acm
+                  operator: Exists
+                - key: node-role.kubernetes.io/infra
+                  operator: DoesNotExist
+        remediationAction: enforce
+        severity: medium
+  remediationAction: enforce
+---
+apiVersion: policy.open-cluster-management.io/v1
+kind: Policy
+metadata:
+  annotations:
+    argocd.argoproj.io/compare-options: IgnoreExtraneous
+    policy.open-cluster-management.io/categories: CM Configuration Management
+    policy.open-cluster-management.io/controls: CM-2 Baseline Configuration
+    policy.open-cluster-management.io/description: ""
+    policy.open-cluster-management.io/standards: NIST SP 800-53
+  labels:
+    open-cluster-management.io/policy-set: opp
   name: node-infra-toleration
   namespace: policies
 spec:
@@ -2389,6 +2458,7 @@ spec:
   - install-operators
   - install-operators-hub
   - node-infra-label
+  - node-infra-mcp
   - node-infra-toleration
   - proxy-sync-hub
   - upgrade-release-channel
@@ -2413,6 +2483,7 @@ spec:
   - config-operators-managed
   - install-operators
   - node-infra-label
+  - node-infra-mcp
   - node-infra-toleration
   - proxy-sync-managed
   - upgrade-release-channel
