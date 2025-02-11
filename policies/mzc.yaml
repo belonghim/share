@@ -608,9 +608,7 @@ spec:
                         resources:
                           requests:
                             storage: 90Gi
-                          retention: 24h
-                          retentionSize: 90GB
-                          scrapeInterval: 1m
+                    retentionSize: 60GB
           {{- end }}
                   prometheusOperator:
                     nodeSelector:
@@ -639,6 +637,14 @@ spec:
         name: config-operators
       spec:
         object-templates:
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: v1
+            kind: Namespace
+            metadata:
+              annotations:
+                openshift.io/node-selector: node-role.kubernetes.io/master=
+              name: openshift-console
         - complianceType: musthave
           objectDefinition:
             apiVersion: self-node-remediation.medik8s.io/v1alpha1

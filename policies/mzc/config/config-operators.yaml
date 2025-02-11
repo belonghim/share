@@ -1,4 +1,11 @@
 ---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: openshift-console
+  annotations:
+    openshift.io/node-selector: node-role.kubernetes.io/master=
+---
 apiVersion: self-node-remediation.medik8s.io/v1alpha1
 kind: SelfNodeRemediationConfig
 metadata:
@@ -519,9 +526,7 @@ spec:
                   resources:
                     requests:
                       storage: 90Gi
-                    retention: 24h
-                    retentionSize: 90GB
-                    scrapeInterval: 1m
+              retentionSize: 60GB
     {{- end }}
             prometheusOperator:
               nodeSelector:
