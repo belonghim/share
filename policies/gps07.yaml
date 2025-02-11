@@ -530,7 +530,7 @@ spec:
       apiVersion: policy.open-cluster-management.io/v1
       kind: ConfigurationPolicy
       metadata:
-        name: config-operators-logforwarder
+        name: config-operators-monitoring
       spec:
         object-templates-raw: |
           - complianceType: musthave
