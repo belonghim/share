@@ -549,7 +549,7 @@ spec:
                     - effect: NoSchedule
                       key: node-role.kubernetes.io/infra
                       operator: Exists
-          {{ if eq "Bound" (lookup v1 PersistentVolumeClaim "clushkube-monitoring" "alertmanager-main-db-0").kind }}
+          {{ if eq "Bound" (lookup "v1" "PersistentVolumeClaim" "clushkube-monitoring" "alertmanager-main-db-0").kind }}
                     volumeClaimTemplate:
                       metadata:
                         name: alertmanager-main-db
@@ -592,7 +592,7 @@ spec:
                       managed_cluster: {{hub .ManagedClusterName hub}}
                     nodeSelector:
                       node-role.kubernetes.io/infra: ""
-          {{ if eq "Service" (lookup v1 Service "clushkube-monitoring" "kube-prometheus-stack-prometheus").kind }}
+          {{ if eq "Service" (lookup "v1" "Service" "clushkube-monitoring" "kube-prometheus-stack-prometheus").kind }}
                     remoteWrite:
                       - url: http://kube-prometheus-stack-prometheus.clushkube-monitoring.svc.cluster.local:9090/api/v1/write
           {{ end }}
@@ -600,7 +600,7 @@ spec:
                     - effect: NoSchedule
                       key: node-role.kubernetes.io/infra
                       operator: Exists
-          {{ if eq "Bound" (lookup v1 PersistentVolumeClaim "clushkube-monitoring" "prometheus-k8s-db-0").kind }}
+          {{ if eq "Bound" (lookup "v1" "PersistentVolumeClaim" "clushkube-monitoring" "prometheus-k8s-db-0").kind }}
                     volumeClaimTemplate:
                       metadata:
                         name: prometheus-k8s-db
