@@ -6,6 +6,20 @@ metadata:
   annotations:
     openshift.io/node-selector: node-role.kubernetes.io/master=
 ---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: openshift-kube-storage-version-migrator
+  annotations:
+    openshift.io/node-selector: node-role.kubernetes.io/master=
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: openshift-network-console
+  annotations:
+    openshift.io/node-selector: node-role.kubernetes.io/infra=
+---
 apiVersion: self-node-remediation.medik8s.io/v1alpha1
 kind: SelfNodeRemediationConfig
 metadata:
