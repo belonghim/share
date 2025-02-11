@@ -467,7 +467,7 @@ spec:
               - effect: NoSchedule
                 key: node-role.kubernetes.io/infra
                 operator: Exists
-    {{- if eq "Bound" (lookup "v1" "PersistentVolumeClaim" "clushkube-monitoring" "alertmanager-main-db-0").status.phase }}
+    {{- if eq "Bound" (lookup "v1" "PersistentVolumeClaim" "openshift-monitoring" "alertmanager-main-db-alertmanager-main-0").status.phase }}
               volumeClaimTemplate:
                 metadata:
                   name: alertmanager-main-db
@@ -514,11 +514,12 @@ spec:
               remoteWrite:
                 - url: http://kube-prometheus-stack-prometheus.clushkube-monitoring.svc.cluster.local:9090/api/v1/write
     {{- end }}
+              retentionSize: 60GiB
               tolerations:
               - effect: NoSchedule
                 key: node-role.kubernetes.io/infra
                 operator: Exists
-    {{- if eq "Bound" (lookup "v1" "PersistentVolumeClaim" "clushkube-monitoring" "prometheus-k8s-db-0").status.phase }}
+    {{- if eq "Bound" (lookup "v1" "PersistentVolumeClaim" "openshift-monitoring" "prometheus-k8s-db-prometheus-k8s-0").status.phase }}
               volumeClaimTemplate:
                 metadata:
                   name: prometheus-k8s-db
@@ -526,7 +527,6 @@ spec:
                   resources:
                     requests:
                       storage: 90Gi
-              retentionSize: 60GB
     {{- end }}
             prometheusOperator:
               nodeSelector:
