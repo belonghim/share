@@ -570,7 +570,7 @@ spec:
   severity: high
   object-templates-raw: |
     {{- $rc := ( (lookup "machineconfiguration.openshift.io/v1" "MachineConfigPool" "" "infra").status.machineCount | toInt ) }}
-    {{- if lt 0 $rc }}
+    {{- if lt 1 $rc }}
     - complianceType: musthave
       objectDefinition:
         apiVersion: operator.openshift.io/v1
