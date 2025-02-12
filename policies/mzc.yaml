@@ -637,6 +637,8 @@ spec:
         name: config-operators-ingresscontroller
       spec:
         object-templates-raw: |
+          {{- $rc := ( (lookup "machineconfiguration.openshift.io/v1" "MachineConfigPool" "" "infra").status.machineCount | toInt ) }}
+          {{- if lt 0 $rc }}
           - complianceType: musthave
             objectDefinition:
               apiVersion: operator.openshift.io/v1
@@ -645,7 +647,8 @@ spec:
                 name: default
                 namespace: openshift-ingress-operator
               spec:
-                replicas: {{ (lookup "machineconfiguration.openshift.io/v1" "MachineConfigPool" "" "infra").status.machineCount }}
+                replicas: {{ $rc }}
+          {{- end }}
         remediationAction: enforce
         severity: high
   - objectDefinition:
