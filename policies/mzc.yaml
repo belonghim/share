@@ -634,6 +634,24 @@ spec:
       apiVersion: policy.open-cluster-management.io/v1
       kind: ConfigurationPolicy
       metadata:
+        name: config-operators-ingresscontroller
+      spec:
+        object-templates-raw: |
+          - complianceType: musthave
+            objectDefinition:
+              apiVersion: operator.openshift.io/v1
+              kind: IngressController
+              metadata:
+                name: default
+                namespace: openshift-ingress-operator
+              spec:
+                replicas: {{ (lookup "machineconfiguration.openshift.io/v1" "MachineConfigPool" "" "infra").status.machineCount }}
+        remediationAction: enforce
+        severity: high
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
         name: config-operators
       spec:
         object-templates:
