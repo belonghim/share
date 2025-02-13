@@ -961,6 +961,7 @@ spec:
             kind: DevWorkspaceOperatorConfig
             metadata:
               name: devworkspace-operator-config
+              namespace: openshift-operators
         remediationAction: enforce
         severity: medium
   remediationAction: enforce
