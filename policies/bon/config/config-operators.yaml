@@ -290,6 +290,7 @@ spec:
     {{hub- if (lookup "v1" "ConfigMap" "policies" "config-operators").data.logBrokers hub}}
     {{hub- if (lookup "v1" "ConfigMap" "policies" "config-operators").data.logTopic hub}}
     - complianceType: musthave
+      recreateOption: IfRequired
       objectDefinition:
         apiVersion: observability.openshift.io/v1
         kind: ClusterLogForwarder
