@@ -1557,8 +1557,6 @@ spec:
             apiVersion: operators.coreos.com/v1alpha1
             kind: Subscription
             metadata:
-              labels:
-                policies.install: ""
               name: multicluster-engine
               namespace: multicluster-engine
             spec:
