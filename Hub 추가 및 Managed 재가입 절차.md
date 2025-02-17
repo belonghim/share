@@ -282,8 +282,7 @@ $ oc label mcl local-cluster policies.osus=ocp4
 
 ### Apply cluster-log-forwarder
 ```
-$ oc -n policies annotate policy config-operators policies.log-topic=test
-$ oc -n policies annotate policy config-operators policies.log-brokers='["tcp://192.168.10.3:7777","tcp://192.168.10.4:7777","tcp://192.168.10.5:7777"]'
+$ oc -n policies create cm config-operators --from-literal logTopic=test --from-literal logBrokers='["tcp://192.168.10.3:7777","tcp://192.168.10.4:7777","tcp://192.168.10.5:7777"]'
 ```
 
 ### Check the policies & operators
