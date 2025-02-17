@@ -163,11 +163,11 @@ $ mv linux-amd64-PolicyGenerator ${HOME}/.config/kustomize/plugin/policy.open-cl
 $ git clone https://github.com/belonghim/share
 
 ## Generate policies
-$ cd share/policies/mzc
-$ oc kustomize --enable-alpha-plugins --output ../mzc.yaml
+$ cd share/policies/bon
+$ oc kustomize --enable-alpha-plugins --output ../bon.yaml
 
 ## Apply the OPP policies
-$ oc apply -f ../mzc.yaml
+$ oc apply -f ../bon.yaml
 
 
 #### Additional policies
