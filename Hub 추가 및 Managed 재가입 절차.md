@@ -261,7 +261,7 @@ EOF
 ### Apply the policies
 ```
 ## Apply the OPP policies
-$ oc apply -f mzc.yaml
+$ oc apply -f bon.yaml
 
 
 #### Additional policies
