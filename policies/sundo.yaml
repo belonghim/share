@@ -352,7 +352,6 @@ spec:
                 name: log-forwarder
                 namespace: openshift-logging
               spec:
-                managementState: Managed
                 collector:
                   resources:
                     limits:
@@ -365,20 +364,29 @@ spec:
                   name: log-collector
                 outputs:
                 - name: kafka-receiver
-                  type: kafka
                   kafka:
                     brokers: {{hub (lookup "v1" "ConfigMap" "policies" "config-operators").data.logBrokers hub}}
                     topic: {{hub (lookup "v1" "ConfigMap" "policies" "config-operators").data.logTopic hub}}
                     tuning:
+                      compression: none
                       deliveryMode: AtLeastOnce
                       maxWrite: 10M
-                      compression: none
+                  type: kafka
+          {{hub- if ne "" (index .ManagedClusterLabels "policies.log-url") hub}}
+                - name: rsyslog
+                  syslog:
+                    facility: user
+                    rfc: RFC5424
+                    severity: debug
+                  type: syslog
+                  url: {{hub index .ManagedClusterLabels "policies.log-url" hub}}
+          {{hub- end hub}}
                 pipelines:
                 - name: audit-log
                   inputRefs:
                   - audit
                   outputRefs:
-                  - kafka-receiver
+                  - {{hub if ne "" (index .ManagedClusterLabels "policies.log-url") hub}}rsyslog{{hub else hub}}kafka-receiver{{hub end hub}}
                   filterRefs:
                   - add-cluster-name
                 - name: infra-log
