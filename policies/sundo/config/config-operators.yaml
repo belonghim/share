@@ -202,7 +202,6 @@ spec:
       containers:
       - name: kube-eventrouter
         image: registry.redhat.io/openshift-logging/eventrouter-rhel9:v0.4
-        imagePullPolicy: IfNotPresent
         resources:
           requests:
             cpu: 100m

@@ -889,7 +889,6 @@ spec:
                 spec:
                   containers:
                   - image: registry.redhat.io/openshift-logging/eventrouter-rhel9:v0.4
-                    imagePullPolicy: IfNotPresent
                     name: kube-eventrouter
                     resources:
                       requests:
