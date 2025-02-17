@@ -341,9 +341,10 @@ spec:
         name: config-operators-logforwarder
       spec:
         object-templates-raw: |
-          {{hub if ne "" (index .PolicyMetadata.annotations "policies.log-brokers") hub}}
-          {{hub if ne "" (index .PolicyMetadata.annotations "policies.log-topic") hub}}
+          {{hub- if (lookup "v1" "ConfigMap" "policies" "config-operators").data.logBrokers hub}}
+          {{hub- if (lookup "v1" "ConfigMap" "policies" "config-operators").data.logTopic hub}}
           - complianceType: musthave
+            recreateOption: IfRequired
             objectDefinition:
               apiVersion: observability.openshift.io/v1
               kind: ClusterLogForwarder
@@ -366,8 +367,8 @@ spec:
                 - name: kafka-receiver
                   type: kafka
                   kafka:
-                    brokers: {{hub index .PolicyMetadata.annotations "policies.log-brokers" hub}}
-                    topic: {{hub index .PolicyMetadata.annotations "policies.log-topic" hub}}
+                    brokers: {{hub (lookup "v1" "ConfigMap" "policies" "config-operators").data.logBrokers hub}}
+                    topic: {{hub (lookup "v1" "ConfigMap" "policies" "config-operators").data.logTopic hub}}
                     tuning:
                       deliveryMode: AtLeastOnce
                       maxWrite: 10M
@@ -392,8 +393,8 @@ spec:
                   type: openshiftLabels
                   openshiftLabels:
                     cluster-name: {{hub .ManagedClusterName hub}}
-          {{hub end hub}}
-          {{hub end hub}}
+          {{hub- end hub}}
+          {{hub- end hub}}
         remediationAction: enforce
         severity: high
   - objectDefinition:
@@ -480,7 +481,7 @@ spec:
                   defaultPolicy: ""
                   policy: |
                     g, system:cluster-admins, role:admin
-                    g, cluster-admins, role:admin
+                    g, cluster-admin, role:admin
                   scopes: '[groups]'
                 redis:
                   resources:
