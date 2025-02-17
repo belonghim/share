@@ -678,14 +678,6 @@ spec:
             metadata:
               annotations:
                 openshift.io/node-selector: node-role.kubernetes.io/master=
-              name: openshift-console
-        - complianceType: musthave
-          objectDefinition:
-            apiVersion: v1
-            kind: Namespace
-            metadata:
-              annotations:
-                openshift.io/node-selector: node-role.kubernetes.io/master=
               name: openshift-kube-storage-version-migrator
         - complianceType: musthave
           objectDefinition:
