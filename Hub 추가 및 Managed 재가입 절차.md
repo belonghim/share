@@ -285,6 +285,11 @@ $ oc label mcl local-cluster policies.osus=ocp4
 $ oc -n policies create cm config-operators --from-literal logTopic=test --from-literal logBrokers='["tcp://192.168.10.3:7777","tcp://192.168.10.4:7777","tcp://192.168.10.5:7777"]'
 ```
 
+### (Optional) Apply dev environment
+```
+$ oc label mcl local-cluster policies.extra=dev
+```
+
 ### Check the policies & operators
 ```
 ## Check the policies and operators
