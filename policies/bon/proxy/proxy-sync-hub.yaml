@@ -7,9 +7,9 @@ spec:
   remediationAction: enforce
   severity: high
   object-templates-raw: |
-    {{- if (lookup "config.openshift.io/v1" "Proxy" "" "cluster").spec.trustedCA.name }}
-    {{ $mt := "# hub openshift-ingress-operator router-ca tls.crt" }}
-    {{ $rc := (fromSecret "openshift-ingress-operator" "router-ca" "tls.crt") | base64dec }}
+    {{- if not (contains "custom-ca" (lookup "config.openshift.io/v1" "Proxy" "" "cluster").spec.trustedCA.name) }}
+    {{- $mt := "# hub openshift-ingress-operator router-ca tls.crt" }}
+    {{- $rc := (fromSecret "openshift-ingress-operator" "router-ca" "tls.crt") | base64dec }}
     {{- if eq (lookup "v1" "ConfigMap" "openshift-config" "router-bundle").kind "ConfigMap" }}{{ $ca := fromConfigMap "openshift-config" "router-bundle" "ca-bundle.crt" }}
     {{- if not (contains $rc $ca) }}
     {{- if contains $mt $ca }}
