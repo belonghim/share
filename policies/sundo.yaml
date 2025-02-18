@@ -1959,9 +1959,9 @@ spec:
         name: proxy-sync-managed
       spec:
         object-templates-raw: |
-          {{hub if eq "ConfigMap" (lookup "v1" "ConfigMap" "policies" "hub-ca").kind hub}}
-          {{ $mt := "# custom-ca copied from hub-ca" }}
-          {{ $rc := base64dec "{{hub fromConfigMap "policies" "hub-ca" "ca-bundle.crt" | base64enc hub}}" }}
+          {{hub- if eq "ConfigMap" (lookup "v1" "ConfigMap" "policies" "hub-ca").kind hub}}
+          {{- $mt := "# custom-ca copied from hub-ca" }}
+          {{- $rc := base64dec "{{hub fromConfigMap "policies" "hub-ca" "ca-bundle.crt" | base64enc hub}}" }}
           {{- if eq (lookup "v1" "ConfigMap" "openshift-config" "custom-ca").kind "ConfigMap" }}{{ $ca := fromConfigMap "openshift-config" "custom-ca" "ca-bundle.crt" }}
           {{- if not (contains $rc $ca) }}
           {{- if contains $mt $ca }}
@@ -2003,7 +2003,7 @@ spec:
               spec:
                 trustedCA:
                   name: custom-ca
-          {{hub end hub}}
+          {{hub- end hub}}
         remediationAction: enforce
         severity: high
   remediationAction: enforce
