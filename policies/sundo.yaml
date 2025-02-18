@@ -472,7 +472,7 @@ spec:
                   enabled: false
                 nodePlacement:
                   nodeSelector:
-                    node-role.kubernetes.io/infra: ""
+                    node-role.kubernetes.io/worker: ""
                   tolerations:
                   - effect: NoSchedule
                     key: node-role.kubernetes.io/infra
@@ -1143,7 +1143,7 @@ spec:
               metadata:
                 name: openshift-gitops
                 annotations:
-                  openshift.io/node-selector: node-role.kubernetes.io/infra=
+                  openshift.io/node-selector: node-role.kubernetes.io/worker=
                   scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator":"Exists","effect":"NoSchedule","key":"node-role.kubernetes.io/infra"}]'
           - complianceType: musthave
             objectDefinition:

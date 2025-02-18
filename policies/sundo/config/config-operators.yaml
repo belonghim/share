@@ -396,7 +396,7 @@ spec:
             enabled: false
           nodePlacement:
             nodeSelector:
-              node-role.kubernetes.io/infra: ""
+              node-role.kubernetes.io/worker: ""
             tolerations:
             - effect: NoSchedule
               key: node-role.kubernetes.io/infra
