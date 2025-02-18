@@ -400,7 +400,7 @@ spec:
                 - name: add-cluster-name
                   type: openshiftLabels
                   openshiftLabels:
-                    cluster-name: {{hub .ManagedClusterName hub}}
+                    cluster-name: {{ (lookup "config.openshift.io/v1" "Infrastructure" "" "cluster").status.infrastructureName }}
           {{hub- end hub}}
           {{hub- end hub}}
         remediationAction: enforce
@@ -602,7 +602,7 @@ spec:
                       operator: Exists
                   prometheusK8s:
                     externalLabels:
-                      managed_cluster: {{hub .ManagedClusterName hub}}
+                      managed_cluster: {{ (lookup "config.openshift.io/v1" "Infrastructure" "" "cluster").status.infrastructureName }}
                     nodeSelector:
                       node-role.kubernetes.io/infra: ""
           {{- if eq "Service" (lookup "v1" "Service" "clushkube-monitoring" "kube-prometheus-stack-prometheus").kind }}
