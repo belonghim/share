@@ -373,10 +373,8 @@ spec:
     enabled: true
 EOF
 
-### (Optional) Apply dev environment
-```
+## (Optional) Apply dev environment
 $ oc label mcl ${ManagedCluster} policies.extra=dev
-```
 
 ## Validate the JOINED and AVAILABLE status of the managed cluster
 $ oc get managedcluster ${ManagedKubeconfig}
