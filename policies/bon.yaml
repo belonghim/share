@@ -2343,6 +2343,13 @@ spec:
               metadata:
                 name: {{ $mj.metadata.name }}
                 namespace: openshift-marketplace
+          - complianceType: mustnothave
+            objectDefinition:
+              apiVersion: v1
+              kind: ConfigMap
+              metadata:
+                name: {{ $mj.metadata.name }}
+                namespace: openshift-marketplace
           {{ end }}
           {{ end }}
         remediationAction: enforce
