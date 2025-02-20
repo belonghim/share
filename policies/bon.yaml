@@ -338,6 +338,26 @@ spec:
       apiVersion: policy.open-cluster-management.io/v1
       kind: ConfigurationPolicy
       metadata:
+        name: config-operators-clean-og
+      spec:
+        object-templates-raw: |
+          {{- range $og := (lookup "operators.coreos.com/v1" "OperatorGroup" "" "" "policies.install").items }}
+          {{- range $cg := (lookup "operators.coreos.com/v1" "OperatorGroup" $og.metadata.namespace "" "!policies.install").items }}
+          - complianceType: mustnothave
+            objectDefinition:
+              apiVersion: operators.coreos.com/v1
+              kind: OperatorGroup
+              metadata:
+                name: {{ $cg.metadata.name }}
+                namespace: {{ $cg.metadata.namespace }}
+          {{- end }}
+          {{- end }}
+        remediationAction: enforce
+        severity: high
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
         name: config-operators-logforwarder
       spec:
         object-templates-raw: |
@@ -1120,6 +1140,8 @@ spec:
               metadata:
                 name: openshift-nmstate
                 namespace: openshift-nmstate
+                labels:
+                  policies.install: ""
               spec:
                 targetNamespaces:
                 - openshift-nmstate
@@ -1158,6 +1180,8 @@ spec:
               metadata:
                 name: openshift-storage
                 namespace: openshift-storage
+                labels:
+                  policies.install: ""
               spec:
                 targetNamespaces:
                 - openshift-storage
@@ -1205,6 +1229,8 @@ spec:
               metadata:
                 name: openshift-gitops-operator
                 namespace: openshift-gitops-operator
+                labels:
+                  policies.install: ""
           - complianceType: musthave
             objectDefinition:
               apiVersion: operators.coreos.com/v1alpha1
@@ -1240,6 +1266,8 @@ spec:
               metadata:
                 name: openshift-local-storage
                 namespace: openshift-local-storage
+                labels:
+                  policies.install: ""
               spec:
                 targetNamespaces:
                 - openshift-local-storage
@@ -1326,6 +1354,8 @@ spec:
               metadata:
                 name: openshift-distributed-tracing
                 namespace: openshift-distributed-tracing
+                labels:
+                  policies.install: ""
           - complianceType: musthave
             objectDefinition:
               apiVersion: operators.coreos.com/v1alpha1
@@ -1401,6 +1431,8 @@ spec:
               metadata:
                 name: openshift-tempo-operator
                 namespace: openshift-tempo-operator
+                labels:
+                  policies.install: ""
           - complianceType: musthave
             objectDefinition:
               apiVersion: operators.coreos.com/v1alpha1
@@ -1436,6 +1468,8 @@ spec:
               metadata:
                 name: openshift-opentelemetry-operator
                 namespace: openshift-opentelemetry-operator
+                labels:
+                  policies.install: ""
           - complianceType: musthave
             objectDefinition:
               apiVersion: operators.coreos.com/v1alpha1
@@ -1471,6 +1505,8 @@ spec:
               metadata:
                 name: openshift-netobserv-operator
                 namespace: openshift-netobserv-operator
+                labels:
+                  policies.install: ""
           - complianceType: musthave
             objectDefinition:
               apiVersion: operators.coreos.com/v1alpha1
@@ -1506,6 +1542,8 @@ spec:
               metadata:
                 name: node-observability-operator
                 namespace: node-observability-operator
+                labels:
+                  policies.install: ""
           - complianceType: musthave
             objectDefinition:
               apiVersion: operators.coreos.com/v1alpha1
@@ -1541,6 +1579,8 @@ spec:
               metadata:
                 name: openshift-keda
                 namespace: openshift-keda
+                labels:
+                  policies.install: ""
           - complianceType: musthave
             objectDefinition:
               apiVersion: operators.coreos.com/v1alpha1
@@ -1576,6 +1616,8 @@ spec:
               metadata:
                 name: openshift-vertical-pod-autoscaler
                 namespace: openshift-vertical-pod-autoscaler
+                labels:
+                  policies.install: ""
               spec:
                 targetNamespaces:
                 - openshift-vertical-pod-autoscaler
@@ -1622,6 +1664,8 @@ spec:
             apiVersion: operators.coreos.com/v1
             kind: OperatorGroup
             metadata:
+              labels:
+                policies.install: ""
               name: openshift-logging
               namespace: openshift-logging
             spec:
@@ -1660,6 +1704,8 @@ spec:
             apiVersion: operators.coreos.com/v1
             kind: OperatorGroup
             metadata:
+              labels:
+                policies.install: ""
               name: openshift-workload-availability
               namespace: openshift-workload-availability
         - complianceType: musthave
@@ -1766,6 +1812,8 @@ spec:
             apiVersion: operators.coreos.com/v1
             kind: OperatorGroup
             metadata:
+              labels:
+                policies.install: ""
               name: open-cluster-management
               namespace: open-cluster-management
             spec:
@@ -1802,6 +1850,8 @@ spec:
             apiVersion: operators.coreos.com/v1
             kind: OperatorGroup
             metadata:
+              labels:
+                policies.install: ""
               name: default
               namespace: multicluster-engine
             spec:
@@ -1841,6 +1891,8 @@ spec:
             apiVersion: operators.coreos.com/v1
             kind: OperatorGroup
             metadata:
+              labels:
+                policies.install: ""
               name: openshift-update-service
               namespace: openshift-update-service
             spec:
@@ -2530,7 +2582,7 @@ spec:
       apiVersion: policy.open-cluster-management.io/v1
       kind: ConfigurationPolicy
       metadata:
-        name: upgrade-sub-approval
+        name: upgrade-sub-remove-manual-ip
       spec:
         object-templates-raw: |
           {{- range $sb := (lookup "operators.coreos.com/v1alpha1" "Subscription" "" "" "!policies.ignore,policies.install").items }}

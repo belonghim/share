@@ -11,6 +11,8 @@ kind: OperatorGroup
 metadata:
   name: openshift-logging
   namespace: openshift-logging
+  labels:
+    policies.install: ""
 spec:
   targetNamespaces:
   - openshift-logging
@@ -46,6 +48,8 @@ kind: OperatorGroup
 metadata:
   name: openshift-workload-availability
   namespace: openshift-workload-availability
+  labels:
+    policies.install: ""
 ---
 apiVersion: operators.coreos.com/v1alpha1
 kind: Subscription
@@ -128,6 +132,8 @@ spec:
         metadata:
           name: openshift-nmstate
           namespace: openshift-nmstate
+          labels:
+            policies.install: ""
         spec:
           targetNamespaces:
           - openshift-nmstate
@@ -175,6 +181,8 @@ spec:
         metadata:
           name: openshift-gitops-operator
           namespace: openshift-gitops-operator
+          labels:
+            policies.install: ""
     - complianceType: musthave
       objectDefinition:
         apiVersion: operators.coreos.com/v1alpha1
@@ -210,6 +218,8 @@ spec:
         metadata:
           name: openshift-local-storage
           namespace: openshift-local-storage
+          labels:
+            policies.install: ""
         spec:
           targetNamespaces:
           - openshift-local-storage
@@ -296,6 +306,8 @@ spec:
         metadata:
           name: openshift-distributed-tracing
           namespace: openshift-distributed-tracing
+          labels:
+            policies.install: ""
     - complianceType: musthave
       objectDefinition:
         apiVersion: operators.coreos.com/v1alpha1
@@ -331,6 +343,8 @@ spec:
         metadata:
           name: openshift-tempo-operator
           namespace: openshift-tempo-operator
+          labels:
+            policies.install: ""
     - complianceType: musthave
       objectDefinition:
         apiVersion: operators.coreos.com/v1alpha1
@@ -366,6 +380,8 @@ spec:
         metadata:
           name: openshift-netobserv-operator
           namespace: openshift-netobserv-operator
+          labels:
+            policies.install: ""
     - complianceType: musthave
       objectDefinition:
         apiVersion: operators.coreos.com/v1alpha1

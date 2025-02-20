@@ -45,7 +45,7 @@ spec:
 apiVersion: policy.open-cluster-management.io/v1
 kind: ConfigurationPolicy
 metadata:
-  name: upgrade-sub-approval
+  name: upgrade-sub-remove-manual-ip
 spec:
   remediationAction: enforce
   severity: high

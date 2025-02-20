@@ -9,6 +9,8 @@ kind: OperatorGroup
 metadata:
   name: open-cluster-management
   namespace: open-cluster-management
+  labels:
+    policies.install: ""
 spec:
   targetNamespaces:
   - open-cluster-management
@@ -42,6 +44,8 @@ kind: OperatorGroup
 metadata:
   name: default
   namespace: multicluster-engine
+  labels:
+    policies.install: ""
 spec:
   targetNamespaces:
   - multicluster-engine
@@ -78,6 +82,8 @@ kind: OperatorGroup
 metadata:
   name: openshift-update-service
   namespace: openshift-update-service
+  labels:
+    policies.install: ""
 spec:
   targetNamespaces:
   - openshift-update-service
