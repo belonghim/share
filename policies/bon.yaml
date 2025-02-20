@@ -2588,6 +2588,7 @@ spec:
           {{- range $sb := (lookup "operators.coreos.com/v1alpha1" "Subscription" "" "" "!policies.ignore,policies.install").items }}
           {{- range $ip := (lookup "operators.coreos.com/v1alpha1" "InstallPlan" $sb.metadata.namespace "").items }}
           {{- if contains (splitn "." 2 $sb.status.currentCSV)._0 (index $ip.spec.clusterServiceVersionNames 0) }}
+          {{- if and (eq "Manual" $ip.spec.approval) (eq false $ip.spec.approved) }}
           - complianceType: mustnothave
             objectDefinition:
               apiVersion: operators.coreos.com/v1alpha1
@@ -2595,9 +2596,7 @@ spec:
               metadata:
                 name: {{ $ip.metadata.name }}
                 namespace: {{ $ip.metadata.namespace }}
-              spec:
-                approval: Manual
-                approved: false
+          {{- end }}
           {{- end }}
           {{- end }}
           {{- end }}
