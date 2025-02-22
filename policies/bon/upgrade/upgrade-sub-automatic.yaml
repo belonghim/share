@@ -25,8 +25,8 @@ metadata:
   name: upgrade-sub-reset
 spec:
   evaluationInterval:
-    compliant: 5m
-    noncompliant: 5m
+    compliant: 10m
+    noncompliant: 1m
   remediationAction: enforce
   severity: high
   object-templates-raw: |

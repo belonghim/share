@@ -2564,8 +2564,8 @@ spec:
         name: upgrade-sub-reset
       spec:
         evaluationInterval:
-          compliant: 5m
-          noncompliant: 5m
+          compliant: 10m
+          noncompliant: 1m
         object-templates-raw: |
           {{- range $sub := (lookup "operators.coreos.com/v1alpha1" "Subscription" "" "" "!policies.ignore,policies.install").items }}
           - complianceType: musthave
