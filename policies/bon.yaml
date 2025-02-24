@@ -361,8 +361,8 @@ spec:
         name: config-operators-logforwarder
       spec:
         object-templates-raw: |
-          {{hub- if (lookup "v1" "ConfigMap" "policies" "config-operators").data.logBrokers hub}}
-          {{hub- if (lookup "v1" "ConfigMap" "policies" "config-operators").data.logTopic hub}}
+          {{hub- if and (lookup "v1" "ConfigMap" "policies" "config-operators").data.infraBrokers (lookup "v1" "ConfigMap" "policies" "config-operators").data.infraTopic hub}}
+          {{hub- if and (lookup "v1" "ConfigMap" "policies" "config-operators").data.eventBrokers (lookup "v1" "ConfigMap" "policies" "config-operators").data.eventTopic hub}}
           - complianceType: musthave
             recreateOption: IfRequired
             objectDefinition:
@@ -382,38 +382,63 @@ spec:
                       memory: 2Gi
                 serviceAccount:
                   name: log-collector
+                inputs:
+                - name: eventrouter
+                  application:
+                    includes:
+                    - namespace: ocp-logging
+                    selector:
+                      matchLabels:
+                        component: eventrouter
+                  type: application
                 outputs:
-                - name: kafka-receiver
+                - name: infra-receiver
                   kafka:
-                    brokers: {{hub (lookup "v1" "ConfigMap" "policies" "config-operators").data.logBrokers hub}}
-                    topic: {{hub (lookup "v1" "ConfigMap" "policies" "config-operators").data.logTopic hub}}
+                    brokers: {{hub (lookup "v1" "ConfigMap" "policies" "config-operators").data.infraBrokers hub}}
+                    topic: {{hub (lookup "v1" "ConfigMap" "policies" "config-operators").data.infraTopic hub}}
                     tuning:
                       compression: none
                       deliveryMode: AtLeastOnce
                       maxWrite: 10M
                   type: kafka
-          {{hub- if ne "" (index .ManagedClusterLabels "policies.log-url") hub}}
+                - name: event-receiver
+                  kafka:
+                    brokers: {{hub (lookup "v1" "ConfigMap" "policies" "config-operators").data.eventBrokers hub}}
+                    topic: {{hub (lookup "v1" "ConfigMap" "policies" "config-operators").data.eventTopic hub}}
+                    tuning:
+                      compression: none
+                      deliveryMode: AtLeastOnce
+                      maxWrite: 10M
+                  type: kafka
+          {{hub- if ne "" (index .ManagedClusterLabels "policies.syslog-url") hub}}
                 - name: rsyslog
                   syslog:
                     facility: user
                     rfc: RFC5424
                     severity: debug
                   type: syslog
-                  url: {{hub index .ManagedClusterLabels "policies.log-url" hub}}
+                  url: {{hub index .ManagedClusterLabels "policies.syslog-url" hub}}
           {{hub- end hub}}
                 pipelines:
                 - name: audit-log
                   inputRefs:
                   - audit
                   outputRefs:
-                  - {{hub if ne "" (index .ManagedClusterLabels "policies.log-url") hub}}rsyslog{{hub else hub}}kafka-receiver{{hub end hub}}
+                  - {{hub if ne "" (index .ManagedClusterLabels "policies.syslog-url") hub}}rsyslog{{hub else hub}}infra-receiver{{hub end hub}}
                   filterRefs:
                   - add-cluster-name
                 - name: infra-log
                   inputRefs:
                   - infrastructure
                   outputRefs:
-                  - kafka-receiver
+                  - infra-receiver
+                  filterRefs:
+                  - add-cluster-name
+                - name: event-log
+                  inputRefs:
+                  - eventrouter
+                  outputRefs:
+                  - event-receiver
                   filterRefs:
                   - add-cluster-name
                 filters:
@@ -829,10 +854,16 @@ spec:
         - complianceType: musthave
           objectDefinition:
             apiVersion: v1
+            kind: Namespace
+            metadata:
+              name: ocp-logging
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: v1
             kind: ServiceAccount
             metadata:
               name: eventrouter
-              namespace: openshift-logging
+              namespace: ocp-logging
         - complianceType: musthave
           objectDefinition:
             apiVersion: rbac.authorization.k8s.io/v1
@@ -860,7 +891,7 @@ spec:
             subjects:
             - kind: ServiceAccount
               name: eventrouter
-              namespace: openshift-logging
+              namespace: ocp-logging
         - complianceType: musthave
           objectDefinition:
             apiVersion: v1
@@ -872,7 +903,7 @@ spec:
             kind: ConfigMap
             metadata:
               name: eventrouter
-              namespace: openshift-logging
+              namespace: ocp-logging
         - complianceType: musthave
           objectDefinition:
             apiVersion: apps/v1
@@ -883,7 +914,7 @@ spec:
                 logging-infra: eventrouter
                 provider: openshift
               name: eventrouter
-              namespace: openshift-logging
+              namespace: ocp-logging
             spec:
               replicas: 1
               selector:
