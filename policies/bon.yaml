@@ -361,8 +361,8 @@ spec:
         name: config-operators-logforwarder
       spec:
         object-templates-raw: |
-          {{hub- if and (lookup "v1" "ConfigMap" "policies" "config-operators").data.infraBrokers (lookup "v1" "ConfigMap" "policies" "config-operators").data.infraTopic hub}}
-          {{hub- if and (lookup "v1" "ConfigMap" "policies" "config-operators").data.eventBrokers (lookup "v1" "ConfigMap" "policies" "config-operators").data.eventTopic hub}}
+          {{hub- if and (lookup "v1" "ConfigMap" "policies" "config-operators").data.infraBrokers (ne "" (index .ManagedClusterLabels "policies.infra-topic")) hub}}
+          {{hub- if and (lookup "v1" "ConfigMap" "policies" "config-operators").data.eventBrokers (ne "" (index .ManagedClusterLabels "policies.event-topic")) hub}}
           - complianceType: musthave
             recreateOption: IfRequired
             objectDefinition:
@@ -380,6 +380,10 @@ spec:
                     requests:
                       cpu: "1"
                       memory: 2Gi
+                  tolerations:
+                  - effect: NoSchedule
+                    key: node-role.kubernetes.io/infra
+                    operator: Exists
                 serviceAccount:
                   name: log-collector
                 inputs:
@@ -395,7 +399,7 @@ spec:
                 - name: infra-receiver
                   kafka:
                     brokers: {{hub (lookup "v1" "ConfigMap" "policies" "config-operators").data.infraBrokers hub}}
-                    topic: {{hub (lookup "v1" "ConfigMap" "policies" "config-operators").data.infraTopic hub}}
+                    topic: {{hub index .ManagedClusterLabels "policies.infra-topic" hub}}
                     tuning:
                       compression: none
                       deliveryMode: AtLeastOnce
@@ -404,20 +408,21 @@ spec:
                 - name: event-receiver
                   kafka:
                     brokers: {{hub (lookup "v1" "ConfigMap" "policies" "config-operators").data.eventBrokers hub}}
-                    topic: {{hub (lookup "v1" "ConfigMap" "policies" "config-operators").data.eventTopic hub}}
+                    topic: {{hub index .ManagedClusterLabels "policies.event-topic" hub}}
                     tuning:
                       compression: none
                       deliveryMode: AtLeastOnce
                       maxWrite: 10M
                   type: kafka
-          {{hub- if ne "" (index .ManagedClusterLabels "policies.syslog-url") hub}}
+          {{hub- $sl := index .ManagedClusterLabels "policies.syslog-url" hub}}
+          {{hub- if ne "" $sl hub}}
                 - name: rsyslog
                   syslog:
                     facility: user
                     rfc: RFC5424
                     severity: debug
                   type: syslog
-                  url: {{hub index .ManagedClusterLabels "policies.syslog-url" hub}}
+                  url: tcp://{{hub (splitn ".." 2 $sl)._0 hub}}:{{hub (splitn ".." 2 $sl)._1 hub}}
           {{hub- end hub}}
                 pipelines:
                 - name: audit-log
@@ -856,6 +861,9 @@ spec:
             apiVersion: v1
             kind: Namespace
             metadata:
+              annotations:
+                openshift.io/node-selector: node-role.kubernetes.io/infra=
+                scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator":"Exists","effect":"NoSchedule","key":"node-role.kubernetes.io/infra"}]'
               name: ocp-logging
         - complianceType: musthave
           objectDefinition:
