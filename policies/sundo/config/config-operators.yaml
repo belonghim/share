@@ -353,15 +353,15 @@ spec:
               facility: user
               rfc: RFC5424
               severity: debug
+              url: tcp://{{hub (splitn ".." 2 $sl)._0 hub}}:{{hub (splitn ".." 2 $sl)._1 hub}}
             type: syslog
-            url: tcp://{{hub (splitn ".." 2 $sl)._0 hub}}:{{hub (splitn ".." 2 $sl)._1 hub}}
     {{hub- end hub}}
           pipelines:
           - name: audit-log
             inputRefs:
             - audit
             outputRefs:
-            - {{hub if ne "" (index .ManagedClusterLabels "policies.syslog-url") hub}}rsyslog{{hub else hub}}infra-receiver{{hub end hub}}
+            - {{hub if ne "" $sl hub}}rsyslog{{hub else hub}}infra-receiver{{hub end hub}}
             filterRefs:
             - add-cluster-name
           - name: infra-log
