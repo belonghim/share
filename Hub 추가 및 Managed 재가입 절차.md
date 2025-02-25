@@ -280,9 +280,14 @@ $ sh script/osus.sh ${Registry} | oc create -f -
 $ oc label mcl local-cluster policies.osus=ocp4
 ```
 
-### Apply cluster-log-forwarder
+### Apply cluster-log-forwarder's brokers
 ```
-$ oc -n policies create cm config-operators --from-literal logTopic=test --from-literal logBrokers='["tcp://192.168.10.3:7777","tcp://192.168.10.4:7777","tcp://192.168.10.5:7777"]'
+$ oc -n policies create cm config-operators --from-literal eventBrokers='["tcp://192.168.10.3:7777","tcp://192.168.10.4:7777","tcp://192.168.10.5:7777"]' --from-literal infraBrokers='["tcp://192.168.10.3:7777","tcp://192.168.10.4:7777","tcp://192.168.10.5:7777"]'
+```
+
+### Apply cluster-log-forwarder's topics
+```
+$ oc label mcl local-cluster policies.event-topic=event policies.infra-topic=infra
 ```
 
 ### (Optional) Apply dev environment
@@ -375,6 +380,11 @@ EOF
 
 ## (Optional) Apply dev environment
 $ oc label mcl ${ManagedCluster} policies.extra=dev
+
+### Apply cluster-log-forwarder's topics
+```
+$ oc label mcl ${ManagedCluster} policies.event-topic=event policies.infra-topic=infra
+```
 
 ## Validate the JOINED and AVAILABLE status of the managed cluster
 $ oc get managedcluster ${ManagedKubeconfig}
