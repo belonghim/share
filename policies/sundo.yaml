@@ -666,9 +666,12 @@ spec:
                       managed_cluster: {{ (lookup "config.openshift.io/v1" "Infrastructure" "" "cluster").status.infrastructureName }}
                     nodeSelector:
                       node-role.kubernetes.io/infra: ""
-          {{- if eq "Service" (lookup "v1" "Service" "clushkube-monitoring" "kube-prometheus-stack-prometheus").kind }}
+          {{- $np := "{{hub index .ManagedClusterLabels "policies.ns-prefix" hub}}" }}
+          {{- $mn := "clushkube-monitoring" }}
+          {{- if ne "" $np }}{{ $mn = (cat $np "-monitoring-np" | replace " " "") }}{{ end }}
+          {{- if eq "Service" (lookup "v1" "Service" $mn "kube-prometheus-stack-prometheus").kind }}
                     remoteWrite:
-                      - url: http://kube-prometheus-stack-prometheus.clushkube-monitoring.svc.cluster.local:9090/api/v1/write
+                    - url: http://kube-prometheus-stack-prometheus.{{ $mn }}.svc.cluster.local:9090/api/v1/write
           {{- end }}
                     retentionSize: 60GiB
                     tolerations:
@@ -2306,7 +2309,7 @@ spec:
           {{- if ne $cm.metadata.name "signatures-managed" }}
           {{- $not_exist := true }}
           {{hub range $hcm := (lookup "v1" "ConfigMap" "policies" "" "release.openshift.io/verification-signatures").items hub}}
-          {{- if eq $cm.metadata.name "{{hub $hcm.metadata.name hub}}" }} {{ $not_exist := false }} {{ continue }} {{ end }}
+          {{- if eq $cm.metadata.name "{{hub $hcm.metadata.name hub}}" }} {{ $not_exist = false }} {{ continue }} {{ end }}
           {{hub end hub}}
           {{- if $not_exist }}
           - complianceType: mustnothave
