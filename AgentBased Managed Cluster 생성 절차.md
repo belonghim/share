@@ -1209,13 +1209,13 @@ EOF
 ```
 
 
-### Apply cluster-log-forwarder's topics and syslog-url
+### (Optional) Apply cluster-log-forwarder's topics and syslog-url
 ```
 $ oc label mcl ${ManagedCluster} policies.event-topic=event policies.infra-topic=infra policies.syslog-url=192.168.10.100..514
 ```
 
 
-### Apply cluster-monitoring-config's remote write monitoring namespace prefix
+### (Optional) Apply cluster-monitoring-config's remote write monitoring namespace prefix
 ```
 $ oc label mcl ${ManagedCluster} policies.ns-prefix=g-tpj-dev
 ```
