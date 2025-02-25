@@ -373,6 +373,7 @@ spec:
             - infra-receiver
             filterRefs:
             - add-cluster-name
+            - important
     {{hub- end hub}}
           - name: event-log
             inputRefs:
@@ -386,6 +387,14 @@ spec:
             type: openshiftLabels
             openshiftLabels:
               cluster-name: {{ (lookup "config.openshift.io/v1" "Infrastructure" "" "cluster").status.infrastructureName }}
+          - name: important
+            type: drop
+            drop:
+            - test:
+              - field: .message
+                notMatches: "(?i)critical|error"
+              - field: .level
+                matches: "info|warning"
     {{hub- end hub}}
 ---
 apiVersion: policy.open-cluster-management.io/v1
