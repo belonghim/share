@@ -1206,11 +1206,32 @@ spec:
   searchCollector:
     enabled: true
 EOF
-
-## Validate the JOINED and AVAILABLE status of the managed cluster
-$ oc get managedcluster ${ManagedCluster}
-
 ```
+
+
+### Apply cluster-log-forwarder's topics and syslog-url
+```
+$ oc label mcl ${ManagedCluster} policies.event-topic=event policies.infra-topic=infra policies.syslog-url=192.168.10.100..514
+```
+
+
+### Apply cluster-monitoring-config's remote write monitoring namespace prefix
+```
+$ oc label mcl ${ManagedCluster} policies.ns-prefix=g-tpj-dev
+```
+
+
+### (Optional) Apply dev environment
+```
+$ oc label mcl ${ManagedCluster} policies.extra=dev
+```
+
+
+### Validate the JOINED and AVAILABLE status of the managed cluster
+```
+$ oc get managedcluster ${ManagedCluster}
+```
+
 
 ### Delete auto-import secret
 ```
@@ -1221,6 +1242,7 @@ $ oc wait mcl ${ManagedCluster} --for=condition=ManagedClusterImportSucceeded &&
 $ oc -n ${ManagedCluster} delete secret auto-import-secret
 
 ```
+
 
 <br><br>
 ## Adding AgentBased node
