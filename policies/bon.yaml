@@ -361,7 +361,6 @@ spec:
         name: config-operators-logforwarder
       spec:
         object-templates-raw: |
-          {{hub- if and (lookup "v1" "ConfigMap" "policies" "config-operators").data.infraBrokers (ne "" (index .ManagedClusterLabels "policies.infra-topic")) hub}}
           {{hub- if and (lookup "v1" "ConfigMap" "policies" "config-operators").data.eventBrokers (ne "" (index .ManagedClusterLabels "policies.event-topic")) hub}}
           - complianceType: musthave
             recreateOption: IfRequired
@@ -396,6 +395,7 @@ spec:
                         component: eventrouter
                   type: application
                 outputs:
+          {{hub- if and (lookup "v1" "ConfigMap" "policies" "config-operators").data.infraBrokers (ne "" (index .ManagedClusterLabels "policies.infra-topic")) hub}}
                 - name: infra-receiver
                   kafka:
                     brokers: {{hub (lookup "v1" "ConfigMap" "policies" "config-operators").data.infraBrokers hub}}
@@ -405,6 +405,7 @@ spec:
                       deliveryMode: AtLeastOnce
                       maxWrite: 10M
                   type: kafka
+          {{hub- end hub}}
                 - name: event-receiver
                   kafka:
                     brokers: {{hub (lookup "v1" "ConfigMap" "policies" "config-operators").data.eventBrokers hub}}
@@ -432,6 +433,7 @@ spec:
                   - {{hub if ne "" $sl hub}}rsyslog{{hub else hub}}infra-receiver{{hub end hub}}
                   filterRefs:
                   - add-cluster-name
+          {{hub- if and (lookup "v1" "ConfigMap" "policies" "config-operators").data.infraBrokers (ne "" (index .ManagedClusterLabels "policies.infra-topic")) hub}}
                 - name: infra-log
                   inputRefs:
                   - infrastructure
@@ -439,6 +441,7 @@ spec:
                   - infra-receiver
                   filterRefs:
                   - add-cluster-name
+          {{hub- end hub}}
                 - name: event-log
                   inputRefs:
                   - eventrouter
@@ -451,7 +454,6 @@ spec:
                   type: openshiftLabels
                   openshiftLabels:
                     cluster-name: {{ (lookup "config.openshift.io/v1" "Infrastructure" "" "cluster").status.infrastructureName }}
-          {{hub- end hub}}
           {{hub- end hub}}
         remediationAction: enforce
         severity: high
