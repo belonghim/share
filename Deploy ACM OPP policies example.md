@@ -187,17 +187,17 @@ $ sh osus.sh | oc create -f -
 $ oc label mcl local-cluster policies.osus=ocp4
 ```
 
-### Apply cluster-log-forwarder's brokers
+### (Optional) Apply cluster-log-forwarder's brokers
 ```
 $ oc -n policies create cm config-operators --from-literal eventBrokers='["tcp://192.168.10.3:7777","tcp://192.168.10.4:7777","tcp://192.168.10.5:7777"]' --from-literal infraBrokers='["tcp://192.168.10.3:7777","tcp://192.168.10.4:7777","tcp://192.168.10.5:7777"]'
 ```
 
-### Apply cluster-log-forwarder's topics and syslog-url
+### (Optional) Apply cluster-log-forwarder's topics and syslog-url
 ```
 $ oc label mcl local-cluster policies.event-topic=event policies.infra-topic=infra policies.syslog-url="192.168.10.100..514"
 ```
 
-### Apply cluster-monitoring-config's remote write monitoring namespace prefix
+### (Optional) Apply cluster-monitoring-config's remote write monitoring namespace prefix
 ```
 $ oc label mcl local-cluster policies.ns-prefix=g-tpj-dev
 ```
