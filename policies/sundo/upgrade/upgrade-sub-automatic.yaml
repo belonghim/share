@@ -113,7 +113,7 @@ spec:
           name: {{ $sb.metadata.name }}
           namespace: {{ $sb.metadata.namespace }}
     {{- range $csv := (lookup "operators.coreos.com/v1alpha1" "ClusterServiceVersion" $sb.metadata.namespace "" "!olm.copiedFrom").items }}
-    {{- range $pr := (index $csv.metadata.annotations "operatorframework.io/properties").properties }}
+    {{- range $pr := (fromJson (index $csv.metadata.annotations "operatorframework.io/properties").properties) }}
     {{- if and (eq "olm.package" $pr.type) (eq $sb.spec.name $pr.value.packageName) }}
     - complianceType: mustnothave
       objectDefinition:
