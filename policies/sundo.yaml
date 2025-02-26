@@ -2163,7 +2163,7 @@ spec:
                 name: {{ $cs.metadata.name }}
                 namespace: {{ $cs.metadata.namespace }}
               spec:
-                image: {{ ( (cat (split ":v4." $cs.spec.image)._0 ":v4." (split "." (lookup "config.openshift.io/v1" "ClusterVersion" "" "version").status.desired.version)._1) | replace " " "" ) }}
+                image: {{ cat (split ":v" $cs.spec.image)._0 ":v" "{{hub index .ManagedClusterLabels "openshiftVersion-major-minor" hub}}" | replace " " "" }}
                 sourceType: grpc
         remediationAction: enforce
         severity: high
@@ -2405,6 +2405,69 @@ spec:
               metadata:
                 name: {{ $ip.metadata.name }}
                 namespace: {{ $ip.metadata.namespace }}
+          {{- end }}
+          {{- end }}
+          {{- end }}
+          {{- end }}
+        remediationAction: enforce
+        severity: high
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: upgrade-sub-remove-unpackfailed
+      spec:
+        evaluationInterval:
+          compliant: 10m
+          noncompliant: 1m
+        object-templates-raw: |
+          {{- range $sb := (lookup "operators.coreos.com/v1alpha1" "Subscription" "" "" "!policies.ignore,policies.install").items }}
+          {{- range $cd := (lookup "operators.coreos.com/v1alpha1" "Subscription" $sb.metadata.namespace $sb.metadata.name).status.conditions }}
+          {{- if and (eq "BundleUnpackFailed" $cd.type) (eq "True" $cd.status) }}
+          - complianceType: mustnothave
+            objectDefinition:
+              apiVersion: operators.coreos.com/v1alpha1
+              kind: Subscription
+              metadata:
+                name: {{ $sb.metadata.name }}
+                namespace: {{ $sb.metadata.namespace }}
+          {{- end }}
+          {{- end }}
+          {{- end }}
+        remediationAction: enforce
+        severity: high
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: upgrade-sub-remove-resolutionfailed
+      spec:
+        evaluationInterval:
+          compliant: 10m
+          noncompliant: 1m
+        object-templates-raw: |
+          {{- range $sb := (lookup "operators.coreos.com/v1alpha1" "Subscription" "" "" "!policies.ignore,policies.install").items }}
+          {{- range $cd := (lookup "operators.coreos.com/v1alpha1" "Subscription" $sb.metadata.namespace $sb.metadata.name).status.conditions }}
+          {{- if and (eq "ResolutionFailed" $cd.type) (eq "True" $cd.status) }}
+          - complianceType: mustnothave
+            objectDefinition:
+              apiVersion: operators.coreos.com/v1alpha1
+              kind: Subscription
+              metadata:
+                name: {{ $sb.metadata.name }}
+                namespace: {{ $sb.metadata.namespace }}
+          {{- range $csv := (lookup "operators.coreos.com/v1alpha1" "ClusterServiceVersion" $sb.metadata.namespace "" "!olm.copiedFrom").items }}
+          {{- range $pr := (index $csv.metadata.annotations "operatorframework.io/properties").properties }}
+          {{- if and (eq "olm.package" $pr.type) (eq $sb.spec.name $pr.value.packageName) }}
+          - complianceType: mustnothave
+            objectDefinition:
+              apiVersion: operators.coreos.com/v1alpha1
+              kind: ClusterServiceVersion
+              metadata:
+                name: {{ $csv.metadata.name }}
+                namespace: {{ $csv.metadata.namespace }}
+          {{- end }}
+          {{- end }}
           {{- end }}
           {{- end }}
           {{- end }}
