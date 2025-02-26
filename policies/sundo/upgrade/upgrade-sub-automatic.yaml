@@ -97,7 +97,7 @@ metadata:
   name: upgrade-sub-remove-failed
 spec:
   evaluationInterval:
-    compliant: 20m
+    compliant: 10m
     noncompliant: 5m
   remediationAction: enforce
   severity: high

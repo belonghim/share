@@ -2443,7 +2443,7 @@ spec:
         name: upgrade-sub-remove-failed
       spec:
         evaluationInterval:
-          compliant: 20m
+          compliant: 10m
           noncompliant: 5m
         object-templates-raw: |
           {{- range $sb := (lookup "operators.coreos.com/v1alpha1" "Subscription" "" "" "!policies.ignore,policies.install").items }}
