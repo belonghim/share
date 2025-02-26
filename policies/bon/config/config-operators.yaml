@@ -292,6 +292,7 @@ metadata:
   namespace: openshift-operators
 config:
   webhook:
+    replicas: 2
     nodeSelector:
       node-role.kubernetes.io/infra: ""
     tolerations:
