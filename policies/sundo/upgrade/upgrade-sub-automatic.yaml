@@ -73,7 +73,7 @@ metadata:
 spec:
   evaluationInterval:
     compliant: 10m
-    noncompliant: 1m
+    noncompliant: 2m
   remediationAction: enforce
   severity: high
   object-templates-raw: |
@@ -97,8 +97,8 @@ metadata:
   name: upgrade-sub-remove-resolutionfailed
 spec:
   evaluationInterval:
-    compliant: 10m
-    noncompliant: 1m
+    compliant: 20m
+    noncompliant: 5m
   remediationAction: enforce
   severity: high
   object-templates-raw: |
