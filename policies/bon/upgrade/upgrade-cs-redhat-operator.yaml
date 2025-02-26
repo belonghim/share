@@ -16,6 +16,6 @@ spec:
           name: {{ $cs.metadata.name }}
           namespace: {{ $cs.metadata.namespace }}
         spec:
-          image: {{ ( (cat (split ":v4." $cs.spec.image)._0 ":v4." (split "." (lookup "config.openshift.io/v1" "ClusterVersion" "" "version").status.desired.version)._1) | replace " " "" ) }}
+          image: {{ cat (split ":v" $cs.spec.image)._0 ":v" "{{hub index .ManagedClusterLabels "openshiftVersion-major-minor" hub}}" | replace " " "" }}
           sourceType: grpc
 ---
