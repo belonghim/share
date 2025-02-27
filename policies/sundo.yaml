@@ -81,6 +81,29 @@ metadata:
     argocd.argoproj.io/compare-options: IgnoreExtraneous
   labels:
     open-cluster-management.io/policy-set: opp
+  name: placement-sub-init
+  namespace: policies
+spec:
+  predicates:
+  - requiredClusterSelector:
+      labelSelector:
+        matchExpressions:
+        - key: vendor
+          operator: In
+          values:
+          - OpenShift
+        - key: policies.undeploy
+          operator: DoesNotExist
+        - key: policies.sub-approval
+          operator: DoesNotExist
+---
+apiVersion: cluster.open-cluster-management.io/v1beta1
+kind: Placement
+metadata:
+  annotations:
+    argocd.argoproj.io/compare-options: IgnoreExtraneous
+  labels:
+    open-cluster-management.io/policy-set: opp
   name: placement-sub-manual
   namespace: policies
 spec:
@@ -166,14 +189,29 @@ metadata:
 placementRef:
   apiGroup: cluster.open-cluster-management.io
   kind: Placement
+  name: placement-sub-init
+subjects:
+- apiGroup: policy.open-cluster-management.io
+  kind: PolicySet
+  name: sub-init
+---
+apiVersion: policy.open-cluster-management.io/v1
+kind: PlacementBinding
+metadata:
+  annotations:
+    argocd.argoproj.io/compare-options: IgnoreExtraneous
+  labels:
+    open-cluster-management.io/policy-set: opp
+  name: binding-policy-hub5
+  namespace: policies
+placementRef:
+  apiGroup: cluster.open-cluster-management.io
+  kind: Placement
   name: placement-sub-manual
 subjects:
 - apiGroup: policy.open-cluster-management.io
   kind: PolicySet
   name: sub-manual
-- apiGroup: policy.open-cluster-management.io
-  kind: PolicySet
-  name: sub-init
 ---
 apiVersion: policy.open-cluster-management.io/v1
 kind: Policy
@@ -2497,11 +2535,6 @@ spec:
   - apiVersion: policy.open-cluster-management.io/v1
     compliance: Compliant
     kind: Policy
-    name: check-cv
-    namespace: policies
-  - apiVersion: policy.open-cluster-management.io/v1
-    compliance: Compliant
-    kind: Policy
     name: check-csv
     namespace: policies
   - apiVersion: policy.open-cluster-management.io/v1
@@ -2517,32 +2550,7 @@ spec:
   - apiVersion: policy.open-cluster-management.io/v1
     compliance: Compliant
     kind: Policy
-    name: node-infra-label
-    namespace: policies
-  - apiVersion: policy.open-cluster-management.io/v1
-    compliance: Compliant
-    kind: Policy
-    name: node-infra-toleration
-    namespace: policies
-  - apiVersion: policy.open-cluster-management.io/v1
-    compliance: Compliant
-    kind: Policy
-    name: node-infra-mcp
-    namespace: policies
-  - apiVersion: policy.open-cluster-management.io/v1
-    compliance: Compliant
-    kind: Policy
-    name: upgrade-signatures
-    namespace: policies
-  - apiVersion: policy.open-cluster-management.io/v1
-    compliance: Compliant
-    kind: Policy
     name: upgrade-upstream
-    namespace: policies
-  - apiVersion: policy.open-cluster-management.io/v1
-    compliance: Compliant
-    kind: Policy
-    name: upgrade-release-channel
     namespace: policies
   disabled: false
   policy-templates:
@@ -2550,7 +2558,7 @@ spec:
       apiVersion: policy.open-cluster-management.io/v1
       kind: ConfigurationPolicy
       metadata:
-        name: upgrade-sub-init
+        name: upgrade-sub-manual
       spec:
         object-templates-raw: |
           {{- range $sub := (lookup "operators.coreos.com/v1alpha1" "Subscription" "" "" "!policies.ignore,policies.install").items }}
