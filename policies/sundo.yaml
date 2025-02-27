@@ -171,6 +171,9 @@ subjects:
 - apiGroup: policy.open-cluster-management.io
   kind: PolicySet
   name: sub-manual
+- apiGroup: policy.open-cluster-management.io
+  kind: PolicySet
+  name: sub-init
 ---
 apiVersion: policy.open-cluster-management.io/v1
 kind: Policy
@@ -2720,10 +2723,23 @@ metadata:
     argocd.argoproj.io/compare-options: IgnoreExtraneous
   labels:
     open-cluster-management.io/policy-set: opp
-  name: sub-manual
+  name: sub-init
   namespace: policies
 spec:
   description: ""
   policies:
   - upgrade-sub-init
+---
+apiVersion: policy.open-cluster-management.io/v1beta1
+kind: PolicySet
+metadata:
+  annotations:
+    argocd.argoproj.io/compare-options: IgnoreExtraneous
+  labels:
+    open-cluster-management.io/policy-set: opp
+  name: sub-manual
+  namespace: policies
+spec:
+  description: ""
+  policies:
   - upgrade-sub-manual
