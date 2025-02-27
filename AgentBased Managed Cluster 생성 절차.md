@@ -1165,7 +1165,6 @@ metadata:
     policies.osus: ocp4
 spec:
   hubAcceptsClient: true
-  leaseDurationSeconds: 300
 EOF
 ```
 
@@ -1182,7 +1181,7 @@ metadata:
   annotations:
     managedcluster-import-controller.open-cluster-management.io/keeping-auto-import-secret: ""
 stringData:
-  autoImportRetry: "720"
+  autoImportRetry: "7200"
   kubeconfig: |-
 $(sed 's/^/    /g' ${ManagedKubeconfig})
 type: Opaque
