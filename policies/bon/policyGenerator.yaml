@@ -33,10 +33,23 @@ policies:
   - hub
   - managed
 # All Operators Policies - end
-# Manual Subscription Policies - start
-- name: upgrade-sub-manual
+# Subscription Init Policies - start
+- name: upgrade-sub-init
+  dependencies:
+  - name: check-csv
+  - name: install-operators
+  - name: config-operators
+  - name: upgrade-upstream
   evaluationInterval:
     compliant: never
+    noncompliant: 30m
+  manifests:
+  - path: upgrade/upgrade-sub-manual.yaml
+  policySets:
+  - sub-init
+# Subscription Init Policies - end
+# Manual Subscription Policies - start
+- name: upgrade-sub-manual
   manifests:
   - path: upgrade/upgrade-sub-manual.yaml
   policySets:
@@ -65,8 +78,8 @@ policies:
   manifests:
   - path: proxy/proxy-sync-hub.yaml
   evaluationInterval:
-    compliant: 1m
-    noncompliant: 1m
+    compliant: 2m
+    noncompliant: 2m
   policySets:
   - hub
 # Create Router Bundle Policies - end
@@ -111,6 +124,9 @@ policies:
 # CV check Policies - end
 # CSV check Policies - start
 - name: check-csv
+  evaluationInterval:
+    compliant: 2m
+    noncompliant: 2m
   manifests:
   - path: check/check-csv.yaml
   policySets:
@@ -149,7 +165,7 @@ policies:
   - managed
   remediationAction: enforce
 # infra mcp Policies - end
-# signature cm Policies - start
+# signatures cm Policies - start
 - name: upgrade-signatures
   manifests:
   - path: upgrade/upgrade-signatures.yaml
@@ -157,11 +173,11 @@ policies:
   - hub
   - managed
   remediationAction: enforce
-# signature cm Policies - end
+# signatures cm Policies - end
 # marketplace jobs Policies - start
 - name: upgrade-marketplace-job
   evaluationInterval:
-    compliant: 10m
+    compliant: 20m
     noncompliant: 10m
   manifests:
   - path: upgrade/upgrade-marketplace-job.yaml
@@ -200,3 +216,6 @@ policySets:
   - name: sub-automatic
     placement:
       placementPath: placement/placement-sub-automatic.yaml
+  - name: sub-init
+    placement:
+      placementPath: placement/placement-sub-init.yaml

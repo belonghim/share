@@ -69,11 +69,11 @@ spec:
 apiVersion: policy.open-cluster-management.io/v1
 kind: ConfigurationPolicy
 metadata:
-  name: upgrade-sub-remove-unpackfailed
+  name: upgrade-sub-remove-unpack
 spec:
   evaluationInterval:
     compliant: 10m
-    noncompliant: 1m
+    noncompliant: 2m
   remediationAction: enforce
   severity: high
   object-templates-raw: |
@@ -94,17 +94,17 @@ spec:
 apiVersion: policy.open-cluster-management.io/v1
 kind: ConfigurationPolicy
 metadata:
-  name: upgrade-sub-remove-resolutionfailed
+  name: upgrade-sub-remove-failed
 spec:
   evaluationInterval:
     compliant: 10m
-    noncompliant: 1m
+    noncompliant: 5m
   remediationAction: enforce
   severity: high
   object-templates-raw: |
     {{- range $sb := (lookup "operators.coreos.com/v1alpha1" "Subscription" "" "" "!policies.ignore,policies.install").items }}
     {{- range $cd := (lookup "operators.coreos.com/v1alpha1" "Subscription" $sb.metadata.namespace $sb.metadata.name).status.conditions }}
-    {{- if and (eq "ResolutionFailed" $cd.type) (eq "True" $cd.status) }}
+    {{- if and (or (eq "ResolutionFailed" $cd.type) (eq "InstallPlanFailed" $cd.type)) (eq "True" $cd.status) }}
     - complianceType: mustnothave
       objectDefinition:
         apiVersion: operators.coreos.com/v1alpha1

@@ -171,6 +171,9 @@ subjects:
 - apiGroup: policy.open-cluster-management.io
   kind: PolicySet
   name: sub-manual
+- apiGroup: policy.open-cluster-management.io
+  kind: PolicySet
+  name: sub-init
 ---
 apiVersion: policy.open-cluster-management.io/v1
 kind: Policy
@@ -2661,11 +2664,11 @@ spec:
       apiVersion: policy.open-cluster-management.io/v1
       kind: ConfigurationPolicy
       metadata:
-        name: upgrade-sub-remove-unpackfailed
+        name: upgrade-sub-remove-unpack
       spec:
         evaluationInterval:
           compliant: 10m
-          noncompliant: 1m
+          noncompliant: 2m
         object-templates-raw: |
           {{- range $sb := (lookup "operators.coreos.com/v1alpha1" "Subscription" "" "" "!policies.ignore,policies.install").items }}
           {{- range $cd := (lookup "operators.coreos.com/v1alpha1" "Subscription" $sb.metadata.namespace $sb.metadata.name).status.conditions }}
@@ -2686,15 +2689,15 @@ spec:
       apiVersion: policy.open-cluster-management.io/v1
       kind: ConfigurationPolicy
       metadata:
-        name: upgrade-sub-remove-resolutionfailed
+        name: upgrade-sub-remove-failed
       spec:
         evaluationInterval:
           compliant: 10m
-          noncompliant: 1m
+          noncompliant: 5m
         object-templates-raw: |
           {{- range $sb := (lookup "operators.coreos.com/v1alpha1" "Subscription" "" "" "!policies.ignore,policies.install").items }}
           {{- range $cd := (lookup "operators.coreos.com/v1alpha1" "Subscription" $sb.metadata.namespace $sb.metadata.name).status.conditions }}
-          {{- if and (eq "ResolutionFailed" $cd.type) (eq "True" $cd.status) }}
+          {{- if and (or (eq "ResolutionFailed" $cd.type) (eq "InstallPlanFailed" $cd.type)) (eq "True" $cd.status) }}
           - complianceType: mustnothave
             objectDefinition:
               apiVersion: operators.coreos.com/v1alpha1
@@ -2717,6 +2720,65 @@ spec:
           {{- end }}
           {{- end }}
           {{- end }}
+          {{- end }}
+        remediationAction: enforce
+        severity: high
+  remediationAction: enforce
+---
+apiVersion: policy.open-cluster-management.io/v1
+kind: Policy
+metadata:
+  annotations:
+    argocd.argoproj.io/compare-options: IgnoreExtraneous
+    policy.open-cluster-management.io/categories: CM Configuration Management
+    policy.open-cluster-management.io/controls: CM-2 Baseline Configuration
+    policy.open-cluster-management.io/description: ""
+    policy.open-cluster-management.io/standards: NIST SP 800-53
+  labels:
+    open-cluster-management.io/policy-set: opp
+  name: upgrade-sub-init
+  namespace: policies
+spec:
+  dependencies:
+  - apiVersion: policy.open-cluster-management.io/v1
+    compliance: Compliant
+    kind: Policy
+    name: check-csv
+    namespace: policies
+  - apiVersion: policy.open-cluster-management.io/v1
+    compliance: Compliant
+    kind: Policy
+    name: install-operators
+    namespace: policies
+  - apiVersion: policy.open-cluster-management.io/v1
+    compliance: Compliant
+    kind: Policy
+    name: config-operators
+    namespace: policies
+  - apiVersion: policy.open-cluster-management.io/v1
+    compliance: Compliant
+    kind: Policy
+    name: upgrade-upstream
+    namespace: policies
+  disabled: false
+  policy-templates:
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: upgrade-sub-manual
+      spec:
+        object-templates-raw: |
+          {{- range $sub := (lookup "operators.coreos.com/v1alpha1" "Subscription" "" "" "!policies.ignore,policies.install").items }}
+          - complianceType: musthave
+            objectDefinition:
+              apiVersion: operators.coreos.com/v1alpha1
+              kind: Subscription
+              metadata:
+                name: {{ $sub.metadata.name }}
+                namespace: {{ $sub.metadata.namespace }}
+              spec:
+                installPlanApproval: Manual
           {{- end }}
         remediationAction: enforce
         severity: high
@@ -2869,6 +2931,20 @@ spec:
   - upgrade-cs-redhat-operator
   - upgrade-marketplace-job
   - upgrade-sub-automatic
+---
+apiVersion: policy.open-cluster-management.io/v1beta1
+kind: PolicySet
+metadata:
+  annotations:
+    argocd.argoproj.io/compare-options: IgnoreExtraneous
+  labels:
+    open-cluster-management.io/policy-set: opp
+  name: sub-init
+  namespace: policies
+spec:
+  description: ""
+  policies:
+  - upgrade-sub-init
 ---
 apiVersion: policy.open-cluster-management.io/v1beta1
 kind: PolicySet
