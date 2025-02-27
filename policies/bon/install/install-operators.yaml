@@ -331,7 +331,6 @@ spec:
             - effect: NoSchedule
               operator: Exists
               key: node-role.kubernetes.io/infra
-          channel: stable
     - complianceType: musthave
       objectDefinition:
         apiVersion: v1
