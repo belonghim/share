@@ -50,7 +50,7 @@ policies:
     compliant: never
     noncompliant: 30m
   manifests:
-  - path: upgrade/upgrade-sub-manual.yaml
+  - path: upgrade/upgrade-sub-init.yaml
   policySets:
   - sub-init
 # Subscription Init Policies - end

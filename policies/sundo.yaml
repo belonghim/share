@@ -2550,7 +2550,7 @@ spec:
       apiVersion: policy.open-cluster-management.io/v1
       kind: ConfigurationPolicy
       metadata:
-        name: upgrade-sub-manual
+        name: upgrade-sub-init
       spec:
         object-templates-raw: |
           {{- range $sub := (lookup "operators.coreos.com/v1alpha1" "Subscription" "" "" "!policies.ignore,policies.install").items }}
