@@ -377,6 +377,11 @@ spec:
   - apiVersion: policy.open-cluster-management.io/v1
     compliance: Compliant
     kind: Policy
+    name: check-cv
+    namespace: policies
+  - apiVersion: policy.open-cluster-management.io/v1
+    compliance: Compliant
+    kind: Policy
     name: check-csv
     namespace: policies
   disabled: false
@@ -1640,12 +1645,6 @@ metadata:
   name: install-operators-hub
   namespace: policies
 spec:
-  dependencies:
-  - apiVersion: policy.open-cluster-management.io/v1
-    compliance: Compliant
-    kind: Policy
-    name: check-cv
-    namespace: policies
   disabled: false
   policy-templates:
   - objectDefinition:
@@ -2019,6 +2018,12 @@ metadata:
   name: proxy-sync-hub
   namespace: policies
 spec:
+  dependencies:
+  - apiVersion: policy.open-cluster-management.io/v1
+    compliance: Compliant
+    kind: Policy
+    name: check-cv
+    namespace: policies
   disabled: false
   policy-templates:
   - objectDefinition:
@@ -2112,6 +2117,12 @@ metadata:
   name: proxy-sync-managed
   namespace: policies
 spec:
+  dependencies:
+  - apiVersion: policy.open-cluster-management.io/v1
+    compliance: Compliant
+    kind: Policy
+    name: check-cv
+    namespace: policies
   disabled: false
   policy-templates:
   - objectDefinition:
@@ -2228,6 +2239,12 @@ metadata:
   name: upgrade-marketplace-job
   namespace: policies
 spec:
+  dependencies:
+  - apiVersion: policy.open-cluster-management.io/v1
+    compliance: Compliant
+    kind: Policy
+    name: check-cv
+    namespace: policies
   disabled: false
   policy-templates:
   - objectDefinition:
@@ -2276,6 +2293,12 @@ metadata:
   name: upgrade-release-channel
   namespace: policies
 spec:
+  dependencies:
+  - apiVersion: policy.open-cluster-management.io/v1
+    compliance: Compliant
+    kind: Policy
+    name: check-cv
+    namespace: policies
   disabled: false
   policy-templates:
   - objectDefinition:
@@ -2387,6 +2410,12 @@ metadata:
   name: upgrade-sub-automatic
   namespace: policies
 spec:
+  dependencies:
+  - apiVersion: policy.open-cluster-management.io/v1
+    compliance: Compliant
+    kind: Policy
+    name: check-cv
+    namespace: policies
   disabled: false
   policy-templates:
   - objectDefinition:

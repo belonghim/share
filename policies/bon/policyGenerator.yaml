@@ -16,8 +16,6 @@ policyDefaults:
 policies:
 # Hub Operators Policies - start
 - name: install-operators-hub
-  dependencies:
-  - name: check-cv
   manifests:
   - path: install/install-operators-hub.yaml
   policySets:
@@ -57,6 +55,8 @@ policies:
 # Manual Subscription Policies - end
 # Automatic Subscription Policies - start
 - name: upgrade-sub-automatic
+  dependencies:
+  - name: check-cv
   complianceType: mustonlyhave
   manifests:
   - path: upgrade/upgrade-sub-automatic.yaml
@@ -75,6 +75,8 @@ policies:
 # cs-redhat operator update Policies - end
 # Create Router Bundle Policies - start
 - name: proxy-sync-hub
+  dependencies:
+  - name: check-cv
   manifests:
   - path: proxy/proxy-sync-hub.yaml
   evaluationInterval:
@@ -85,6 +87,8 @@ policies:
 # Create Router Bundle Policies - end
 # Proxy Router Bundle Policies - start
 - name: proxy-sync-managed
+  dependencies:
+  - name: check-cv
   evaluationInterval:
     compliant: 30m
     noncompliant: 2m
@@ -96,6 +100,7 @@ policies:
 # Config  operators Policies - start
 - name: config-operators
   dependencies:
+  - name: check-cv
   - name: check-csv
   manifests:
   - path: config/config-operators.yaml
@@ -181,6 +186,8 @@ policies:
 # signatures cm Policies - end
 # marketplace jobs Policies - start
 - name: upgrade-marketplace-job
+  dependencies:
+  - name: check-cv
   evaluationInterval:
     compliant: 20m
     noncompliant: 10m
@@ -206,6 +213,8 @@ policies:
 # upgrade upstream Policies - end
 # upgrade release channel Policies - start
 - name: upgrade-release-channel
+  dependencies:
+  - name: check-cv
   evaluationInterval:
     compliant: 30m
     noncompliant: 2m
