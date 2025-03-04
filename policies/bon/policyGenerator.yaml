@@ -85,6 +85,9 @@ policies:
 # Create Router Bundle Policies - end
 # Proxy Router Bundle Policies - start
 - name: proxy-sync-managed
+  evaluationInterval:
+    compliant: 30m
+    noncompliant: 2m
   manifests:
   - path: proxy/proxy-sync-managed.yaml
   policySets:
