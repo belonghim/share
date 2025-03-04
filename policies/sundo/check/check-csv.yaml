@@ -4,6 +4,9 @@ kind: ConfigurationPolicy
 metadata:
   name: check-csv
 spec:
+  evaluationInterval:
+    compliant: 2m
+    noncompliant: 2m
   remediationAction: inform
   severity: high
   object-templates-raw: |
@@ -24,6 +27,9 @@ kind: ConfigurationPolicy
 metadata:
   name: check-csv-ip
 spec:
+  evaluationInterval:
+    compliant: 2m
+    noncompliant: 2m
   remediationAction: inform
   severity: high
   object-templates-raw: |

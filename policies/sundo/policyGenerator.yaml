@@ -38,9 +38,6 @@ policies:
   - name: config-operators
   - name: upgrade-upstream
     compliance: NonCompliant
-  evaluationInterval:
-    compliant: never
-    noncompliant: 30m
   manifests:
   - path: upgrade/upgrade-sub-manual.yaml
   policySets:
@@ -79,9 +76,6 @@ policies:
   - name: check-cv
   manifests:
   - path: proxy/proxy-sync-hub.yaml
-  evaluationInterval:
-    compliant: 2m
-    noncompliant: 2m
   policySets:
   - hub
 # Create Router Bundle Policies - end
@@ -89,9 +83,6 @@ policies:
 - name: proxy-sync-managed
   dependencies:
   - name: check-cv
-  evaluationInterval:
-    compliant: 30m
-    noncompliant: 2m
   manifests:
   - path: proxy/proxy-sync-managed.yaml
   policySets:
@@ -134,9 +125,6 @@ policies:
 # CV check Policies - end
 # CSV check Policies - start
 - name: check-csv
-  evaluationInterval:
-    compliant: 2m
-    noncompliant: 2m
   manifests:
   - path: check/check-csv.yaml
   policySets:
@@ -157,6 +145,7 @@ policies:
 - name: node-infra-toleration
   evaluationInterval:
     compliant: never
+    noncompliant: 1m
   manifests:
   - path: node/node-infra-toleration.yaml
   policySets:
@@ -168,6 +157,7 @@ policies:
 - name: node-infra-mcp
   evaluationInterval:
     compliant: never
+    noncompliant: 1m
   manifests:
   - path: node/node-infra-mcp.yaml
   policySets:
@@ -184,13 +174,19 @@ policies:
   - managed
   remediationAction: enforce
 # signatures cm Policies - end
+# admin-acks cm Policies - start
+- name: upgrade-admin-acks
+  manifests:
+  - path: upgrade/upgrade-admin-acks.yaml
+  policySets:
+  - hub
+  - managed
+  remediationAction: enforce
+# admin-acks cm Policies - end
 # marketplace jobs Policies - start
 - name: upgrade-marketplace-job
   dependencies:
   - name: check-cv
-  evaluationInterval:
-    compliant: 20m
-    noncompliant: 10m
   manifests:
   - path: upgrade/upgrade-marketplace-job.yaml
   policySets:
@@ -201,9 +197,6 @@ policies:
 - name: upgrade-upstream
   dependencies:
   - name: install-operators
-  evaluationInterval:
-    compliant: 30m
-    noncompliant: 2m
   manifests:
   - path: upgrade/upgrade-upstream.yaml
   policySets:
@@ -215,9 +208,6 @@ policies:
 - name: upgrade-release-channel
   dependencies:
   - name: check-cv
-  evaluationInterval:
-    compliant: 30m
-    noncompliant: 2m
   manifests:
   - path: upgrade/upgrade-release-channel.yaml
   policySets:

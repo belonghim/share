@@ -235,6 +235,9 @@ spec:
       metadata:
         name: check-csv
       spec:
+        evaluationInterval:
+          compliant: 2m
+          noncompliant: 2m
         object-templates-raw: |
           {{- range $sub := (lookup "operators.coreos.com/v1alpha1" "Subscription" "" "" "!policies.ignore,policies.install").items }}
           - complianceType: musthave
@@ -255,6 +258,9 @@ spec:
       metadata:
         name: check-csv-ip
       spec:
+        evaluationInterval:
+          compliant: 2m
+          noncompliant: 2m
         object-templates-raw: |
           {{- range $sb := (lookup "operators.coreos.com/v1alpha1" "Subscription" "" "" "!policies.ignore,policies.install").items }}
           {{- if eq "InstallPlan" (lookup "operators.coreos.com/v1alpha1" "InstallPlan" $sb.metadata.namespace $sb.status.installPlanRef.name).kind }}
@@ -1879,6 +1885,7 @@ spec:
       spec:
         evaluationInterval:
           compliant: never
+          noncompliant: 1m
         object-templates:
         - complianceType: musthave
           objectDefinition:
@@ -1948,6 +1955,7 @@ spec:
       spec:
         evaluationInterval:
           compliant: never
+          noncompliant: 1m
         object-templates:
         - complianceType: musthave
           objectDefinition:
@@ -2131,6 +2139,9 @@ spec:
       metadata:
         name: proxy-sync-managed
       spec:
+        evaluationInterval:
+          compliant: 30m
+          noncompliant: 2m
         object-templates-raw: |
           {{hub- if eq "ConfigMap" (lookup "v1" "ConfigMap" "policies" "hub-ca").kind hub}}
           {{- $mt := "# custom-ca copied from hub-ca" }}
@@ -2176,6 +2187,49 @@ spec:
               spec:
                 trustedCA:
                   name: custom-ca
+          {{hub- end hub}}
+        remediationAction: enforce
+        severity: high
+  remediationAction: enforce
+---
+apiVersion: policy.open-cluster-management.io/v1
+kind: Policy
+metadata:
+  annotations:
+    argocd.argoproj.io/compare-options: IgnoreExtraneous
+    policy.open-cluster-management.io/categories: CM Configuration Management
+    policy.open-cluster-management.io/controls: CM-2 Baseline Configuration
+    policy.open-cluster-management.io/description: ""
+    policy.open-cluster-management.io/standards: NIST SP 800-53
+  labels:
+    open-cluster-management.io/policy-set: opp
+  name: upgrade-admin-acks
+  namespace: policies
+spec:
+  disabled: false
+  policy-templates:
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: upgrade-admin-acks
+      spec:
+        evaluationInterval:
+          compliant: 2m
+          noncompliant: 1m
+        object-templates-raw: |
+          {{hub- $hcm := lookup "v1" "ConfigMap" "policies" "admin-acks" hub}}
+          {{hub- if and (ne "" (index .ManagedClusterLabels "policies.osus")) (eq "ConfigMap" $hcm.kind) hub}}
+          {{- if not (hasKey (lookup "v1" "ConfigMap" "openshift-config" "admin-acks").metadata.labels "policies.ignore") }}
+          - complianceType: musthave
+            objectDefinition:
+              apiVersion: v1
+              kind: ConfigMap
+              metadata:
+                name: admin-acks
+                namespace: openshift-config
+              data: {{hub $hcm.data | toRawJson hub}}
+          {{- end }}
           {{hub- end hub}}
         remediationAction: enforce
         severity: high
@@ -2254,7 +2308,7 @@ spec:
         name: upgrade-marketplace-job
       spec:
         evaluationInterval:
-          compliant: 10m
+          compliant: 20m
           noncompliant: 10m
         object-templates-raw: |
           {{ range $mj := (lookup "batch/v1" "Job" "openshift-marketplace" "" "olm.managed").items }}
@@ -2307,6 +2361,9 @@ spec:
       metadata:
         name: upgrade-release-channel
       spec:
+        evaluationInterval:
+          compliant: 30m
+          noncompliant: 2m
         object-templates-raw: |
           {{hub if ne "" (index .ManagedClusterLabels "policies.release-channel") hub}}
           - complianceType: musthave
@@ -2344,6 +2401,9 @@ spec:
       metadata:
         name: upgrade-signatures-create
       spec:
+        evaluationInterval:
+          compliant: 2m
+          noncompliant: 1m
         object-templates-raw: |
           {{hub if ne "" (index .ManagedClusterLabels "policies.osus") hub}}
           {{hub range $hcm := (lookup "v1" "ConfigMap" "policies" "" "release.openshift.io/verification-signatures").items hub}}
@@ -2588,6 +2648,9 @@ spec:
       metadata:
         name: upgrade-sub-manual
       spec:
+        evaluationInterval:
+          compliant: never
+          noncompliant: 30m
         object-templates-raw: |
           {{- range $sub := (lookup "operators.coreos.com/v1alpha1" "Subscription" "" "" "!policies.ignore,policies.install").items }}
           - complianceType: musthave
@@ -2626,6 +2689,9 @@ spec:
       metadata:
         name: upgrade-sub-manual
       spec:
+        evaluationInterval:
+          compliant: never
+          noncompliant: 30m
         object-templates-raw: |
           {{- range $sub := (lookup "operators.coreos.com/v1alpha1" "Subscription" "" "" "!policies.ignore,policies.install").items }}
           - complianceType: musthave
@@ -2670,6 +2736,9 @@ spec:
       metadata:
         name: upgrade-upstream
       spec:
+        evaluationInterval:
+          compliant: 30m
+          noncompliant: 2m
         object-templates-raw: |
           {{hub $rp := index .ManagedClusterLabels "policies.osus" hub}}
           {{hub if ne "" $rp hub}}
@@ -2713,6 +2782,7 @@ spec:
   - node-infra-mcp
   - node-infra-toleration
   - proxy-sync-hub
+  - upgrade-admin-acks
   - upgrade-release-channel
   - upgrade-signatures
   - upgrade-upstream
@@ -2738,6 +2808,7 @@ spec:
   - node-infra-mcp
   - node-infra-toleration
   - proxy-sync-managed
+  - upgrade-admin-acks
   - upgrade-release-channel
   - upgrade-signatures
   - upgrade-upstream

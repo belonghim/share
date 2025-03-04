@@ -4,6 +4,9 @@ kind: ConfigurationPolicy
 metadata:
   name: upgrade-sub-manual
 spec:
+  evaluationInterval:
+    compliant: never
+    noncompliant: 30m
   remediationAction: enforce
   severity: high
   object-templates-raw: |

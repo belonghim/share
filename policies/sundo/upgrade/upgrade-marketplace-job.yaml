@@ -4,11 +4,11 @@ kind: ConfigurationPolicy
 metadata:
   name: upgrade-marketplace-job
 spec:
+  evaluationInterval:
+    compliant: 20m
+    noncompliant: 10m
   remediationAction: enforce
   severity: high
-  evaluationInterval:
-    compliant: 10m
-    noncompliant: 10m
   object-templates-raw: |
     {{ range $mj := (lookup "batch/v1" "Job" "openshift-marketplace" "" "olm.managed").items }}
     {{ if gt ($mj.status.failed | toInt) 0 }}

@@ -4,6 +4,9 @@ kind: ConfigurationPolicy
 metadata:
   name: upgrade-signatures-create
 spec:
+  evaluationInterval:
+    compliant: 2m
+    noncompliant: 1m
   remediationAction: enforce
   severity: high
   object-templates-raw: |

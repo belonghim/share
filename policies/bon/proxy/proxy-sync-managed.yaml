@@ -4,6 +4,9 @@ kind: ConfigurationPolicy
 metadata:
   name: proxy-sync-managed
 spec:
+  evaluationInterval:
+    compliant: 30m
+    noncompliant: 2m
   remediationAction: enforce
   severity: high
   object-templates-raw: |

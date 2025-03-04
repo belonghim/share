@@ -4,6 +4,9 @@ kind: ConfigurationPolicy
 metadata:
   name: upgrade-release-channel
 spec:
+  evaluationInterval:
+    compliant: 30m
+    noncompliant: 2m
   remediationAction: enforce
   severity: high
   object-templates-raw: |

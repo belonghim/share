@@ -1,0 +1,26 @@
+---
+apiVersion: policy.open-cluster-management.io/v1
+kind: ConfigurationPolicy
+metadata:
+  name: upgrade-admin-acks
+spec:
+  evaluationInterval:
+    compliant: 2m
+    noncompliant: 1m
+  remediationAction: enforce
+  severity: high
+  object-templates-raw: |
+    {{hub- $hcm := lookup "v1" "ConfigMap" "policies" "admin-acks" hub}}
+    {{hub- if and (ne "" (index .ManagedClusterLabels "policies.osus")) (eq "ConfigMap" $hcm.kind) hub}}
+    {{- if not (hasKey (lookup "v1" "ConfigMap" "openshift-config" "admin-acks").metadata.labels "policies.ignore") }}
+    - complianceType: musthave
+      objectDefinition:
+        apiVersion: v1
+        kind: ConfigMap
+        metadata:
+          name: admin-acks
+          namespace: openshift-config
+        data: {{hub $hcm.data | toRawJson hub}}
+    {{- end }}
+    {{hub- end hub}}
+---
