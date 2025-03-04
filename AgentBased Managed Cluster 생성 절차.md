@@ -1222,7 +1222,7 @@ $ oc label mcl ${ManagedCluster} policies.ns-prefix=g-tpj-dev
 ```
 
 
-### (Optional) Apply dev environment
+### (Optional) Apply dev environment label
 ```
 $ oc label mcl ${ManagedCluster} policies.extra=dev
 ```
@@ -1231,6 +1231,13 @@ $ oc label mcl ${ManagedCluster} policies.extra=dev
 ### Validate the JOINED and AVAILABLE status of the managed cluster
 ```
 $ oc get managedcluster ${ManagedCluster}
+```
+
+
+### Apply manaul subscription approval label
+```
+$ oc label mcl ${ManagedCluster} policies.sub-approval=manual
+
 ```
 
 
