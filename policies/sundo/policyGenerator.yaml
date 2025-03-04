@@ -196,6 +196,9 @@ policies:
 # upgrade upstream Policies - end
 # upgrade release channel Policies - start
 - name: upgrade-release-channel
+  evaluationInterval:
+    compliant: never
+    noncompliant: 30m
   manifests:
   - path: upgrade/upgrade-release-channel.yaml
   policySets:
