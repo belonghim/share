@@ -109,6 +109,7 @@
 ###
 ```
 $ openshift-install agent wait-for bootstrap-complete --dir ${Install_Dir} --log-level=debug
+
 ```
 
 ### Set node labels
@@ -174,6 +175,7 @@ EOF
 
 ## Wait until the CSV is succeeded
 $ oc -n open-cluster-management wait csv -l \!olm.copiedFrom --for=jsonpath={.status.phase}=Succeeded
+
 ```
 
 ### Create MultiClusterHub
@@ -256,6 +258,7 @@ metadata:
 spec:
     clusterSet: default
 EOF
+
 ```
 
 ### Apply the policies
@@ -279,30 +282,35 @@ $ sh script/osus.sh ${Registry} | oc create -f -
 ### Apply osus
 ```
 $ oc label mcl local-cluster policies.osus=ocp4
+
 ```
 
 
 ### (Optional) Apply cluster-log-forwarder's brokers
 ```
 $ oc -n policies create cm config-operators --from-literal eventBrokers='["tcp://192.168.10.3:7777","tcp://192.168.10.4:7777","tcp://192.168.10.5:7777"]' --from-literal infraBrokers='["tcp://192.168.10.3:7777","tcp://192.168.10.4:7777","tcp://192.168.10.5:7777"]'
+
 ```
 
 
 ### (Optional) Apply cluster-log-forwarder's topics and syslog-url
 ```
 $ oc label mcl local-cluster policies.event-topic=event policies.infra-topic=infra policies.syslog-url=192.168.10.100..514
+
 ```
 
 
 ### (Optional) Apply cluster-monitoring-config's remote write monitoring namespace prefix
 ```
 $ oc label mcl local-cluster policies.ns-prefix=g-tpj-dev
+
 ```
 
 
 ### (Optional) Apply dev environment
 ```
 $ oc label mcl local-cluster policies.extra=dev
+
 ```
 
 
@@ -386,30 +394,35 @@ spec:
   hubAcceptsClient: true
   leaseDurationSeconds: 120
 EOF
+
 ```
 
 
 ### (Optional) Apply cluster-log-forwarder's topics and syslog-url
 ```
 $ oc label mcl ${ManagedCluster} policies.event-topic=event policies.infra-topic=infra policies.syslog-url=192.168.10.100..514
+
 ```
 
 
 ### (Optional) Apply cluster-monitoring-config's remote write monitoring namespace prefix
 ```
 $ oc label mcl ${ManagedCluster} policies.ns-prefix=g-tpj-dev
+
 ```
 
 
 ### (Optional) Apply dev environment
 ```
 $ oc label mcl ${ManagedCluster} policies.extra=dev
+
 ```
 
 
 ### Validate the JOINED and AVAILABLE status of the managed cluster
 ```
 $ oc get managedcluster ${ManagedKubeconfig}
+
 ```
 
 ### Apply manaul subscription approval label
