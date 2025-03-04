@@ -1145,32 +1145,12 @@ done; unset IFS
 <br><br>
 ## Importing to Hub Cluster
 
-### Preparing for cluster import (in Hub Cluster)
+### Importing a cluster by using the auto import secret (in Hub Cluster)
 ```
 ## create Namespace
 $ ManagedCluster=compact
 $ oc create namespace ${ManagedCluster}
 
-## create ManagedCluster
-$ oc create -f - <<EOF
-apiVersion: cluster.open-cluster-management.io/v1
-kind: ManagedCluster
-metadata:
-  name: ${ManagedCluster}
-  annotations:
-    open-cluster-management/tolerations: '[{"key":"node-role.kubernetes.io/infra","operator":"Exists","effect":"NoSchedule"}]'
-  labels:
-    cloud: auto-detect
-    vendor: OpenShift
-    policies.osus: ocp4
-spec:
-  hubAcceptsClient: true
-  leaseDurationSeconds: 300
-EOF
-```
-
-### Importing a cluster by using the auto import secret (in Hub Cluster)
-```
 ## create auto import secret
 $ ManagedKubeconfig="/opt/compact/auth/kubeconfig"
 $ oc create -f - <<EOF
@@ -1206,6 +1186,23 @@ spec:
     enabled: true
   searchCollector:
     enabled: true
+EOF
+
+## create ManagedCluster
+$ oc create -f - <<EOF
+apiVersion: cluster.open-cluster-management.io/v1
+kind: ManagedCluster
+metadata:
+  name: ${ManagedCluster}
+  annotations:
+    open-cluster-management/tolerations: '[{"key":"node-role.kubernetes.io/infra","operator":"Exists","effect":"NoSchedule"}]'
+  labels:
+    cloud: auto-detect
+    vendor: OpenShift
+    policies.osus: ocp4
+spec:
+  hubAcceptsClient: true
+  leaseDurationSeconds: 300
 EOF
 ```
 
