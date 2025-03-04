@@ -36,13 +36,15 @@ policies:
 # Subscription Init Policies - start
 - name: upgrade-sub-init
   dependencies:
+  - name: install-operators
   - name: config-operators
   - name: upgrade-upstream
+    compliance: NonCompliant
   evaluationInterval:
     compliant: never
     noncompliant: 30m
   manifests:
-  - path: upgrade/upgrade-sub-init.yaml
+  - path: upgrade/upgrade-sub-manual.yaml
   policySets:
   - sub-init
 # Subscription Init Policies - end
@@ -92,7 +94,6 @@ policies:
 - name: config-operators
   dependencies:
   - name: check-csv
-  - name: install-operators
   manifests:
   - path: config/config-operators.yaml
   policySets:
