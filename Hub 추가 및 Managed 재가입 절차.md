@@ -384,7 +384,7 @@ metadata:
     policies.osus: ocp4
 spec:
   hubAcceptsClient: true
-  leaseDurationSeconds: 300
+  leaseDurationSeconds: 120
 EOF
 ```
 
