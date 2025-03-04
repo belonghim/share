@@ -192,6 +192,9 @@ policies:
 # marketplace jobs Policies - end
 # upgrade upstream Policies - start
 - name: upgrade-upstream
+  evaluationInterval:
+    compliant: 30m
+    noncompliant: 2m
   manifests:
   - path: upgrade/upgrade-upstream.yaml
   policySets:
@@ -202,7 +205,7 @@ policies:
 # upgrade release channel Policies - start
 - name: upgrade-release-channel
   evaluationInterval:
-    compliant: never
+    compliant: 30m
     noncompliant: 2m
   manifests:
   - path: upgrade/upgrade-release-channel.yaml
