@@ -55,8 +55,6 @@ kind: Subscription
 metadata:
   name: multicluster-engine
   namespace: multicluster-engine
-  labels:
-    policies.install: ""
 spec:
   config:
     nodeSelector:
