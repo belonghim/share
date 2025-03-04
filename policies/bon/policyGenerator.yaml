@@ -36,7 +36,6 @@ policies:
 # Subscription Init Policies - start
 - name: upgrade-sub-init
   dependencies:
-  - name: check-csv
   - name: install-operators
   - name: config-operators
   - name: upgrade-upstream
@@ -92,6 +91,8 @@ policies:
 # Proxy Router Bundle Policies - end
 # Config  operators Policies - start
 - name: config-operators
+  dependencies:
+  - name: check-csv
   manifests:
   - path: config/config-operators.yaml
   policySets:
