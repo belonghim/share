@@ -327,32 +327,12 @@ $ oc delete ns mngda
 
 ```
 
-### Preparing for cluster import
+### Importing managed cluster by using the auto import secret
 ```
 ## create Namespace
 $ ManagedCluster=mngda
 $ oc create namespace ${ManagedCluster}
 
-## create ManagedCluster
-$ oc create -f - <<EOF
-apiVersion: cluster.open-cluster-management.io/v1
-kind: ManagedCluster
-metadata:
-  name: ${ManagedCluster}
-  annotations:
-    open-cluster-management/tolerations: '[{"key":"node-role.kubernetes.io/infra","operator":"Exists","effect":"NoSchedule"}]'
-  labels:
-    cloud: auto-detect
-    vendor: OpenShift
-    policies.osus: ocp4
-spec:
-  hubAcceptsClient: true
-  leaseDurationSeconds: 300
-EOF
-```
-
-### Importing managed cluster by using the auto import secret
-```
 ## create auto import secret
 $ ManagedKubeconfig="/opt/mngda/auth/kubeconfig"
 $ oc create -f - <<EOF
@@ -388,6 +368,23 @@ spec:
     enabled: true
   searchCollector:
     enabled: true
+EOF
+
+## create ManagedCluster
+$ oc create -f - <<EOF
+apiVersion: cluster.open-cluster-management.io/v1
+kind: ManagedCluster
+metadata:
+  name: ${ManagedCluster}
+  annotations:
+    open-cluster-management/tolerations: '[{"key":"node-role.kubernetes.io/infra","operator":"Exists","effect":"NoSchedule"}]'
+  labels:
+    cloud: auto-detect
+    vendor: OpenShift
+    policies.osus: ocp4
+spec:
+  hubAcceptsClient: true
+  leaseDurationSeconds: 300
 EOF
 ```
 
