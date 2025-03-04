@@ -415,6 +415,11 @@ $ oc label mcl ${ManagedCluster} policies.extra=dev
 $ oc get managedcluster ${ManagedKubeconfig}
 ```
 
+### Apply manaul subscription approval label
+```
+$ oc label mcl ${ManagedCluster} policies.sub-approval=manual
+
+```
 
 ### Delete auto-import secret
 ```
