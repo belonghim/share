@@ -1204,30 +1204,35 @@ spec:
   hubAcceptsClient: true
   leaseDurationSeconds: 120
 EOF
+
 ```
 
 
 ### (Optional) Apply cluster-log-forwarder's topics and syslog-url
 ```
 $ oc label mcl ${ManagedCluster} policies.event-topic=event policies.infra-topic=infra policies.syslog-url=192.168.10.100..514
+
 ```
 
 
 ### (Optional) Apply cluster-monitoring-config's remote write monitoring namespace prefix
 ```
 $ oc label mcl ${ManagedCluster} policies.ns-prefix=g-tpj-dev
+
 ```
 
 
 ### (Optional) Apply dev environment label
 ```
 $ oc label mcl ${ManagedCluster} policies.extra=dev
+
 ```
 
 
 ### Validate the JOINED and AVAILABLE status of the managed cluster
 ```
 $ oc get managedcluster ${ManagedCluster}
+
 ```
 
 
@@ -1257,6 +1262,7 @@ $ oc -n ${ManagedCluster} delete secret auto-import-secret
 
 ```
 worker2.ocp4.example.com.	IN	A	192.168.1.15
+
 ```
 
 ### nodes-config.yaml
@@ -1298,6 +1304,7 @@ hosts:
         next-hop-interface: enp1s0
         table-id: 254
 EOF
+
 ```
 
 ### node-image create
@@ -1309,6 +1316,7 @@ $ oc adm node-image create
 ## ocp 4.16 based command
 ## https://github.com/openshift/installer/blob/master/docs/user/agent/add-node/add-nodes.md
 $ ./node-joiner.sh
+
 ```
 
 ### vm.create
@@ -1343,6 +1351,7 @@ $  govc ls /<datacenter>/vm/<folder_name>
 
 ## After 2 minutes, shut down the VMs:
 $ govc vm.power -s=true $VM
+
 ```
 
 ### disk.enableUUID 설정 및 시작
@@ -1353,6 +1362,7 @@ $ govc vm.change -vm $VM -e disk.enableUUID=TRUE
 
 ## Restart the VM:
 $ govc vm.power -on=true $VM
+
 ```
 
 ### Joing the node
@@ -1394,4 +1404,5 @@ apiVersion: machineconfiguration.openshift.io/v1
                  [Service]
                  Environment="KUBELET_LOG_LEVEL=4"
 EOF
+
 ```
