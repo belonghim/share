@@ -418,13 +418,16 @@ $ oc label mcl ${ManagedCluster} policies.sub-approval=manual
 
 ```
 
-### Delete auto-import secret
+### Delete auto-import-secret & KlusterletAddonConfig
 ```
 ## Wait until the managedluster joined
 $ oc wait mcl ${ManagedCluster} --for=condition=ManagedClusterImportSucceeded && oc wait mcl ${ManagedCluster} --for=condition=ManagedClusterConditionAvailable && oc wait mcl ${ManagedCluster} --for=condition=ManagedClusterJoined
 
 ## Delete auto-import-secret
 $ oc -n ${ManagedCluster} delete secret auto-import-secret
+
+## Delete KlusterletAddonConfig
+$ oc -n ${ManagedCluster} delete KlusterletAddonConfig ${ManagedCluster}
 
 ```
 
