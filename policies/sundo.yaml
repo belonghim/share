@@ -379,6 +379,11 @@ spec:
     kind: Policy
     name: check-csv
     namespace: policies
+  - apiVersion: policy.open-cluster-management.io/v1
+    compliance: Compliant
+    kind: Policy
+    name: install-operators
+    namespace: policies
   disabled: false
   policy-templates:
   - objectDefinition:
@@ -2539,11 +2544,6 @@ spec:
   - apiVersion: policy.open-cluster-management.io/v1
     compliance: Compliant
     kind: Policy
-    name: install-operators
-    namespace: policies
-  - apiVersion: policy.open-cluster-management.io/v1
-    compliance: Compliant
-    kind: Policy
     name: config-operators
     namespace: policies
   - apiVersion: policy.open-cluster-management.io/v1
@@ -2557,9 +2557,10 @@ spec:
       apiVersion: policy.open-cluster-management.io/v1
       kind: ConfigurationPolicy
       metadata:
-        name: upgrade-sub-manual
+        name: upgrade-sub-init
       spec:
         object-templates-raw: |
+          {{hub- if eq "Secret" (lookup "v1" "Secret" .ManagedClusterName "auto-import-secret").kind hub}}
           {{- range $sub := (lookup "operators.coreos.com/v1alpha1" "Subscription" "" "" "!policies.ignore,policies.install").items }}
           - complianceType: musthave
             objectDefinition:
@@ -2571,6 +2572,7 @@ spec:
               spec:
                 installPlanApproval: Manual
           {{- end }}
+          {{hub- end hub}}
         remediationAction: enforce
         severity: high
   remediationAction: enforce
