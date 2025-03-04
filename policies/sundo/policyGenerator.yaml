@@ -192,6 +192,8 @@ policies:
 # marketplace jobs Policies - end
 # upgrade upstream Policies - start
 - name: upgrade-upstream
+  dependencies:
+  - name: install-operators
   evaluationInterval:
     compliant: 30m
     noncompliant: 2m
