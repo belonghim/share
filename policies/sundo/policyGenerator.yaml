@@ -198,7 +198,7 @@ policies:
 - name: upgrade-release-channel
   evaluationInterval:
     compliant: never
-    noncompliant: 30m
+    noncompliant: 2m
   manifests:
   - path: upgrade/upgrade-release-channel.yaml
   policySets:
