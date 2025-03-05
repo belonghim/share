@@ -1236,6 +1236,14 @@ $ oc get managedcluster ${ManagedCluster}
 ```
 
 
+### Wait until check-cv policies state is "Compliant"
+```
+$ oc -n ${ManagedCluster} wait --timeout=1h --for=jsonpath='{.status.compliant}'=Compliant policy policies.check-cv
+policy.policy.open-cluster-management.io/policies.check-cv condition met
+
+```
+
+
 ### Apply manaul subscription approval label
 ```
 $ oc label mcl ${ManagedCluster} policies.sub-approval=manual
