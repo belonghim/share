@@ -48,3 +48,10 @@ status:
   - status: 'True'
     type: Progressing
 ---
+apiVersion: config.openshift.io/v1
+kind: ClusterVersion
+status:
+  conditions:
+  - status: 'False'
+    type: Upgradeable
+---

@@ -361,6 +361,73 @@ spec:
               conditions:
               - status: "True"
                 type: Progressing
+        - complianceType: mustnothave
+          objectDefinition:
+            apiVersion: config.openshift.io/v1
+            kind: ClusterVersion
+            status:
+              conditions:
+              - status: "False"
+                type: Upgradeable
+        remediationAction: inform
+        severity: medium
+  remediationAction: inform
+---
+apiVersion: policy.open-cluster-management.io/v1
+kind: Policy
+metadata:
+  annotations:
+    argocd.argoproj.io/compare-options: IgnoreExtraneous
+    policy.open-cluster-management.io/categories: CM Configuration Management
+    policy.open-cluster-management.io/controls: CM-2 Baseline Configuration
+    policy.open-cluster-management.io/description: ""
+    policy.open-cluster-management.io/standards: NIST SP 800-53
+  labels:
+    open-cluster-management.io/policy-set: opp
+  name: check-upgradeable
+  namespace: policies
+spec:
+  disabled: false
+  policy-templates:
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: check-upgradeable
+      spec:
+        object-templates:
+        - complianceType: mustnothave
+          objectDefinition:
+            apiVersion: config.openshift.io/v1
+            kind: ClusterOperator
+            status:
+              conditions:
+              - status: "False"
+                type: Upgradeable
+        - complianceType: mustnothave
+          objectDefinition:
+            apiVersion: config.openshift.io/v1
+            kind: ClusterVersion
+            status:
+              conditions:
+              - status: "True"
+                type: Progressing
+        - complianceType: mustnothave
+          objectDefinition:
+            apiVersion: config.openshift.io/v1
+            kind: ClusterVersion
+            status:
+              conditions:
+              - status: "False"
+                type: RetrievedUpdates
+        - complianceType: mustnothave
+          objectDefinition:
+            apiVersion: config.openshift.io/v1
+            kind: ClusterVersion
+            status:
+              conditions:
+              - status: "False"
+                type: Upgradeable
         remediationAction: inform
         severity: medium
   remediationAction: inform
@@ -2141,7 +2208,7 @@ spec:
       spec:
         evaluationInterval:
           compliant: 30m
-          noncompliant: 2m
+          noncompliant: 10m
         object-templates-raw: |
           {{hub- if eq "ConfigMap" (lookup "v1" "ConfigMap" "policies" "hub-ca").kind hub}}
           {{- $mt := "# custom-ca copied from hub-ca" }}
@@ -2774,6 +2841,7 @@ spec:
   policies:
   - check-csv
   - check-cv
+  - check-upgradeable
   - config-operators
   - config-operators-hub
   - install-operators
@@ -2801,6 +2869,7 @@ spec:
   policies:
   - check-csv
   - check-cv
+  - check-upgradeable
   - config-operators
   - config-operators-managed
   - install-operators

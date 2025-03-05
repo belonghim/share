@@ -1,0 +1,29 @@
+---
+apiVersion: config.openshift.io/v1
+kind: ClusterOperator
+status:
+  conditions:
+  - status: 'False'
+    type: Upgradeable
+---
+apiVersion: config.openshift.io/v1
+kind: ClusterVersion
+status:
+  conditions:
+  - status: 'True'
+    type: Progressing
+---
+apiVersion: config.openshift.io/v1
+kind: ClusterVersion
+status:
+  conditions:
+  - status: 'False'
+    type: RetrievedUpdates
+---
+apiVersion: config.openshift.io/v1
+kind: ClusterVersion
+status:
+  conditions:
+  - status: 'False'
+    type: Upgradeable
+---

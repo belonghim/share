@@ -122,7 +122,17 @@ policies:
   - hub
   - managed
   remediationAction: inform
-# CV check Policies - end
+# Upgradeable check Policies - end
+# CV check Policies - start
+- name: check-upgradeable
+  complianceType: mustnothave
+  manifests:
+  - path: check/check-upgradeable.yaml
+  policySets:
+  - hub
+  - managed
+  remediationAction: inform
+# Upgradeable check Policies - end
 # CSV check Policies - start
 - name: check-csv
   manifests:
