@@ -126,6 +126,8 @@ policies:
 # CV check Policies - start
 - name: check-upgradeable
   complianceType: mustnothave
+  dependencies:
+  - name: check-cv
   manifests:
   - path: check/check-upgradeable.yaml
   policySets:
