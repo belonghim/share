@@ -55,8 +55,8 @@ spec:
           apiServerTimeout: 1h
     {{- end }}
     {{- end }}
-    {{- range $cd := (lookup "operator.openshift.io/v1" "Etcd" "" "cluster").status.conditions }}
-    {{- if and (eq "EtcdEndpointsDegraded" $cd.type) (eq "True" $cd.status) }}
+    {{- range $ed := (lookup "operator.openshift.io/v1" "Etcd" "" "cluster").status.conditions }}
+    {{- if and (eq "EtcdEndpointsDegraded" $ed.type) (eq "True" $ed.status) }}
           maxApiErrorThreshold: 864000
     {{- end }}
     {{- end }}
