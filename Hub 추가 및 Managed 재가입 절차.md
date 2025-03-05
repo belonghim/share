@@ -382,23 +382,10 @@ $ oc get managedcluster ${ManagedKubeconfig}
 
 ```
 
-### Wait until all policies states are "Compliant"
+### Wait until check-cv policies state is "Compliant"
 ```
-$ oc -n ${ManagedCluster} wait --timeout=1h --for=jsonpath='{.status.compliant}'=Compliant policy --all
-policy.policy.open-cluster-management.io/policies.check-csv condition met
+$ oc -n ${ManagedCluster} wait --timeout=1h --for=jsonpath='{.status.compliant}'=Compliant policy policies.check-cv
 policy.policy.open-cluster-management.io/policies.check-cv condition met
-policy.policy.open-cluster-management.io/policies.check-upgradeable condition met
-policy.policy.open-cluster-management.io/policies.config-operators condition met
-policy.policy.open-cluster-management.io/policies.config-operators-managed condition met
-policy.policy.open-cluster-management.io/policies.install-operators condition met
-policy.policy.open-cluster-management.io/policies.node-infra-label condition met
-policy.policy.open-cluster-management.io/policies.node-infra-mcp condition met
-policy.policy.open-cluster-management.io/policies.node-infra-toleration condition met
-policy.policy.open-cluster-management.io/policies.proxy-sync-managed condition met
-policy.policy.open-cluster-management.io/policies.upgrade-admin-acks condition met
-policy.policy.open-cluster-management.io/policies.upgrade-release-channel condition met
-policy.policy.open-cluster-management.io/policies.upgrade-signatures condition met
-policy.policy.open-cluster-management.io/policies.upgrade-upstream condition met
 
 ```
 
