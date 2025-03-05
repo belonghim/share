@@ -10,9 +10,9 @@ spec:
   remediationAction: enforce
   severity: high
   object-templates-raw: |
-    {{hub $rp := index .ManagedClusterLabels "policies.osus" hub}}
-    {{hub if ne "" $rp hub}}
-    {{hub $gr := fromConfigMap "policies" (cat "upgrade-osus-" $rp | replace " " "") "graphUrl" hub}}
+    {{hub- $rp := index .ManagedClusterLabels "policies.osus" hub}}
+    {{hub- if ne "" $rp hub}}
+    {{hub- $gr := fromConfigMap "policies" (cat "upgrade-osus-" $rp | replace " " "") "graphUrl" hub}}
     - complianceType: musthave
       objectDefinition:
         apiVersion: config.openshift.io/v1
@@ -21,9 +21,5 @@ spec:
           name: version
         spec:
           upstream: {{hub $gr hub}}
-        status:
-          conditions:
-          - status: 'True'
-            type: RetrievedUpdates
-    {{hub end hub}}
+    {{hub- end hub}}
 ---
