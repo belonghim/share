@@ -236,8 +236,8 @@ spec:
         name: check-csv
       spec:
         evaluationInterval:
-          compliant: 2m
-          noncompliant: 2m
+          compliant: 5m
+          noncompliant: 5m
         object-templates-raw: |
           {{- range $sub := (lookup "operators.coreos.com/v1alpha1" "Subscription" "" "" "!policies.ignore,policies.install").items }}
           - complianceType: musthave
@@ -249,34 +249,6 @@ spec:
                 namespace: {{ $sub.metadata.namespace }}
               status:
                 phase: Succeeded
-          {{- end }}
-        remediationAction: inform
-        severity: high
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1
-      kind: ConfigurationPolicy
-      metadata:
-        name: check-csv-ip
-      spec:
-        evaluationInterval:
-          compliant: 2m
-          noncompliant: 2m
-        object-templates-raw: |
-          {{- range $sb := (lookup "operators.coreos.com/v1alpha1" "Subscription" "" "" "!policies.ignore,policies.install").items }}
-          {{- if eq "InstallPlan" (lookup "operators.coreos.com/v1alpha1" "InstallPlan" $sb.metadata.namespace $sb.status.installPlanRef.name).kind }}
-          {{- $ip := (lookup "operators.coreos.com/v1alpha1" "InstallPlan" $sb.metadata.namespace $sb.status.installPlanRef.name) }}
-          - complianceType: musthave
-            objectDefinition:
-              apiVersion: operators.coreos.com/v1alpha1
-              kind: InstallPlan
-              metadata:
-                name: {{ $ip.metadata.name }}
-                namespace: {{ $ip.metadata.namespace }}
-              spec:
-                approved: true
-              status:
-                phase: Complete
-          {{- end }}
           {{- end }}
         remediationAction: inform
         severity: high
