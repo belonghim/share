@@ -86,6 +86,10 @@ metadata:
 spec:
   predicates:
   - requiredClusterSelector:
+      claimSelector:
+        matchExpressions:
+        - key: version.openshift.io
+          operator: DoesNotExist
       labelSelector:
         matchExpressions:
         - key: vendor
@@ -95,8 +99,6 @@ spec:
         - key: policies.undeploy
           operator: DoesNotExist
         - key: policies.sub-approval
-          operator: DoesNotExist
-        - key: openshiftVersion-major-minor
           operator: DoesNotExist
 ---
 apiVersion: cluster.open-cluster-management.io/v1beta1
