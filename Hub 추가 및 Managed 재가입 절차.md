@@ -263,6 +263,10 @@ EOF
 
 ### Apply the policies
 ```
+## Download the git repo
+$ git clone https://github.com/belonghim/share
+$ cd share/policies
+
 ## Apply the OPP policies
 $ oc apply -f bon.yaml
 
@@ -337,63 +341,16 @@ $ oc delete ns mngda
 
 ### Importing managed cluster by using the auto import secret
 ```
-## create Namespace
+## Change directory to policies script
+$ cd share/policies
+
+## Test import-cluster script
 $ ManagedCluster=mngda
-$ oc create namespace ${ManagedCluster}
+$ ManagedKubeconfig=/opt/mngda/auth/kubeconfig
+$ sh import-cluster ${ManagedCluster} ${ManagedKubeconfig}
 
-## create auto import secret
-$ ManagedKubeconfig="/opt/mngda/auth/kubeconfig"
-$ oc create -f - <<EOF
-apiVersion: v1
-kind: Secret
-metadata:
-  name: auto-import-secret
-  namespace: ${ManagedCluster}
-  annotations:
-    managedcluster-import-controller.open-cluster-management.io/keeping-auto-import-secret: ""
-stringData:
-  autoImportRetry: "7200"
-  kubeconfig: |-
-$(sed 's/^/    /g' ${ManagedKubeconfig})
-type: Opaque
-EOF
-
-## create klusterlet addon config
-$ oc create -f - <<EOF
-apiVersion: agent.open-cluster-management.io/v1
-kind: KlusterletAddonConfig
-metadata:
-  name: ${ManagedCluster}
-  namespace: ${ManagedCluster}
-spec:
-  applicationManager:
-    enabled: false
-  certPolicyController:
-    enabled: true
-  iamPolicyController:
-    enabled: false
-  policyController:
-    enabled: true
-  searchCollector:
-    enabled: true
-EOF
-
-## create ManagedCluster
-$ oc create -f - <<EOF
-apiVersion: cluster.open-cluster-management.io/v1
-kind: ManagedCluster
-metadata:
-  name: ${ManagedCluster}
-  annotations:
-    open-cluster-management/tolerations: '[{"key":"node-role.kubernetes.io/infra","operator":"Exists","effect":"NoSchedule"}]'
-  labels:
-    cloud: auto-detect
-    vendor: OpenShift
-    policies.osus: ocp4
-spec:
-  hubAcceptsClient: true
-  leaseDurationSeconds: 120
-EOF
+## Start to import the cluster
+$ sh import-cluster ${ManagedCluster} ${ManagedKubeconfig} | oc create -f -
 
 ```
 
