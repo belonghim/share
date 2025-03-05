@@ -23,8 +23,6 @@ policies:
 # Hub Operators Policies - end
 # All Operators Policies - start
 - name: install-operators
-  dependencies:
-  - name: check-cv
   manifests:
   - path: install/install-operators.yaml
   policySets:
