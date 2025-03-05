@@ -53,11 +53,16 @@ spec:
     {{- if and (eq "Progressing" $cd.type) (eq "True" $cd.status) }}
           apiCheckInterval: 1h
           apiServerTimeout: 1h
+    {{- else }}
+          apiCheckInterval: 1m
+          apiServerTimeout: 1m
     {{- end }}
     {{- end }}
     {{- range $ed := (lookup "operator.openshift.io/v1" "Etcd" "" "cluster").status.conditions }}
     {{- if and (eq "EtcdEndpointsDegraded" $ed.type) (eq "True" $ed.status) }}
           maxApiErrorThreshold: 864000
+    {{- else }}
+          maxApiErrorThreshold: 3
     {{- end }}
     {{- end }}
           customDsTolerations:
