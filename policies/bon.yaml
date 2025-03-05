@@ -96,7 +96,7 @@ spec:
           operator: DoesNotExist
         - key: policies.sub-approval
           operator: DoesNotExist
-        - key: openshiftVersion
+        - key: openshiftVersion-major-minor
           operator: DoesNotExist
 ---
 apiVersion: cluster.open-cluster-management.io/v1beta1
