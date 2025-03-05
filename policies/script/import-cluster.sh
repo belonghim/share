@@ -20,6 +20,7 @@ metadata:
     policies.osus: ocp4
 spec:
   hubAcceptsClient: true
+  leaseDurationSeconds: 120
 ---
 apiVersion: agent.open-cluster-management.io/v1
 kind: KlusterletAddonConfig
@@ -48,7 +49,7 @@ metadata:
 stringData:
   #token: sha256~fywkF0ePyj7wP_Hi7RLrfGYDL-0BQ-2Accc7GR6orKI
   #server: https://api.sno-a.wooribank.lab:6443
-  autoImportRetry: "720"
+  autoImportRetry: "7200"
   kubeconfig: |-
 $(sed 's/^/    /g' $KUBECON)
 type: Opaque
