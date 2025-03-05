@@ -776,7 +776,7 @@ spec:
           {{- if ne "" $np }}{{ $mn = (cat $np "-monitoring-ns" | replace " " "") }}{{ end }}
                     remoteWrite:
                     - url: http://kube-prometheus-stack-prometheus.{{ $mn }}.svc.cluster.local:9090/api/v1/write
-                    retentionSize: 60GiB
+                    retentionSize: 30GiB
                     tolerations:
                     - effect: NoSchedule
                       key: node-role.kubernetes.io/infra
