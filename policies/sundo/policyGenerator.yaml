@@ -203,6 +203,7 @@ policies:
 # upgrade upstream Policies - start
 - name: upgrade-upstream
   dependencies:
+  - name: check-cv
   - name: install-operators
   manifests:
   - path: upgrade/upgrade-upstream.yaml

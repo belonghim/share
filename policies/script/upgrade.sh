@@ -5,6 +5,7 @@ if [ "$CLUSTER" = "" -o "$VERSION" = "" ];then echo "Example: upgrade.sh <cluste
 #oc label mcl $CLUSTER policies.undeploy= 2>/dev/null
 
 cat <<EOF
+---
 apiVersion: cluster.open-cluster-management.io/v1beta1
 kind: ClusterCurator
 metadata:
