@@ -335,14 +335,6 @@ spec:
               conditions:
               - status: "True"
                 type: Progressing
-        - complianceType: mustnothave
-          objectDefinition:
-            apiVersion: config.openshift.io/v1
-            kind: ClusterVersion
-            status:
-              conditions:
-              - status: "False"
-                type: Upgradeable
         remediationAction: inform
         severity: medium
   remediationAction: inform
