@@ -36,8 +36,6 @@ policies:
   dependencies:
   - name: install-operators
   - name: config-operators
-  - name: upgrade-upstream
-    compliance: NonCompliant
   manifests:
   - path: upgrade/upgrade-sub-manual.yaml
   policySets:
