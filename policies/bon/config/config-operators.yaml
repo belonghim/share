@@ -41,7 +41,7 @@ spec:
   remediationAction: enforce
   severity: high
   object-templates-raw: |
-    - complianceType: mustnothave
+    - complianceType: musthave
       objectDefinition:
         apiVersion: self-node-remediation.medik8s.io/v1alpha1
         kind: SelfNodeRemediationConfig
