@@ -50,29 +50,6 @@ spec:
 apiVersion: remediation.medik8s.io/v1alpha1
 kind: NodeHealthCheck
 metadata:
-  name: nodehealthcheck-master
-spec:
-  minHealthy: 90%
-  remediationTemplate:
-    apiVersion: self-node-remediation.medik8s.io/v1alpha1
-    name: self-node-remediation-automatic-strategy-template
-    namespace: openshift-workload-availability
-    kind: SelfNodeRemediationTemplate
-  selector:
-    matchExpressions:
-    - key: node-role.kubernetes.io/master
-      operator: Exists
-  unhealthyConditions:
-  - type: Ready
-    status: "False"
-    duration: 300s
-  - type: Ready
-    status: Unknown
-    duration: 300s
----
-apiVersion: remediation.medik8s.io/v1alpha1
-kind: NodeHealthCheck
-metadata:
   name: nodehealthcheck-worker
 spec:
   minHealthy: 51%
