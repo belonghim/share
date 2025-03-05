@@ -1,26 +1,12 @@
 if [ "$CLUSTER" = "" ];then CLUSTER=$1;fi
 if [ "$KUBECON" = "" ];then KUBECON=$2;fi
-if [ "$CLUSTER" = "" -o "$KUBECON" = ""];then echo "Example: import-cluster.sh <cluster> <kubeconfig>";exit 1;fi
+if [ "$CLUSTER" = "" -o "$KUBECON" = "" ];then echo "Example: import-cluster.sh <cluster> <kubeconfig>";exit 1;fi
 
 cat <<EOF
 apiVersion: v1
 kind: Namespace
 metadata:
   name: $CLUSTER
----
-apiVersion: cluster.open-cluster-management.io/v1
-kind: ManagedCluster
-metadata:
-  name: $CLUSTER
-  annotations:
-    open-cluster-management/tolerations: '[{"key":"node-role.kubernetes.io/infra","operator":"Exists","effect":"NoSchedule"}]'
-  labels:
-    cloud: auto-detect
-    vendor: OpenShift
-    policies.osus: ocp4
-spec:
-  hubAcceptsClient: true
-  leaseDurationSeconds: 120
 ---
 apiVersion: agent.open-cluster-management.io/v1
 kind: KlusterletAddonConfig
@@ -48,9 +34,23 @@ metadata:
     managedcluster-import-controller.open-cluster-management.io/keeping-auto-import-secret: ""
 stringData:
   #token: sha256~fywkF0ePyj7wP_Hi7RLrfGYDL-0BQ-2Accc7GR6orKI
-  #server: https://api.sno-a.wooribank.lab:6443
+  #server: https://api.sno-a.woorifg.lab:6443
   autoImportRetry: "7200"
   kubeconfig: |-
 $(sed 's/^/    /g' $KUBECON)
 type: Opaque
+---
+apiVersion: cluster.open-cluster-management.io/v1
+kind: ManagedCluster
+metadata:
+  name: $CLUSTER
+  annotations:
+    open-cluster-management/tolerations: '[{"key":"node-role.kubernetes.io/infra","operator":"Exists","effect":"NoSchedule"}]'
+  labels:
+    cloud: auto-detect
+    vendor: OpenShift
+    policies.osus: ocp4
+spec:
+  hubAcceptsClient: true
+  leaseDurationSeconds: 120
 EOF
