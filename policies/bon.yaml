@@ -2926,9 +2926,6 @@ spec:
       metadata:
         name: upgrade-sub-manual
       spec:
-        evaluationInterval:
-          compliant: 60m
-          noncompliant: 30m
         object-templates-raw: |
           {{- range $sub := (lookup "operators.coreos.com/v1alpha1" "Subscription" "" "" "!policies.ignore,policies.install").items }}
           - complianceType: musthave
@@ -2967,9 +2964,6 @@ spec:
       metadata:
         name: upgrade-sub-manual
       spec:
-        evaluationInterval:
-          compliant: 60m
-          noncompliant: 30m
         object-templates-raw: |
           {{- range $sub := (lookup "operators.coreos.com/v1alpha1" "Subscription" "" "" "!policies.ignore,policies.install").items }}
           - complianceType: musthave
