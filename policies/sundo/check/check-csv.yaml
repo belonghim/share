@@ -5,8 +5,8 @@ metadata:
   name: check-csv
 spec:
   evaluationInterval:
-    compliant: 5m
-    noncompliant: 5m
+    compliant: 2m
+    noncompliant: 2m
   remediationAction: inform
   severity: high
   object-templates-raw: |
