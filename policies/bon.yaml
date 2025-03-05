@@ -766,10 +766,8 @@ spec:
           {{- $np := "{{hub index .ManagedClusterLabels "policies.ns-prefix" hub}}" }}
           {{- $mn := "clushkube-monitoring" }}
           {{- if ne "" $np }}{{ $mn = (cat $np "-monitoring-ns" | replace " " "") }}{{ end }}
-          {{- if eq "Service" (lookup "v1" "Service" $mn "kube-prometheus-stack-prometheus").kind }}
                     remoteWrite:
                     - url: http://kube-prometheus-stack-prometheus.{{ $mn }}.svc.cluster.local:9090/api/v1/write
-          {{- end }}
                     retentionSize: 60GiB
                     tolerations:
                     - effect: NoSchedule
