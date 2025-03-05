@@ -8,6 +8,21 @@ kind: Namespace
 metadata:
   name: $CLUSTER
 ---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: auto-import-secret
+  namespace: $CLUSTER
+  annotations:
+    managedcluster-import-controller.open-cluster-management.io/keeping-auto-import-secret: ""
+stringData:
+  #token: sha256~fywkF0ePyj7wP_Hi7RLrfGYDL-0BQ-2Accc7GR6orKI
+  #server: https://api.sno-a.woorifg.lab:6443
+  autoImportRetry: "21600"
+  kubeconfig: |-
+$(sed 's/^/    /g' $KUBECON)
+type: Opaque
+---
 apiVersion: agent.open-cluster-management.io/v1
 kind: KlusterletAddonConfig
 metadata:
@@ -24,21 +39,6 @@ spec:
     enabled: true
   searchCollector:
     enabled: true
----
-apiVersion: v1
-kind: Secret
-metadata:
-  name: auto-import-secret
-  namespace: $CLUSTER
-  annotations:
-    managedcluster-import-controller.open-cluster-management.io/keeping-auto-import-secret: ""
-stringData:
-  #token: sha256~fywkF0ePyj7wP_Hi7RLrfGYDL-0BQ-2Accc7GR6orKI
-  #server: https://api.sno-a.woorifg.lab:6443
-  autoImportRetry: "7200"
-  kubeconfig: |-
-$(sed 's/^/    /g' $KUBECON)
-type: Opaque
 ---
 apiVersion: cluster.open-cluster-management.io/v1
 kind: ManagedCluster

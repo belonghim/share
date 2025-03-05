@@ -87,7 +87,6 @@ policies:
 # Config  operators Policies - start
 - name: config-operators
   dependencies:
-  - name: check-cv
   - name: check-csv
   manifests:
   - path: config/config-operators.yaml

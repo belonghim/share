@@ -422,11 +422,6 @@ spec:
   - apiVersion: policy.open-cluster-management.io/v1
     compliance: Compliant
     kind: Policy
-    name: check-cv
-    namespace: policies
-  - apiVersion: policy.open-cluster-management.io/v1
-    compliance: Compliant
-    kind: Policy
     name: check-csv
     namespace: policies
   disabled: false
