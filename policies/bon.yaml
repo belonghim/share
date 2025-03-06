@@ -228,7 +228,7 @@ metadata:
     policy.open-cluster-management.io/standards: NIST SP 800-53
   labels:
     open-cluster-management.io/policy-set: opp
-    policies.upgrade-csv: ""
+    policies.csv: ""
   name: check-csv
   namespace: policies
 spec:
@@ -270,8 +270,8 @@ metadata:
     policy.open-cluster-management.io/standards: NIST SP 800-53
   labels:
     open-cluster-management.io/policy-set: opp
-    policies.upgrade-csv: ""
-    policies.upgrade-cv: ""
+    policies.csv: ""
+    policies.cv: ""
   name: check-cv
   namespace: policies
 spec:
@@ -355,7 +355,7 @@ metadata:
     policy.open-cluster-management.io/standards: NIST SP 800-53
   labels:
     open-cluster-management.io/policy-set: opp
-    policies.upgrade-cv: ""
+    policies.cv: ""
   name: check-upgradeable
   namespace: policies
 spec:
@@ -421,7 +421,7 @@ metadata:
     policy.open-cluster-management.io/standards: NIST SP 800-53
   labels:
     open-cluster-management.io/policy-set: opp
-    policies.upgrade-csv: ""
+    policies.csv: ""
   name: config-operators
   namespace: policies
 spec:
@@ -1282,7 +1282,7 @@ metadata:
     policy.open-cluster-management.io/standards: NIST SP 800-53
   labels:
     open-cluster-management.io/policy-set: opp
-    policies.upgrade-csv: ""
+    policies.csv: ""
   name: install-operators
   namespace: policies
 spec:
@@ -2329,7 +2329,7 @@ metadata:
     policy.open-cluster-management.io/standards: NIST SP 800-53
   labels:
     open-cluster-management.io/policy-set: opp
-    policies.upgrade-cv: ""
+    policies.cv: ""
   name: proxy-sync-hub
   namespace: policies
 spec:
@@ -2429,7 +2429,7 @@ metadata:
     policy.open-cluster-management.io/standards: NIST SP 800-53
   labels:
     open-cluster-management.io/policy-set: opp
-    policies.upgrade-cv: ""
+    policies.cv: ""
   name: proxy-sync-managed
   namespace: policies
 spec:
@@ -2511,7 +2511,7 @@ metadata:
     policy.open-cluster-management.io/standards: NIST SP 800-53
   labels:
     open-cluster-management.io/policy-set: opp
-    policies.upgrade-cv: ""
+    policies.cv: ""
   name: upgrade-admin-acks
   namespace: policies
 spec:
@@ -2555,7 +2555,7 @@ metadata:
     policy.open-cluster-management.io/standards: NIST SP 800-53
   labels:
     open-cluster-management.io/policy-set: opp
-    policies.upgrade-csv: ""
+    policies.csv: ""
   name: upgrade-cs-redhat-operator
   namespace: policies
 spec:
@@ -2600,7 +2600,7 @@ metadata:
     policy.open-cluster-management.io/standards: NIST SP 800-53
   labels:
     open-cluster-management.io/policy-set: opp
-    policies.upgrade-csv: ""
+    policies.csv: ""
   name: upgrade-marketplace-job
   namespace: policies
 spec:
@@ -2655,7 +2655,7 @@ metadata:
     policy.open-cluster-management.io/standards: NIST SP 800-53
   labels:
     open-cluster-management.io/policy-set: opp
-    policies.upgrade-cv: ""
+    policies.cv: ""
   name: upgrade-release-channel
   namespace: policies
 spec:
@@ -2702,7 +2702,7 @@ metadata:
     policy.open-cluster-management.io/standards: NIST SP 800-53
   labels:
     open-cluster-management.io/policy-set: opp
-    policies.upgrade-cv: ""
+    policies.cv: ""
   name: upgrade-signatures
   namespace: policies
 spec:
@@ -2780,8 +2780,8 @@ metadata:
     policy.open-cluster-management.io/standards: NIST SP 800-53
   labels:
     open-cluster-management.io/policy-set: opp
-    policies.upgrade-csv: ""
-    policies.upgrade-cv: ""
+    policies.csv: ""
+    policies.cv: ""
   name: upgrade-sub-automatic
   namespace: policies
 spec:
@@ -2985,8 +2985,8 @@ metadata:
     policy.open-cluster-management.io/standards: NIST SP 800-53
   labels:
     open-cluster-management.io/policy-set: opp
-    policies.upgrade-csv: ""
-    policies.upgrade-cv: ""
+    policies.csv: ""
+    policies.cv: ""
   name: upgrade-sub-manual
   namespace: policies
 spec:
@@ -3025,7 +3025,7 @@ metadata:
     policy.open-cluster-management.io/standards: NIST SP 800-53
   labels:
     open-cluster-management.io/policy-set: opp
-    policies.upgrade-cv: ""
+    policies.cv: ""
   name: upgrade-upstream
   namespace: policies
 spec:

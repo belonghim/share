@@ -26,7 +26,7 @@ policies:
   manifests:
   - path: install/install-operators.yaml
   policyLabels:
-    policies.upgrade-csv: ""
+    policies.csv: ""
   policySets:
   - hub
   - managed
@@ -46,8 +46,8 @@ policies:
   manifests:
   - path: upgrade/upgrade-sub-manual.yaml
   policyLabels:
-    policies.upgrade-csv: ""
-    policies.upgrade-cv: ""
+    policies.csv: ""
+    policies.cv: ""
   policySets:
   - sub-manual
 # Manual Subscription Policies - end
@@ -59,8 +59,8 @@ policies:
   manifests:
   - path: upgrade/upgrade-sub-automatic.yaml
   policyLabels:
-    policies.upgrade-csv: ""
-    policies.upgrade-cv: ""
+    policies.csv: ""
+    policies.cv: ""
   policySets:
   - sub-automatic
 # Automatic Subscription Policies - end
@@ -72,7 +72,7 @@ policies:
   manifests:
   - path: upgrade/upgrade-cs-redhat-operator.yaml
   policyLabels:
-    policies.upgrade-csv: ""
+    policies.csv: ""
   policySets:
   - sub-automatic
 # cs-redhat operator update Policies - end
@@ -83,7 +83,7 @@ policies:
   manifests:
   - path: proxy/proxy-sync-hub.yaml
   policyLabels:
-    policies.upgrade-cv: ""
+    policies.cv: ""
   policySets:
   - hub
 # Create Router Bundle Policies - end
@@ -94,7 +94,7 @@ policies:
   manifests:
   - path: proxy/proxy-sync-managed.yaml
   policyLabels:
-    policies.upgrade-cv: ""
+    policies.cv: ""
   policySets:
   - managed
 # Proxy Router Bundle Policies - end
@@ -105,7 +105,7 @@ policies:
   manifests:
   - path: config/config-operators.yaml
   policyLabels:
-    policies.upgrade-csv: ""
+    policies.csv: ""
   policySets:
   - hub
   - managed
@@ -130,8 +130,8 @@ policies:
   manifests:
   - path: check/check-cv.yaml
   policyLabels:
-    policies.upgrade-csv: ""
-    policies.upgrade-cv: ""
+    policies.csv: ""
+    policies.cv: ""
   policySets:
   - hub
   - managed
@@ -145,7 +145,7 @@ policies:
   manifests:
   - path: check/check-upgradeable.yaml
   policyLabels:
-    policies.upgrade-cv: ""
+    policies.cv: ""
   policySets:
   - hub
   - managed
@@ -156,7 +156,7 @@ policies:
   manifests:
   - path: check/check-csv.yaml
   policyLabels:
-    policies.upgrade-csv: ""
+    policies.csv: ""
   policySets:
   - hub
   - managed
@@ -200,7 +200,7 @@ policies:
   manifests:
   - path: upgrade/upgrade-signatures.yaml
   policyLabels:
-    policies.upgrade-cv: ""
+    policies.cv: ""
   policySets:
   - hub
   - managed
@@ -211,7 +211,7 @@ policies:
   manifests:
   - path: upgrade/upgrade-admin-acks.yaml
   policyLabels:
-    policies.upgrade-cv: ""
+    policies.cv: ""
   policySets:
   - hub
   - managed
@@ -224,7 +224,7 @@ policies:
   manifests:
   - path: upgrade/upgrade-marketplace-job.yaml
   policyLabels:
-    policies.upgrade-csv: ""
+    policies.csv: ""
   policySets:
   - sub-automatic
   remediationAction: enforce
@@ -237,7 +237,7 @@ policies:
   manifests:
   - path: upgrade/upgrade-upstream.yaml
   policyLabels:
-    policies.upgrade-cv: ""
+    policies.cv: ""
   policySets:
   - hub
   - managed
@@ -250,7 +250,7 @@ policies:
   manifests:
   - path: upgrade/upgrade-release-channel.yaml
   policyLabels:
-    policies.upgrade-cv: ""
+    policies.cv: ""
   policySets:
   - hub
   - managed
