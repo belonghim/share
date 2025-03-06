@@ -38,39 +38,18 @@ kind: ConfigurationPolicy
 metadata:
   name: config-operators-snrc
 spec:
+  evaluationInterval:
+    compliant: Never
   remediationAction: enforce
   severity: high
-  object-templates-raw: |
-    - complianceType: musthave
-      objectDefinition:
-        apiVersion: self-node-remediation.medik8s.io/v1alpha1
-        kind: SelfNodeRemediationConfig
-        metadata:
-          name: self-node-remediation-config
-          namespace: openshift-workload-availability
-        spec:
-    {{- range $cd := (lookup "config.openshift.io/v1" "ClusterVersion" "" "version").status.conditions }}
-    {{- if eq "Progressing" $cd.type }}
-    {{- if eq "True" $cd.status }}
-          apiCheckInterval: 1h
-          apiServerTimeout: 1h
-    {{- else }}
-          apiCheckInterval: 1m
-          apiServerTimeout: 1m
-    {{- end }}
-    {{- end }}
-    {{- end }}
-    {{- range $ed := (lookup "operator.openshift.io/v1" "Etcd" "" "cluster").status.conditions }}
-    {{- if eq "EtcdEndpointsDegraded" $ed.type }}
-    {{- if eq "True" $ed.status }}
-          maxApiErrorThreshold: 864000
-    {{- end }}
-    {{- end }}
-    {{- end }}
-          customDsTolerations:
-          - effect: NoSchedule
-            operator: Exists
-            key: node-role.kubernetes.io/infra
+  object-templates:
+  - complianceType: mustnothave
+    objectDefinition:
+      apiVersion: self-node-remediation.medik8s.io/v1alpha1
+      kind: SelfNodeRemediationConfig
+      metadata:
+        name: self-node-remediation-config
+        namespace: openshift-workload-availability
 ---
 apiVersion: remediation.medik8s.io/v1alpha1
 kind: NodeHealthCheck
