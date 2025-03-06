@@ -35,7 +35,7 @@ policies:
 - name: upgrade-sub-init
   dependencies:
   - name: install-operators
-  - name: config-operators
+  - name: check-csv
   manifests:
   - path: upgrade/upgrade-sub-manual.yaml
   policySets:

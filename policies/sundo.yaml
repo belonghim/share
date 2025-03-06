@@ -2663,7 +2663,7 @@ spec:
   - apiVersion: policy.open-cluster-management.io/v1
     compliance: Compliant
     kind: Policy
-    name: config-operators
+    name: check-csv
     namespace: policies
   disabled: false
   policy-templates:
