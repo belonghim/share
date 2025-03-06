@@ -10,9 +10,9 @@ spec:
   remediationAction: enforce
   severity: high
   object-templates-raw: |
-    {{hub- $hcm := lookup "v1" "ConfigMap" "policies" "admin-acks" hub}}
-    {{hub- if and (ne "" (index .ManagedClusterLabels "policies.osus")) (eq "ConfigMap" $hcm.kind) hub}}
-    {{- if not (hasKey (lookup "v1" "ConfigMap" "openshift-config" "admin-acks").metadata.labels "policies.ignore") }}
+    {{hub- if and (ne "" (index .ManagedClusterLabels "policies.osus")) (ne "" (index .ManagedClusterLabels "openshiftVersion-major-minor")) hub}}
+    {{- $ov := semver (fromClusterClaim "version.openshift.io") }}
+    {{- $kv := semver (fromClusterClaim "kubeversion.open-cluster-management.io") }}
     - complianceType: musthave
       objectDefinition:
         apiVersion: v1
@@ -20,7 +20,7 @@ spec:
         metadata:
           name: admin-acks
           namespace: openshift-config
-        data: {{hub $hcm.data | toRawJson hub}}
-    {{- end }}
+        data:
+          ack-{{ $ov.Major }}.{{ $ov.Minor }}-kube-{{ $kv.Major }}.{{ add 1 $kv.Minor }}-api-removals-in-{{ $ov.Major }}.{{ add 1 $ov.Minor }}: "true"
     {{hub- end hub}}
 ---

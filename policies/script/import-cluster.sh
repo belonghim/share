@@ -3,6 +3,7 @@ if [ "$KUBECON" = "" ];then KUBECON=$2;fi
 if [ "$CLUSTER" = "" -o "$KUBECON" = "" ];then echo "Example: import-cluster.sh <cluster> <kubeconfig>";exit 1;fi
 
 cat <<EOF
+---
 apiVersion: v1
 kind: Namespace
 metadata:
