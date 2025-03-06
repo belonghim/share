@@ -39,7 +39,7 @@ metadata:
   name: config-operators-snrc
 spec:
   evaluationInterval:
-    compliant: Never
+    compliant: never
   remediationAction: enforce
   severity: high
   object-templates:

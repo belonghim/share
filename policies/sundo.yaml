@@ -462,7 +462,7 @@ spec:
         name: config-operators-snrc
       spec:
         evaluationInterval:
-          compliant: Never
+          compliant: never
         object-templates:
         - complianceType: mustnothave
           objectDefinition:
