@@ -90,6 +90,8 @@ spec:
         matchExpressions:
         - key: version.openshift.io
           operator: DoesNotExist
+        - key: consoleurl.cluster.open-cluster-management.io
+          operator: DoesNotExist
       labelSelector:
         matchExpressions:
         - key: vendor

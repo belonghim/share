@@ -8,9 +8,10 @@ spec:
   - requiredClusterSelector:
       claimSelector:
         matchExpressions:
-          - {key: "version.openshift.io", operator: DoesNotExist}
+        - {key: "version.openshift.io", operator: DoesNotExist}
+        - {key: "consoleurl.cluster.open-cluster-management.io", operator: DoesNotExist}
       labelSelector:
         matchExpressions:
-          - {key: vendor, operator: In, values: ["OpenShift"]}
-          - {key: "policies.undeploy", operator: DoesNotExist}
-          - {key: "policies.sub-approval", operator: DoesNotExist}
+        - {key: vendor, operator: In, values: ["OpenShift"]}
+        - {key: "policies.undeploy", operator: DoesNotExist}
+        - {key: "policies.sub-approval", operator: DoesNotExist}
