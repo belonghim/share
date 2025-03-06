@@ -485,8 +485,6 @@ spec:
           {{- if eq "EtcdEndpointsDegraded" $ed.type }}
           {{- if eq "True" $ed.status }}
                 maxApiErrorThreshold: 864000
-          {{- else }}
-                maxApiErrorThreshold: 3
           {{- end }}
           {{- end }}
           {{- end }}
