@@ -1460,7 +1460,9 @@ spec:
                 namespace: openshift-operators
                 labels:
                   policies.install: ""
+                  policies.stable: ""
               spec:
+                channel: stable
                 name: kiali-ossm
                 source: cs-redhat-operator-index
                 sourceNamespace: openshift-marketplace
@@ -2784,7 +2786,7 @@ spec:
           compliant: 10m
           noncompliant: 1m
         object-templates-raw: |
-          {{- range $sub := (lookup "operators.coreos.com/v1alpha1" "Subscription" "" "" "!policies.ignore,policies.install").items }}
+          {{- range $sub := (lookup "operators.coreos.com/v1alpha1" "Subscription" "" "" "!policies.stable,!policies.ignore,policies.install").items }}
           - complianceType: musthave
             objectDefinition:
               apiVersion: operators.coreos.com/v1alpha1

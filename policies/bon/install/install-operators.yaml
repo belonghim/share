@@ -320,7 +320,9 @@ spec:
           namespace: openshift-operators
           labels:
             policies.install: ""
+            policies.stable: ""
         spec:
+          channel: stable
           name: kiali-ossm
           source: cs-redhat-operator-index
           sourceNamespace: openshift-marketplace
