@@ -170,6 +170,9 @@ subjects:
 - apiGroup: policy.open-cluster-management.io
   kind: PolicySet
   name: sub-manual
+- apiGroup: policy.open-cluster-management.io
+  kind: PolicySet
+  name: sub-init
 ---
 apiVersion: policy.open-cluster-management.io/v1
 kind: Policy
@@ -2631,7 +2634,6 @@ spec:
           compliant: never
           noncompliant: 2m
         object-templates-raw: |
-          {{hub- if not (regexMatch "^[Aa]utomatic$" (index .ManagedClusterLabels "policies.sub-approval")) hub}}
           {{- range $sub := (lookup "operators.coreos.com/v1alpha1" "Subscription" "" "" "!policies.ignore,policies.install").items }}
           - complianceType: musthave
             objectDefinition:
@@ -2643,7 +2645,6 @@ spec:
               spec:
                 installPlanApproval: Manual
           {{- end }}
-          {{hub- end hub}}
         remediationAction: enforce
         severity: high
   remediationAction: enforce
@@ -2768,7 +2769,6 @@ spec:
   - upgrade-admin-acks
   - upgrade-release-channel
   - upgrade-signatures
-  - upgrade-sub-init
   - upgrade-upstream
 ---
 apiVersion: policy.open-cluster-management.io/v1beta1
@@ -2796,7 +2796,6 @@ spec:
   - upgrade-admin-acks
   - upgrade-release-channel
   - upgrade-signatures
-  - upgrade-sub-init
   - upgrade-upstream
 ---
 apiVersion: policy.open-cluster-management.io/v1beta1
@@ -2814,6 +2813,20 @@ spec:
   - upgrade-cs-redhat-operator
   - upgrade-marketplace-job
   - upgrade-sub-automatic
+---
+apiVersion: policy.open-cluster-management.io/v1beta1
+kind: PolicySet
+metadata:
+  annotations:
+    argocd.argoproj.io/compare-options: IgnoreExtraneous
+  labels:
+    open-cluster-management.io/policy-set: opp
+  name: sub-init
+  namespace: policies
+spec:
+  description: ""
+  policies:
+  - upgrade-sub-init
 ---
 apiVersion: policy.open-cluster-management.io/v1beta1
 kind: PolicySet

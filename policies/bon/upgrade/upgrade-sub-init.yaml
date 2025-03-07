@@ -10,7 +10,6 @@ spec:
   remediationAction: enforce
   severity: high
   object-templates-raw: |
-    {{hub- if not (regexMatch "^[Aa]utomatic$" (index .ManagedClusterLabels "policies.sub-approval")) hub}}
     {{- range $sub := (lookup "operators.coreos.com/v1alpha1" "Subscription" "" "" "!policies.ignore,policies.install").items }}
     - complianceType: musthave
       objectDefinition:
@@ -22,5 +21,4 @@ spec:
         spec:
           installPlanApproval: Manual
     {{- end }}
-    {{hub- end hub}}
 ---

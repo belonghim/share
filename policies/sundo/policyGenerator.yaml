@@ -39,8 +39,7 @@ policies:
   manifests:
   - path: upgrade/upgrade-sub-init.yaml
   policySets:
-  - hub
-  - managed
+  - sub-init
 # Subscription Init Policies - end
 # Manual Subscription Policies - start
 - name: upgrade-sub-manual
@@ -270,3 +269,6 @@ policySets:
   - name: sub-automatic
     placement:
       placementPath: placement/placement-sub-automatic.yaml
+  - name: sub-init
+    placement:
+      placementPath: placement/placement-sub-init.yaml
