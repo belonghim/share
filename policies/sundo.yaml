@@ -80,6 +80,29 @@ metadata:
     argocd.argoproj.io/compare-options: IgnoreExtraneous
   labels:
     open-cluster-management.io/policy-set: opp
+  name: placement-sub-init
+  namespace: policies
+spec:
+  predicates:
+  - requiredClusterSelector:
+      labelSelector:
+        matchExpressions:
+        - key: vendor
+          operator: In
+          values:
+          - OpenShift
+        - key: policies.undeploy
+          operator: DoesNotExist
+        - key: policies.sub-approval
+          operator: DoesNotExist
+---
+apiVersion: cluster.open-cluster-management.io/v1beta1
+kind: Placement
+metadata:
+  annotations:
+    argocd.argoproj.io/compare-options: IgnoreExtraneous
+  labels:
+    open-cluster-management.io/policy-set: opp
   name: placement-sub-manual
   namespace: policies
 spec:
@@ -165,14 +188,29 @@ metadata:
 placementRef:
   apiGroup: cluster.open-cluster-management.io
   kind: Placement
+  name: placement-sub-init
+subjects:
+- apiGroup: policy.open-cluster-management.io
+  kind: PolicySet
+  name: sub-init
+---
+apiVersion: policy.open-cluster-management.io/v1
+kind: PlacementBinding
+metadata:
+  annotations:
+    argocd.argoproj.io/compare-options: IgnoreExtraneous
+  labels:
+    open-cluster-management.io/policy-set: opp
+  name: binding-policy-hub5
+  namespace: policies
+placementRef:
+  apiGroup: cluster.open-cluster-management.io
+  kind: Placement
   name: placement-sub-manual
 subjects:
 - apiGroup: policy.open-cluster-management.io
   kind: PolicySet
   name: sub-manual
-- apiGroup: policy.open-cluster-management.io
-  kind: PolicySet
-  name: sub-init
 ---
 apiVersion: policy.open-cluster-management.io/v1
 kind: Policy
