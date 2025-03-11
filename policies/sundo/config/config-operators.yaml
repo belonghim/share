@@ -38,8 +38,6 @@ kind: ConfigurationPolicy
 metadata:
   name: config-operators-snrc
 spec:
-  evaluationInterval:
-    compliant: never
   object-templates-raw: |
     {{- if eq "SingleReplica" (fromClusterClaim "controlplanetopology.openshift.io") }}
     - complianceType: mustnothave
