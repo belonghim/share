@@ -34,7 +34,7 @@ policies:
 # Subscription Init Policies - start
 - name: upgrade-sub-init
   dependencies:
-  - name: upgrade-upstream
+  - name: check-upgradeable
   - name: config-operators
   manifests:
   - path: upgrade/upgrade-sub-init.yaml

@@ -39,7 +39,7 @@ metadata:
   name: config-operators-snrc
 spec:
   object-templates-raw: |
-    {{- if not (hasKey "policies.ignore" (lookup "v1" "Namespace" "" "openshift-workload-availability")) }}
+    {{- if not (hasKey (lookup "operators.coreos.com/v1alpha1" "Subscription" "openshift-workload-availability" "self-node-remediation") "policies.ignore") }}
     {{- if eq "SingleReplica" (fromClusterClaim "controlplanetopology.openshift.io") }}
     - complianceType: mustnothave
       objectDefinition:

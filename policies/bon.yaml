@@ -10,6 +10,12 @@ metadata:
 spec:
   predicates:
   - requiredClusterSelector:
+      claimSelector:
+        matchExpressions:
+        - key: policies.undeploy
+          operator: NotIn
+          values:
+          - "true"
       labelSelector:
         matchExpressions:
         - key: vendor
@@ -20,8 +26,6 @@ spec:
           operator: In
           values:
           - "true"
-        - key: policies.undeploy
-          operator: DoesNotExist
 ---
 apiVersion: cluster.open-cluster-management.io/v1beta1
 kind: Placement
@@ -35,6 +39,12 @@ metadata:
 spec:
   predicates:
   - requiredClusterSelector:
+      claimSelector:
+        matchExpressions:
+        - key: policies.undeploy
+          operator: NotIn
+          values:
+          - "true"
       labelSelector:
         matchExpressions:
         - key: vendor
@@ -45,8 +55,6 @@ spec:
           operator: NotIn
           values:
           - "true"
-        - key: policies.undeploy
-          operator: DoesNotExist
 ---
 apiVersion: cluster.open-cluster-management.io/v1beta1
 kind: Placement
@@ -60,19 +68,22 @@ metadata:
 spec:
   predicates:
   - requiredClusterSelector:
+      claimSelector:
+        matchExpressions:
+        - key: policies.undeploy
+          operator: NotIn
+          values:
+          - "true"
       labelSelector:
         matchExpressions:
         - key: vendor
           operator: In
           values:
           - OpenShift
-        - key: policies.undeploy
-          operator: DoesNotExist
         - key: policies.sub-approval
           operator: In
           values:
           - automatic
-          - Automatic
 ---
 apiVersion: cluster.open-cluster-management.io/v1beta1
 kind: Placement
@@ -86,14 +97,18 @@ metadata:
 spec:
   predicates:
   - requiredClusterSelector:
+      claimSelector:
+        matchExpressions:
+        - key: policies.undeploy
+          operator: NotIn
+          values:
+          - "true"
       labelSelector:
         matchExpressions:
         - key: vendor
           operator: In
           values:
           - OpenShift
-        - key: policies.undeploy
-          operator: DoesNotExist
         - key: policies.sub-approval
           operator: DoesNotExist
 ---
@@ -109,14 +124,18 @@ metadata:
 spec:
   predicates:
   - requiredClusterSelector:
+      claimSelector:
+        matchExpressions:
+        - key: policies.undeploy
+          operator: NotIn
+          values:
+          - "true"
       labelSelector:
         matchExpressions:
         - key: vendor
           operator: In
           values:
           - OpenShift
-        - key: policies.undeploy
-          operator: DoesNotExist
         - key: policies.sub-approval
           operator: In
           values:
@@ -458,6 +477,7 @@ spec:
         evaluationInterval:
           compliant: never
         object-templates-raw: |
+          {{- if not (hasKey (lookup "operators.coreos.com/v1alpha1" "Subscription" "openshift-workload-availability" "self-node-remediation") "policies.ignore") }}
           {{- if eq "SingleReplica" (fromClusterClaim "controlplanetopology.openshift.io") }}
           - complianceType: mustnothave
             objectDefinition:
@@ -479,6 +499,7 @@ spec:
                 - effect: NoSchedule
                   operator: Exists
                   key: node-role.kubernetes.io/infra
+          {{- end }}
           {{- end }}
         remediationAction: enforce
         severity: low
@@ -2933,7 +2954,7 @@ spec:
   - apiVersion: policy.open-cluster-management.io/v1
     compliance: Compliant
     kind: Policy
-    name: upgrade-upstream
+    name: check-upgradeable
     namespace: policies
   - apiVersion: policy.open-cluster-management.io/v1
     compliance: Compliant

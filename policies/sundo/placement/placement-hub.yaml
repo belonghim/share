@@ -8,6 +8,8 @@ spec:
   - requiredClusterSelector:
       labelSelector:
         matchExpressions:
-          - {key: vendor, operator: In, values: ["OpenShift"]}
-          - {key: "local-cluster", operator: In, values: ["true"]}
-          - {key: "policies.undeploy", operator: DoesNotExist}
+        - {key: vendor, operator: In, values: ["OpenShift"]}
+        - {key: "local-cluster", operator: In, values: ["true"]}
+      claimSelector:
+        matchExpressions:
+        - {key: "policies.undeploy", operator: NotIn, values: ["true"]}
