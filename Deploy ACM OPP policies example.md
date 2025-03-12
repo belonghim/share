@@ -175,6 +175,7 @@ $ cd ../script
 
 ## Test osus policy
 $ export REGISTRY=gps03.redhat.lab:5000
+$ export REPO=ocp4
 $ sh osus.sh
 
 ## Apply osus policy
@@ -184,7 +185,7 @@ $ sh osus.sh | oc create -f -
 
 ### Apply osus
 ```
-$ oc label mcl local-cluster policies.osus=ocp4
+$ oc label mcl local-cluster policies.osus=$REPO
 ```
 
 ### (Optional) Apply cluster-log-forwarder's brokers
