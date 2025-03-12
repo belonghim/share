@@ -1360,7 +1360,7 @@ spec:
       apiVersion: policy.open-cluster-management.io/v1
       kind: ConfigurationPolicy
       metadata:
-        name: config-operators-clean-og
+        name: install-operators-clean-og
       spec:
         evaluationInterval:
           compliant: 1m
@@ -3193,7 +3193,6 @@ spec:
   description: ""
   policies:
   - check-upgradeable
-  - upgrade-marketplace-job
   - upgrade-release-channel
   - upgrade-signatures
   - upgrade-upstream
@@ -3212,6 +3211,7 @@ spec:
   policies:
   - upgrade-admin-acks
   - upgrade-cs-redhat-operator
+  - upgrade-marketplace-job
   - upgrade-sub-automatic
 ---
 apiVersion: policy.open-cluster-management.io/v1beta1

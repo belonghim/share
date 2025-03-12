@@ -2,7 +2,7 @@
 apiVersion: policy.open-cluster-management.io/v1
 kind: ConfigurationPolicy
 metadata:
-  name: config-operators-clean-og
+  name: install-operators-clean-og
 spec:
   evaluationInterval:
     compliant: 1m

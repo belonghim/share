@@ -222,7 +222,7 @@ policies:
   policyLabels:
     policies.csv: ""
   policySets:
-  - osus
+  - sub-automatic
   remediationAction: enforce
 # marketplace jobs Policies - end
 # upgrade upstream Policies - start
