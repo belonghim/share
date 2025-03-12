@@ -352,6 +352,9 @@ $ sh import-cluster ${ManagedCluster} ${ManagedKubeconfig}
 ## Start to import the cluster
 $ sh import-cluster ${ManagedCluster} ${ManagedKubeconfig} | oc create -f -
 
+## Apply sub-approval=manual label
+$ oc label ${ManagedKubeconfig} policies.sub-approval=manual
+
 ```
 
 
