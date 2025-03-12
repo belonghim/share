@@ -38,8 +38,6 @@ kind: ConfigurationPolicy
 metadata:
   name: config-operators-snrc
 spec:
-  evaluationInterval:
-    compliant: never
   object-templates-raw: |
     {{- if not (hasKey (lookup "operators.coreos.com/v1alpha1" "Subscription" "openshift-workload-availability" "self-node-remediation") "policies.ignore") }}
     {{- if eq "SingleReplica" (fromClusterClaim "controlplanetopology.openshift.io") }}
