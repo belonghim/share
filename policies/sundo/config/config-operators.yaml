@@ -39,7 +39,7 @@ metadata:
   name: config-operators-snrc
 spec:
   object-templates-raw: |
-    {{- if not (hasKey (lookup "operators.coreos.com/v1alpha1" "Subscription" "openshift-workload-availability" "self-node-remediation") "policies.ignore") }}
+    {{- if not (hasKey (lookup "operators.coreos.com/v1alpha1" "Subscription" "openshift-workload-availability" "self-node-remediation").metadata.labels "policies.ignore") }}
     {{- if eq "SingleReplica" (fromClusterClaim "controlplanetopology.openshift.io") }}
     - complianceType: mustnothave
       objectDefinition:
@@ -312,6 +312,7 @@ spec:
   remediationAction: enforce
   severity: high
   object-templates-raw: |
+    {{- if not (hasKey (lookup "operators.coreos.com/v1alpha1" "Subscription" "openshift-logging" "cluster-logging").metadata.labels "policies.ignore") }}
     {{hub- if and (lookup "v1" "ConfigMap" "policies" "config-operators").data.eventBrokers (ne "" (index .ManagedClusterLabels "policies.event-topic")) hub}}
     - complianceType: musthave
       recreateOption: IfRequired
@@ -415,6 +416,7 @@ spec:
               - field: .level
                 matches: "info|warning"
     {{hub- end hub}}
+    {{- end }}
 ---
 apiVersion: policy.open-cluster-management.io/v1
 kind: ConfigurationPolicy
@@ -424,7 +426,8 @@ spec:
   remediationAction: enforce
   severity: high
   object-templates-raw: |
-    {{hub if ne "none" (index .ManagedClusterLabels "policies.extra") hub}}
+    {{- if not (hasKey (lookup "operators.coreos.com/v1alpha1" "Subscription" "openshift-gitops-operator" "openshift-gitops-operator").metadata.labels "policies.ignore") }}
+    {{hub- if ne "none" (index .ManagedClusterLabels "policies.extra") hub}}
     - complianceType: musthave
       objectDefinition:
         apiVersion: argoproj.io/v1beta1
@@ -548,7 +551,8 @@ spec:
               enabled: true
             service:
               type: ""
-    {{hub end hub}}
+    {{hub- end hub}}
+    {{- end }}
 ---
 apiVersion: policy.open-cluster-management.io/v1
 kind: ConfigurationPolicy
@@ -558,6 +562,7 @@ spec:
   remediationAction: enforce
   severity: high
   object-templates-raw: |
+    {{- if not (hasKey (lookup "v1" "ConfigMap" "openshift-monitoring" "cluster-monitoring-config").metadata.labels "policies.ignore") }}
     - complianceType: musthave
       objectDefinition:
         apiVersion: v1
@@ -654,6 +659,7 @@ spec:
               - effect: NoSchedule
                 key: node-role.kubernetes.io/infra
                 operator: Exists
+    {{- end }}
 ---
 apiVersion: policy.open-cluster-management.io/v1
 kind: ConfigurationPolicy
@@ -663,6 +669,7 @@ spec:
   remediationAction: enforce
   severity: high
   object-templates-raw: |
+    {{- if not (hasKey (lookup "operator.openshift.io/v1" "IngressController" "openshift-ingress-operator" "default").metadata.labels "policies.ignore") }}
     {{- $rc := ( (lookup "machineconfiguration.openshift.io/v1" "MachineConfigPool" "" "infra").status.machineCount | toInt ) }}
     {{- if lt 1 $rc }}
     - complianceType: musthave
@@ -674,5 +681,6 @@ spec:
           namespace: openshift-ingress-operator
         spec:
           replicas: {{ $rc }}
+    {{- end }}
     {{- end }}
 ---
