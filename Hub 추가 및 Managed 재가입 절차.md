@@ -275,17 +275,18 @@ $ oc apply -f bon.yaml
 
 ## Test osus policy
 $ Registry=gps03.redhat.lab:5000
-$ sh script/osus.sh ${Registry}
+$ Repo=ocp4
+$ sh script/osus.sh ${Registry} ${Repo}
 
 ## Apply osus policy
-$ sh script/osus.sh ${Registry} | oc create -f -
+$ sh script/osus.sh ${Registry} ${Repo} | oc create -f -
 
 ```
 
 
 ### Apply osus
 ```
-$ oc label mcl local-cluster policies.osus=ocp4
+$ oc label mcl local-cluster policies.osus=${Repo}
 
 ```
 
