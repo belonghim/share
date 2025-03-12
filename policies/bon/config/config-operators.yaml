@@ -364,6 +364,7 @@ spec:
             type: syslog
     {{hub- end hub}}
           pipelines:
+    {{hub- if ne "" $sl hub}}
           - name: audit-log
             inputRefs:
             - audit
@@ -371,6 +372,7 @@ spec:
             - {{hub if ne "" $sl hub}}rsyslog{{hub else hub}}infra-receiver{{hub end hub}}
             filterRefs:
             - add-cluster-name
+    {{hub- end hub}}
     {{hub- if and (lookup "v1" "ConfigMap" "policies" "config-operators").data.infraBrokers (ne "" (index .ManagedClusterLabels "policies.infra-topic")) hub}}
           - name: infra-log
             inputRefs:
