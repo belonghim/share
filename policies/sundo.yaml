@@ -74,16 +74,16 @@ spec:
           operator: NotIn
           values:
           - "true"
+        - key: policies.sub-approval
+          operator: In
+          values:
+          - automatic
       labelSelector:
         matchExpressions:
         - key: vendor
           operator: In
           values:
           - OpenShift
-        - key: policies.sub-approval
-          operator: In
-          values:
-          - automatic
 ---
 apiVersion: cluster.open-cluster-management.io/v1beta1
 kind: Placement
@@ -103,14 +103,14 @@ spec:
           operator: NotIn
           values:
           - "true"
+        - key: policies.sub-approval
+          operator: DoesNotExist
       labelSelector:
         matchExpressions:
         - key: vendor
           operator: In
           values:
           - OpenShift
-        - key: policies.sub-approval
-          operator: DoesNotExist
 ---
 apiVersion: cluster.open-cluster-management.io/v1beta1
 kind: Placement
@@ -130,17 +130,17 @@ spec:
           operator: NotIn
           values:
           - "true"
+        - key: policies.sub-approval
+          operator: In
+          values:
+          - manual
+          - Manual
       labelSelector:
         matchExpressions:
         - key: vendor
           operator: In
           values:
           - OpenShift
-        - key: policies.sub-approval
-          operator: In
-          values:
-          - manual
-          - Manual
 ---
 apiVersion: policy.open-cluster-management.io/v1
 kind: PlacementBinding
