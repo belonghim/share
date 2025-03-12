@@ -3195,6 +3195,7 @@ spec:
   description: ""
   policies:
   - check-upgradeable
+  - upgrade-admin-acks
   - upgrade-release-channel
   - upgrade-signatures
   - upgrade-upstream
@@ -3211,7 +3212,6 @@ metadata:
 spec:
   description: ""
   policies:
-  - upgrade-admin-acks
   - upgrade-cs-redhat-operator
   - upgrade-marketplace-job
   - upgrade-sub-automatic

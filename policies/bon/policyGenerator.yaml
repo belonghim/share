@@ -210,7 +210,7 @@ policies:
   policyLabels:
     policies.cv: ""
   policySets:
-  - sub-automatic
+  - osus
   remediationAction: enforce
 # admin-acks cm Policies - end
 # marketplace jobs Policies - start
