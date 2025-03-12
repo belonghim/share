@@ -110,8 +110,7 @@ policies:
   policyLabels:
     policies.csv: ""
   policySets:
-  - hub
-  - managed
+  - sub-init
 # Config operators Policies - end
 # Config operators hub Policies - start
 - name: config-operators-hub
@@ -150,8 +149,7 @@ policies:
   policyLabels:
     policies.cv: ""
   policySets:
-  - hub
-  - managed
+  - osus
   remediationAction: inform
 # Upgradeable check Policies - end
 # CSV check Policies - start
@@ -202,8 +200,7 @@ policies:
   policyLabels:
     policies.cv: ""
   policySets:
-  - hub
-  - managed
+  - osus
   remediationAction: enforce
 # signatures cm Policies - end
 # admin-acks cm Policies - start
@@ -213,8 +210,7 @@ policies:
   policyLabels:
     policies.cv: ""
   policySets:
-  - hub
-  - managed
+  - sub-automatic
   remediationAction: enforce
 # admin-acks cm Policies - end
 # marketplace jobs Policies - start
@@ -226,7 +222,7 @@ policies:
   policyLabels:
     policies.csv: ""
   policySets:
-  - sub-automatic
+  - osus
   remediationAction: enforce
 # marketplace jobs Policies - end
 # upgrade upstream Policies - start
@@ -239,8 +235,7 @@ policies:
   policyLabels:
     policies.cv: ""
   policySets:
-  - hub
-  - managed
+  - osus
   remediationAction: enforce
 # upgrade upstream Policies - end
 # upgrade release channel Policies - start
@@ -252,8 +247,7 @@ policies:
   policyLabels:
     policies.cv: ""
   policySets:
-  - hub
-  - managed
+  - osus
   remediationAction: enforce
 # upgrade release channel Policies - end
 policySets:
@@ -272,3 +266,6 @@ policySets:
   - name: sub-init
     placement:
       placementPath: placement/placement-sub-init.yaml
+  - name: osus
+    placement:
+      placementPath: placement/placement-osus.yaml

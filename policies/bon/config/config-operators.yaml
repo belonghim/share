@@ -2,43 +2,6 @@
 apiVersion: policy.open-cluster-management.io/v1
 kind: ConfigurationPolicy
 metadata:
-  name: config-operators-clean-og
-spec:
-  evaluationInterval:
-    compliant: 1m
-    noncompliant: 1m
-  remediationAction: enforce
-  severity: high
-  object-templates-raw: |
-    {{- range $og := (lookup "operators.coreos.com/v1" "OperatorGroup" "" "" "policies.install").items }}
-    {{- range $cg := (lookup "operators.coreos.com/v1" "OperatorGroup" $og.metadata.namespace "" "!policies.install").items }}
-    - complianceType: mustnothave
-      objectDefinition:
-        apiVersion: operators.coreos.com/v1
-        kind: OperatorGroup
-        metadata:
-          name: {{ $cg.metadata.name }}
-          namespace: {{ $cg.metadata.namespace }}
-    {{- end }}
-    {{- end }}
----
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: openshift-kube-storage-version-migrator
-  annotations:
-    openshift.io/node-selector: node-role.kubernetes.io/master=
----
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: openshift-network-console
-  annotations:
-    openshift.io/node-selector: node-role.kubernetes.io/infra=
----
-apiVersion: policy.open-cluster-management.io/v1
-kind: ConfigurationPolicy
-metadata:
   name: config-operators-snrc
 spec:
   evaluationInterval:

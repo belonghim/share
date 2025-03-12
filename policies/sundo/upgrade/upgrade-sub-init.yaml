@@ -5,7 +5,7 @@ metadata:
   name: upgrade-sub-init
 spec:
   evaluationInterval:
-    compliant: never
+    compliant: 60m
     noncompliant: 2m
   remediationAction: enforce
   severity: high
