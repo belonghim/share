@@ -4,6 +4,9 @@ kind: ConfigurationPolicy
 metadata:
   name: config-operators-clean-og
 spec:
+  evaluationInterval:
+    compliant: 1m
+    noncompliant: 1m
   remediationAction: enforce
   severity: high
   object-templates-raw: |
@@ -38,6 +41,9 @@ kind: ConfigurationPolicy
 metadata:
   name: config-operators-snrc
 spec:
+  evaluationInterval:
+    compliant: 1m
+    noncompliant: 1m
   object-templates-raw: |
     {{- if not (hasKey (lookup "operators.coreos.com/v1alpha1" "Subscription" "openshift-workload-availability" "self-node-remediation").metadata.labels "policies.ignore") }}
     {{- if eq "SingleReplica" (fromClusterClaim "controlplanetopology.openshift.io") }}
@@ -323,6 +329,9 @@ kind: ConfigurationPolicy
 metadata:
   name: config-operators-logforwarder
 spec:
+  evaluationInterval:
+    compliant: 1m
+    noncompliant: 1m
   remediationAction: enforce
   severity: high
   object-templates-raw: |
@@ -437,6 +446,9 @@ kind: ConfigurationPolicy
 metadata:
   name: config-operators-extra
 spec:
+  evaluationInterval:
+    compliant: 1m
+    noncompliant: 1m
   remediationAction: enforce
   severity: high
   object-templates-raw: |
@@ -573,6 +585,9 @@ kind: ConfigurationPolicy
 metadata:
   name: config-operators-monitoring
 spec:
+  evaluationInterval:
+    compliant: 1m
+    noncompliant: 1m
   remediationAction: enforce
   severity: high
   object-templates-raw: |
@@ -680,6 +695,9 @@ kind: ConfigurationPolicy
 metadata:
   name: config-operators-ingresscontroller
 spec:
+  evaluationInterval:
+    compliant: 1m
+    noncompliant: 1m
   remediationAction: enforce
   severity: high
   object-templates-raw: |

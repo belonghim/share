@@ -474,6 +474,9 @@ spec:
       metadata:
         name: config-operators-clean-og
       spec:
+        evaluationInterval:
+          compliant: 1m
+          noncompliant: 1m
         object-templates-raw: |
           {{- range $og := (lookup "operators.coreos.com/v1" "OperatorGroup" "" "" "policies.install").items }}
           {{- range $cg := (lookup "operators.coreos.com/v1" "OperatorGroup" $og.metadata.namespace "" "!policies.install").items }}
@@ -494,6 +497,9 @@ spec:
       metadata:
         name: config-operators-snrc
       spec:
+        evaluationInterval:
+          compliant: 1m
+          noncompliant: 1m
         object-templates-raw: |
           {{- if not (hasKey (lookup "operators.coreos.com/v1alpha1" "Subscription" "openshift-workload-availability" "self-node-remediation").metadata.labels "policies.ignore") }}
           {{- if eq "SingleReplica" (fromClusterClaim "controlplanetopology.openshift.io") }}
@@ -527,6 +533,9 @@ spec:
       metadata:
         name: config-operators-logforwarder
       spec:
+        evaluationInterval:
+          compliant: 1m
+          noncompliant: 1m
         object-templates-raw: |
           {{- if not (hasKey (lookup "operators.coreos.com/v1alpha1" "Subscription" "openshift-logging" "cluster-logging").metadata.labels "policies.ignore") }}
           {{hub- if and (lookup "v1" "ConfigMap" "policies" "config-operators").data.eventBrokers (ne "" (index .ManagedClusterLabels "policies.event-topic")) hub}}
@@ -641,6 +650,9 @@ spec:
       metadata:
         name: config-operators-extra
       spec:
+        evaluationInterval:
+          compliant: 1m
+          noncompliant: 1m
         object-templates-raw: |
           {{- if not (hasKey (lookup "operators.coreos.com/v1alpha1" "Subscription" "openshift-gitops-operator" "openshift-gitops-operator").metadata.labels "policies.ignore") }}
           {{hub- if ne "none" (index .ManagedClusterLabels "policies.extra") hub}}
@@ -777,6 +789,9 @@ spec:
       metadata:
         name: config-operators-monitoring
       spec:
+        evaluationInterval:
+          compliant: 1m
+          noncompliant: 1m
         object-templates-raw: |
           {{- if not (hasKey (lookup "v1" "ConfigMap" "openshift-monitoring" "cluster-monitoring-config").metadata.labels "policies.ignore") }}
           - complianceType: musthave
@@ -884,6 +899,9 @@ spec:
       metadata:
         name: config-operators-ingresscontroller
       spec:
+        evaluationInterval:
+          compliant: 1m
+          noncompliant: 1m
         object-templates-raw: |
           {{- if not (hasKey (lookup "operator.openshift.io/v1" "IngressController" "openshift-ingress-operator" "default").metadata.labels "policies.ignore") }}
           {{- $rc := ( (lookup "machineconfiguration.openshift.io/v1" "MachineConfigPool" "" "infra").status.machineCount | toInt ) }}
@@ -907,6 +925,9 @@ spec:
       metadata:
         name: config-operators
       spec:
+        evaluationInterval:
+          compliant: 1m
+          noncompliant: 1m
         object-templates:
         - complianceType: musthave
           objectDefinition:
@@ -3090,9 +3111,6 @@ spec:
   - config-operators-hub
   - install-operators
   - install-operators-hub
-  - node-infra-label
-  - node-infra-mcp
-  - node-infra-toleration
   - proxy-sync-hub
   - upgrade-admin-acks
   - upgrade-release-channel
@@ -3117,9 +3135,6 @@ spec:
   - config-operators
   - config-operators-managed
   - install-operators
-  - node-infra-label
-  - node-infra-mcp
-  - node-infra-toleration
   - proxy-sync-managed
   - upgrade-admin-acks
   - upgrade-release-channel
@@ -3154,6 +3169,9 @@ metadata:
 spec:
   description: ""
   policies:
+  - node-infra-label
+  - node-infra-mcp
+  - node-infra-toleration
   - upgrade-sub-init
 ---
 apiVersion: policy.open-cluster-management.io/v1beta1

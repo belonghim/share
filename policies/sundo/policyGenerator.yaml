@@ -102,6 +102,9 @@ policies:
 - name: config-operators
   dependencies:
   - name: check-csv
+  evaluationInterval:
+    compliant: 1m
+    noncompliant: 1m
   manifests:
   - path: config/config-operators.yaml
   policyLabels:
@@ -167,8 +170,7 @@ policies:
   manifests:
   - path: node/node-infra-label.yaml
   policySets:
-  - hub
-  - managed
+  - sub-init
   remediationAction: enforce
 # infra label Policies - end
 # infra toleration Policies - start
@@ -179,8 +181,7 @@ policies:
   manifests:
   - path: node/node-infra-toleration.yaml
   policySets:
-  - hub
-  - managed
+  - sub-init
   remediationAction: enforce
 # infra toleration Policies - end
 # infra mcp Policies - start
@@ -191,8 +192,7 @@ policies:
   manifests:
   - path: node/node-infra-mcp.yaml
   policySets:
-  - hub
-  - managed
+  - sub-init
   remediationAction: enforce
 # infra mcp Policies - end
 # signatures cm Policies - start
