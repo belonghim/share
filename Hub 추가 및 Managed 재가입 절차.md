@@ -392,12 +392,6 @@ policy.policy.open-cluster-management.io/policies.check-cv condition met
 
 ```
 
-### Apply manaul subscription approval label
-```
-$ oc label mcl ${ManagedCluster} policies.sub-approval=manual
-
-```
-
 ### Delete auto-import-secret
 ```
 ## Wait until the managedluster joined
@@ -405,6 +399,12 @@ $ oc wait mcl ${ManagedCluster} --for=condition=ManagedClusterImportSucceeded &&
 
 ## Delete auto-import-secret
 $ oc -n ${ManagedCluster} delete secret auto-import-secret
+
+```
+
+### Apply manaul subscription approval label
+```
+$ oc label mcl ${ManagedCluster} policies.sub-approval=manual
 
 ```
 
