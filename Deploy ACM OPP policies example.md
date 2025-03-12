@@ -213,3 +213,9 @@ $ oc label mcl local-cluster policies.extra=dev
 $ oc get policy,sub,csv,ip -A -l \!olm.copiedFrom
 ```
 
+### Apply manaul subscription approval label
+```
+$ oc label mcl local-cluster policies.sub-approval=manual
+
+```
+
