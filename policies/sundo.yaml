@@ -156,7 +156,7 @@ spec:
           operator: NotIn
           values:
           - "true"
-        - key: policies.sub-osus
+        - key: policies.osus
           operator: Exists
         - key: policies.sub-approval
           operator: DoesNotExist
@@ -599,6 +599,18 @@ spec:
                       matchLabels:
                         component: eventrouter
                   type: application
+                - name: infra-log
+                  infrastructure:
+                    sources:
+                    - container
+                  type: infrastructure
+                - name: audit-log
+                  audit:
+                    sources:
+                    - kubeAPI
+                    - openshiftAPI
+                    - ovn
+                  type: audit
                 outputs:
           {{hub- if and (lookup "v1" "ConfigMap" "policies" "config-operators").data.infraBrokers (ne "" (index .ManagedClusterLabels "policies.infra-topic")) hub}}
                 - name: infra-receiver
@@ -634,21 +646,23 @@ spec:
           {{hub- if ne "" $sl hub}}
                 - name: audit-log
                   inputRefs:
-                  - audit
+                  - audit-log
                   outputRefs:
-                  - {{hub if ne "" $sl hub}}rsyslog{{hub else hub}}infra-receiver{{hub end hub}}
+                  - rsyslog
                   filterRefs:
                   - add-cluster-name
+                  - audit-log-drop-keyword
           {{hub- end hub}}
           {{hub- if and (lookup "v1" "ConfigMap" "policies" "config-operators").data.infraBrokers (ne "" (index .ManagedClusterLabels "policies.infra-topic")) hub}}
                 - name: infra-log
                   inputRefs:
-                  - infrastructure
+                  - infra-log
                   outputRefs:
                   - infra-receiver
                   filterRefs:
                   - add-cluster-name
                   - important
+                  - core-infra-log
           {{hub- end hub}}
                 - name: event-log
                   inputRefs:
@@ -670,6 +684,18 @@ spec:
                       notMatches: "(?i)critical|error"
                     - field: .level
                       matches: "info|warning"
+                - name: core-infra-log
+                  type: drop
+                  drop:
+                  - test:
+                    - field: .kubernetes.namespace_name
+                      notMatches: openshift-kube-apiserver|openshift-kube-controller-manager|openshift-controller-manager|openshift-kube-scheduler|openshift-authentication|openshift-ovn-kubernetes
+                - name: audit-log-drop-keyword
+                  type: drop
+                  drop:
+                  - test:
+                    - field: .verb
+                      matches: get|list|watch
           {{hub- end hub}}
           {{- end }}
         remediationAction: enforce
