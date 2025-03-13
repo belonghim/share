@@ -42,6 +42,8 @@ spec:
             metadata:
               name: upgrade-osus-$REPO
               namespace: policies
+              labels:
+                policies.config: ""
             data:
               graphUrl: '{{ ( (cat (lookup "updateservice.operator.openshift.io/v1" "UpdateService" "openshift-update-service" "$REPO").status.policyEngineURI "/api/upgrades_info/v1/graph") | replace " " "") }}'
   - objectDefinition:
