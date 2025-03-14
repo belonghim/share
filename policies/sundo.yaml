@@ -327,8 +327,8 @@ spec:
         name: check-csv
       spec:
         evaluationInterval:
-          compliant: 2m
-          noncompliant: 2m
+          compliant: 1m
+          noncompliant: 1m
         object-templates-raw: |
           {{- range $sub := (lookup "operators.coreos.com/v1alpha1" "Subscription" "" "" "!policies.ignore,policies.install").items }}
           - complianceType: musthave
