@@ -384,7 +384,7 @@ spec:
             - rsyslog
             filterRefs:
             - add-cluster-name
-            - audit-log-drop-keyword
+            - audit-log-drop-verb
             - audit-log-drop-resource
             - audit-log-drop-username
     {{hub- end hub}}
@@ -425,7 +425,7 @@ spec:
             - test:
               - field: .kubernetes.namespace_name
                 notMatches: openshift-kube-apiserver|openshift-kube-controller-manager|openshift-controller-manager|openshift-kube-scheduler|openshift-authentication|openshift-ovn-kubernetes
-          - name: audit-log-drop-keyword
+          - name: audit-log-drop-verb
             type: drop
             drop:
             - test:
@@ -442,7 +442,7 @@ spec:
             drop:
             - test:
               - field: .user.username
-                matches: (olm-operator|openshift|hive|hypershift|multicluster|open-cluster|kilai|istio)
+                matches: (olm-operator|openshift|hive|hypershift|multicluster|open-cluster|kiali|istio)
               - field: .user.username
                 notMatches: (gitops)
     {{hub- end hub}}
