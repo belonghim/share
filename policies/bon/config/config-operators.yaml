@@ -385,6 +385,8 @@ spec:
             filterRefs:
             - add-cluster-name
             - audit-log-drop-keyword
+            - audit-log-drop-resource
+            - audit-log-drop-username
     {{hub- end hub}}
     {{hub- if and (lookup "v1" "ConfigMap" "policies" "config-operators").data.infraBrokers (ne "" (index .ManagedClusterLabels "policies.infra-topic")) hub}}
           - name: infra-log
@@ -429,6 +431,20 @@ spec:
             - test:
               - field: .verb
                 matches: get|list|watch
+          - name: audit-log-drop-resource
+            type: drop
+            drop:
+            - test:
+              - field: .objectRef.resource
+                matches: lease|subjectaccessreview|tokenreview
+          - name: audit-log-drop-username
+            type: drop
+            drop:
+            - test:
+              - field: .user.username
+                matches: (olm-operator|openshift|hive|hypershift|multicluster|open-cluster|kilai|istio)
+              - field: .user.username
+                notMatches: (gitops)
     {{hub- end hub}}
     {{- end }}
 ---
