@@ -1162,7 +1162,7 @@ metadata:
   annotations:
     managedcluster-import-controller.open-cluster-management.io/keeping-auto-import-secret: ""
 stringData:
-  autoImportRetry: "7200"
+  autoImportRetry: "21600"
   kubeconfig: |-
 $(sed 's/^/    /g' ${ManagedKubeconfig})
 type: Opaque
@@ -1177,7 +1177,7 @@ metadata:
   namespace: ${ManagedCluster}
 spec:
   applicationManager:
-    enabled: false
+    enabled: true
   certPolicyController:
     enabled: true
   iamPolicyController:
