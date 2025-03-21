@@ -294,6 +294,7 @@ $ oc label mcl local-cluster policies.osus=${Repo}
 ### (Optional) Apply cluster-log-forwarder's brokers
 ```
 $ oc -n policies create cm config-operators --from-literal eventBrokers='["tcp://192.168.10.3:7777","tcp://192.168.10.4:7777","tcp://192.168.10.5:7777"]' --from-literal infraBrokers='["tcp://192.168.10.3:7777","tcp://192.168.10.4:7777","tcp://192.168.10.5:7777"]'
+$ oc -n policies label cm config-operators policies.config=
 
 ```
 
