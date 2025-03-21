@@ -46,5 +46,12 @@ kind: ClusterVersion
 status:
   conditions:
   - status: 'True'
+    type: Failing
+---
+apiVersion: config.openshift.io/v1
+kind: ClusterVersion
+status:
+  conditions:
+  - status: 'True'
     type: Progressing
 ---
