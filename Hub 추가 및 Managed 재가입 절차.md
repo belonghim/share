@@ -348,10 +348,10 @@ $ cd share/policies
 ## Test import-cluster script
 $ ManagedCluster=mngda
 $ ManagedKubeconfig=/opt/mngda/auth/kubeconfig
-$ sh import-cluster ${ManagedCluster} ${ManagedKubeconfig}
+$ sh import-cluster.sh ${ManagedCluster} ${ManagedKubeconfig}
 
 ## Start to import the cluster
-$ sh import-cluster ${ManagedCluster} ${ManagedKubeconfig} | oc create -f -
+$ sh import-cluster.sh ${ManagedCluster} ${ManagedKubeconfig} | oc create -f -
 
 ## Apply sub-approval=manual label
 $ oc label ${ManagedKubeconfig} policies.sub-approval=manual
