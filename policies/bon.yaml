@@ -2238,10 +2238,9 @@ spec:
           compliant: 1m
           noncompliant: 1m
         object-templates-raw: |
-          {{- range $no := (lookup "v1" "Node" "" "" "!node-role.kubernetes.io/master").items }}
+          {{- range $no := (lookup "v1" "Node" "" "" "!node-role.kubernetes.io/master,!node-role.kubernetes.io/infra,node-role.kubernetes.io/worker").items }}
           {{- if (regexMatch "inf[0-9]{2}" $no.metadata.name) }}
           {{- if not (hasKey $no.metadata.annotations "policies.done") }}
-          {{- if (hasKey $no.metadata.labels "node-role.kubernetes.io/worker") }}
           - complianceType: musthave
             objectDefinition:
               apiVersion: v1
@@ -2249,13 +2248,11 @@ spec:
               metadata:
                 name: {{ $no.metadata.name }}
                 labels:
-                  node-role.kubernetes.io/infra: ""
                   node-role.kubernetes.io/worker:
               spec:
                 taints:
                 - effect: NoSchedule
                   key: node-role.kubernetes.io/infra
-          {{- end }}
           {{- end }}
           {{- end }}
           {{- end }}
@@ -2268,10 +2265,9 @@ spec:
         name: node-infra-label-add
       spec:
         object-templates-raw: |
-          {{- range $no := (lookup "v1" "Node" "" "" "!node-role.kubernetes.io/master").items }}
+          {{- range $no := (lookup "v1" "Node" "" "" "!node-role.kubernetes.io/master,!node-role.kubernetes.io/infra,!node-role.kubernetes.io/worker").items }}
           {{- if (regexMatch "inf[0-9]{2}" $no.metadata.name) }}
           {{- if not (hasKey $no.metadata.annotations "policies.done") }}
-          {{- if and (not (hasKey $no.metadata.labels "node-role.kubernetes.io/worker")) (not (hasKey $no.metadata.labels "kubernetes.io/hostname")) }}
           - complianceType: musthave
             objectDefinition:
               apiVersion: v1
@@ -2284,7 +2280,6 @@ spec:
                   kubernetes.io/hostname: {{ $no.metadata.name }}
                   node-role.kubernetes.io/infra: ""
                   node.openshift.io/os_id: rhcos
-          {{- end }}
           {{- end }}
           {{- end }}
           {{- end }}
