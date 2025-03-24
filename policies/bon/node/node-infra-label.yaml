@@ -2,7 +2,7 @@
 apiVersion: policy.open-cluster-management.io/v1
 kind: ConfigurationPolicy
 metadata:
-  name: node-infra-label-remove
+  name: node-infra-label-add
 spec:
   evaluationInterval:
     compliant: 1m
@@ -19,39 +19,14 @@ spec:
         kind: Node
         metadata:
           name: {{ $no.metadata.name }}
+          annotations:
+            policies.done: {{ now }}
           labels:
-            node-role.kubernetes.io/worker:
+            node-role.kubernetes.io/infra: ""
         spec:
           taints:
           - effect: NoSchedule
             key: node-role.kubernetes.io/infra
-    {{- end }}
-    {{- end }}
-    {{- end }}
----
-apiVersion: policy.open-cluster-management.io/v1
-kind: ConfigurationPolicy
-metadata:
-  name: node-infra-label-add
-spec:
-  remediationAction: enforce
-  severity: high
-  object-templates-raw: |
-    {{- range $no := (lookup "v1" "Node" "" "" "!node-role.kubernetes.io/master,!node-role.kubernetes.io/infra,!node-role.kubernetes.io/worker").items }}
-    {{- if (regexMatch "inf[0-9]{2}" $no.metadata.name) }}
-    {{- if not (hasKey $no.metadata.annotations "policies.done") }}
-    - complianceType: musthave
-      objectDefinition:
-        apiVersion: v1
-        kind: Node
-        metadata:
-          name: {{ $no.metadata.name }}
-          annotations:
-            policies.done: {{ now }}
-          labels:
-            kubernetes.io/hostname: {{ $no.metadata.name }}
-            node-role.kubernetes.io/infra: ""
-            node.openshift.io/os_id: rhcos
     {{- end }}
     {{- end }}
     {{- end }}
