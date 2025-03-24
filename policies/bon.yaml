@@ -482,14 +482,6 @@ spec:
             kind: ClusterVersion
             status:
               conditions:
-              - status: "True"
-                type: Progressing
-        - complianceType: mustnothave
-          objectDefinition:
-            apiVersion: config.openshift.io/v1
-            kind: ClusterVersion
-            status:
-              conditions:
               - status: "False"
                 type: RetrievedUpdates
         - complianceType: mustnothave
