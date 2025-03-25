@@ -9,7 +9,7 @@ spec:
       labelSelector:
         matchExpressions:
         - {key: vendor, operator: In, values: ["OpenShift"]}
-        - {key: "policies.undeploy", operator: NotIn, values: ["true"]}
+        - {key: "policies.undeploy", operator: DoesNotExist}
         - {key: "local-cluster", operator: NotIn, values: ["true"]}
       claimSelector:
         matchExpressions:

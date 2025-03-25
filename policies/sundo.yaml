@@ -23,9 +23,7 @@ spec:
           values:
           - OpenShift
         - key: policies.undeploy
-          operator: NotIn
-          values:
-          - "true"
+          operator: DoesNotExist
         - key: local-cluster
           operator: In
           values:
@@ -56,9 +54,7 @@ spec:
           values:
           - OpenShift
         - key: policies.undeploy
-          operator: NotIn
-          values:
-          - "true"
+          operator: DoesNotExist
         - key: local-cluster
           operator: NotIn
           values:
@@ -89,9 +85,7 @@ spec:
           values:
           - OpenShift
         - key: policies.undeploy
-          operator: NotIn
-          values:
-          - "true"
+          operator: DoesNotExist
         - key: policies.osus
           operator: Exists
 ---
@@ -120,9 +114,7 @@ spec:
           values:
           - OpenShift
         - key: policies.undeploy
-          operator: NotIn
-          values:
-          - "true"
+          operator: DoesNotExist
         - key: policies.sub-approval
           operator: In
           values:
@@ -153,9 +145,7 @@ spec:
           values:
           - OpenShift
         - key: policies.undeploy
-          operator: NotIn
-          values:
-          - "true"
+          operator: DoesNotExist
         - key: policies.osus
           operator: Exists
         - key: policies.sub-approval
@@ -186,9 +176,7 @@ spec:
           values:
           - OpenShift
         - key: policies.undeploy
-          operator: NotIn
-          values:
-          - "true"
+          operator: DoesNotExist
         - key: policies.sub-approval
           operator: In
           values:
