@@ -10,18 +10,24 @@ metadata:
 spec:
   predicates:
   - requiredClusterSelector:
+      claimSelector:
+        matchExpressions:
+        - key: policies.undeploy
+          operator: NotIn
+          values:
+          - "true"
       labelSelector:
         matchExpressions:
         - key: vendor
           operator: In
           values:
           - OpenShift
+        - key: policies.undeploy
+          operator: DoesNotExist
         - key: local-cluster
           operator: In
           values:
           - "true"
-        - key: policies.undeploy
-          operator: DoesNotExist
 ---
 apiVersion: cluster.open-cluster-management.io/v1beta1
 kind: Placement
@@ -35,18 +41,53 @@ metadata:
 spec:
   predicates:
   - requiredClusterSelector:
+      claimSelector:
+        matchExpressions:
+        - key: policies.undeploy
+          operator: NotIn
+          values:
+          - "true"
       labelSelector:
         matchExpressions:
         - key: vendor
           operator: In
           values:
           - OpenShift
+        - key: policies.undeploy
+          operator: DoesNotExist
         - key: local-cluster
           operator: NotIn
           values:
           - "true"
+---
+apiVersion: cluster.open-cluster-management.io/v1beta1
+kind: Placement
+metadata:
+  annotations:
+    argocd.argoproj.io/compare-options: IgnoreExtraneous
+  labels:
+    open-cluster-management.io/policy-set: opp
+  name: placement-osus
+  namespace: policies
+spec:
+  predicates:
+  - requiredClusterSelector:
+      claimSelector:
+        matchExpressions:
+        - key: policies.undeploy
+          operator: NotIn
+          values:
+          - "true"
+      labelSelector:
+        matchExpressions:
+        - key: vendor
+          operator: In
+          values:
+          - OpenShift
         - key: policies.undeploy
           operator: DoesNotExist
+        - key: policies.osus
+          operator: Exists
 ---
 apiVersion: cluster.open-cluster-management.io/v1beta1
 kind: Placement
@@ -60,6 +101,12 @@ metadata:
 spec:
   predicates:
   - requiredClusterSelector:
+      claimSelector:
+        matchExpressions:
+        - key: policies.undeploy
+          operator: NotIn
+          values:
+          - "true"
       labelSelector:
         matchExpressions:
         - key: vendor
@@ -72,7 +119,37 @@ spec:
           operator: In
           values:
           - automatic
-          - Automatic
+---
+apiVersion: cluster.open-cluster-management.io/v1beta1
+kind: Placement
+metadata:
+  annotations:
+    argocd.argoproj.io/compare-options: IgnoreExtraneous
+  labels:
+    open-cluster-management.io/policy-set: opp
+  name: placement-sub-init
+  namespace: policies
+spec:
+  predicates:
+  - requiredClusterSelector:
+      claimSelector:
+        matchExpressions:
+        - key: policies.undeploy
+          operator: NotIn
+          values:
+          - "true"
+      labelSelector:
+        matchExpressions:
+        - key: vendor
+          operator: In
+          values:
+          - OpenShift
+        - key: policies.undeploy
+          operator: DoesNotExist
+        - key: policies.osus
+          operator: Exists
+        - key: policies.sub-approval
+          operator: DoesNotExist
 ---
 apiVersion: cluster.open-cluster-management.io/v1beta1
 kind: Placement
@@ -86,6 +163,12 @@ metadata:
 spec:
   predicates:
   - requiredClusterSelector:
+      claimSelector:
+        matchExpressions:
+        - key: policies.undeploy
+          operator: NotIn
+          values:
+          - "true"
       labelSelector:
         matchExpressions:
         - key: vendor
@@ -148,6 +231,24 @@ metadata:
 placementRef:
   apiGroup: cluster.open-cluster-management.io
   kind: Placement
+  name: placement-osus
+subjects:
+- apiGroup: policy.open-cluster-management.io
+  kind: PolicySet
+  name: osus
+---
+apiVersion: policy.open-cluster-management.io/v1
+kind: PlacementBinding
+metadata:
+  annotations:
+    argocd.argoproj.io/compare-options: IgnoreExtraneous
+  labels:
+    open-cluster-management.io/policy-set: opp
+  name: binding-policy-hub4
+  namespace: policies
+placementRef:
+  apiGroup: cluster.open-cluster-management.io
+  kind: Placement
   name: placement-sub-automatic
 subjects:
 - apiGroup: policy.open-cluster-management.io
@@ -161,7 +262,25 @@ metadata:
     argocd.argoproj.io/compare-options: IgnoreExtraneous
   labels:
     open-cluster-management.io/policy-set: opp
-  name: binding-policy-hub4
+  name: binding-policy-hub5
+  namespace: policies
+placementRef:
+  apiGroup: cluster.open-cluster-management.io
+  kind: Placement
+  name: placement-sub-init
+subjects:
+- apiGroup: policy.open-cluster-management.io
+  kind: PolicySet
+  name: sub-init
+---
+apiVersion: policy.open-cluster-management.io/v1
+kind: PlacementBinding
+metadata:
+  annotations:
+    argocd.argoproj.io/compare-options: IgnoreExtraneous
+  labels:
+    open-cluster-management.io/policy-set: opp
+  name: binding-policy-hub6
   namespace: policies
 placementRef:
   apiGroup: cluster.open-cluster-management.io
@@ -183,6 +302,7 @@ metadata:
     policy.open-cluster-management.io/standards: NIST SP 800-53
   labels:
     open-cluster-management.io/policy-set: opp
+    policies.csv: ""
   name: check-csv
   namespace: policies
 spec:
@@ -194,6 +314,9 @@ spec:
       metadata:
         name: check-csv
       spec:
+        evaluationInterval:
+          compliant: 1m
+          noncompliant: 1m
         object-templates-raw: |
           {{- range $sub := (lookup "operators.coreos.com/v1alpha1" "Subscription" "" "" "!policies.ignore,policies.install").items }}
           - complianceType: musthave
@@ -201,35 +324,10 @@ spec:
               apiVersion: operators.coreos.com/v1alpha1
               kind: ClusterServiceVersion
               metadata:
-                name: {{ $sub.status.currentCSV }}
+                name: {{ $sub.status.installedCSV }}
                 namespace: {{ $sub.metadata.namespace }}
               status:
                 phase: Succeeded
-          {{- end }}
-        remediationAction: inform
-        severity: high
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1
-      kind: ConfigurationPolicy
-      metadata:
-        name: check-csv-ip
-      spec:
-        object-templates-raw: |
-          {{- range $sb := (lookup "operators.coreos.com/v1alpha1" "Subscription" "" "" "!policies.ignore,policies.install").items }}
-          {{- if eq "InstallPlan" (lookup "operators.coreos.com/v1alpha1" "InstallPlan" $sb.metadata.namespace $sb.status.installPlanRef.name).kind }}
-          {{- $ip := (lookup "operators.coreos.com/v1alpha1" "InstallPlan" $sb.metadata.namespace $sb.status.installPlanRef.name) }}
-          - complianceType: musthave
-            objectDefinition:
-              apiVersion: operators.coreos.com/v1alpha1
-              kind: InstallPlan
-              metadata:
-                name: {{ $ip.metadata.name }}
-                namespace: {{ $ip.metadata.namespace }}
-              spec:
-                approved: true
-              status:
-                phase: Complete
-          {{- end }}
           {{- end }}
         remediationAction: inform
         severity: high
@@ -246,6 +344,8 @@ metadata:
     policy.open-cluster-management.io/standards: NIST SP 800-53
   labels:
     open-cluster-management.io/policy-set: opp
+    policies.csv: ""
+    policies.cv: ""
   name: check-cv
   namespace: policies
 spec:
@@ -313,6 +413,14 @@ spec:
             status:
               conditions:
               - status: "True"
+                type: Failing
+        - complianceType: mustnothave
+          objectDefinition:
+            apiVersion: config.openshift.io/v1
+            kind: ClusterVersion
+            status:
+              conditions:
+              - status: "True"
                 type: Progressing
         remediationAction: inform
         severity: medium
@@ -329,20 +437,125 @@ metadata:
     policy.open-cluster-management.io/standards: NIST SP 800-53
   labels:
     open-cluster-management.io/policy-set: opp
-  name: config-operators
+    policies.cv: ""
+  name: check-upgradeable
   namespace: policies
 spec:
+  dependencies:
+  - apiVersion: policy.open-cluster-management.io/v1
+    compliance: Compliant
+    kind: Policy
+    name: check-cv
+    namespace: policies
   disabled: false
   policy-templates:
   - objectDefinition:
       apiVersion: policy.open-cluster-management.io/v1
       kind: ConfigurationPolicy
       metadata:
+        name: check-upgradeable
+      spec:
+        object-templates:
+        - complianceType: mustnothave
+          objectDefinition:
+            apiVersion: config.openshift.io/v1
+            kind: ClusterOperator
+            status:
+              conditions:
+              - status: "False"
+                type: Upgradeable
+        - complianceType: mustnothave
+          objectDefinition:
+            apiVersion: config.openshift.io/v1
+            kind: ClusterVersion
+            status:
+              conditions:
+              - status: "False"
+                type: RetrievedUpdates
+        - complianceType: mustnothave
+          objectDefinition:
+            apiVersion: config.openshift.io/v1
+            kind: ClusterVersion
+            status:
+              conditions:
+              - status: "False"
+                type: Upgradeable
+        remediationAction: inform
+        severity: medium
+  remediationAction: inform
+---
+apiVersion: policy.open-cluster-management.io/v1
+kind: Policy
+metadata:
+  annotations:
+    argocd.argoproj.io/compare-options: IgnoreExtraneous
+    policy.open-cluster-management.io/categories: CM Configuration Management
+    policy.open-cluster-management.io/controls: CM-2 Baseline Configuration
+    policy.open-cluster-management.io/description: ""
+    policy.open-cluster-management.io/standards: NIST SP 800-53
+  labels:
+    open-cluster-management.io/policy-set: opp
+    policies.csv: ""
+  name: config-operators
+  namespace: policies
+spec:
+  dependencies:
+  - apiVersion: policy.open-cluster-management.io/v1
+    compliance: Compliant
+    kind: Policy
+    name: check-csv
+    namespace: policies
+  disabled: false
+  policy-templates:
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: config-operators-snrc
+      spec:
+        evaluationInterval:
+          compliant: 1m
+          noncompliant: 1m
+        object-templates-raw: |
+          {{- if not (hasKey (lookup "operators.coreos.com/v1alpha1" "Subscription" "openshift-workload-availability" "self-node-remediation").metadata.labels "policies.ignore") }}
+          {{- if ne "HighlyAvailable" (fromClusterClaim "controlplanetopology.openshift.io") }}
+          - complianceType: mustnothave
+            objectDefinition:
+              apiVersion: self-node-remediation.medik8s.io/v1alpha1
+              kind: SelfNodeRemediationConfig
+              metadata:
+                name: self-node-remediation-config
+                namespace: openshift-workload-availability
+          {{- else }}
+          - complianceType: musthave
+            objectDefinition:
+              apiVersion: self-node-remediation.medik8s.io/v1alpha1
+              kind: SelfNodeRemediationConfig
+              metadata:
+                name: self-node-remediation-config
+                namespace: openshift-workload-availability
+              spec:
+                peerUpdateInterval: 1m
+                customDsTolerations:
+                - effect: NoSchedule
+                  operator: Exists
+                  key: node-role.kubernetes.io/infra
+          {{- end }}
+          {{- end }}
+        remediationAction: enforce
+        severity: low
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
         name: config-operators-logforwarder
       spec:
+        evaluationInterval:
+          compliant: 1m
+          noncompliant: 1m
         object-templates-raw: |
-          {{hub- if (lookup "v1" "ConfigMap" "policies" "config-operators").data.logBrokers hub}}
-          {{hub- if (lookup "v1" "ConfigMap" "policies" "config-operators").data.logTopic hub}}
+          {{- if not (hasKey (lookup "operators.coreos.com/v1alpha1" "Subscription" "openshift-logging" "cluster-logging").metadata.labels "policies.ignore") }}
+          {{hub- if and (lookup "v1" "ConfigMap" "policies" "config-operators").data.eventBrokers (ne "" (index .ManagedClusterLabels "policies.event-topic")) hub}}
           - complianceType: musthave
             recreateOption: IfRequired
             objectDefinition:
@@ -352,7 +565,6 @@ spec:
                 name: log-forwarder
                 namespace: openshift-logging
               spec:
-                managementState: Managed
                 collector:
                   resources:
                     limits:
@@ -361,40 +573,136 @@ spec:
                     requests:
                       cpu: "1"
                       memory: 2Gi
+                  tolerations:
+                  - effect: NoSchedule
+                    key: node-role.kubernetes.io/infra
+                    operator: Exists
                 serviceAccount:
                   name: log-collector
+                inputs:
+                - name: eventrouter
+                  application:
+                    includes:
+                    - namespace: ocp-logging
+                    selector:
+                      matchLabels:
+                        component: eventrouter
+                  type: application
+                - name: infra-log
+                  infrastructure:
+                    sources:
+                    - container
+                  type: infrastructure
+                - name: audit-log
+                  audit:
+                    sources:
+                    - kubeAPI
+                    - openshiftAPI
+                    - ovn
+                  type: audit
                 outputs:
-                - name: kafka-receiver
-                  type: kafka
+          {{hub- if and (lookup "v1" "ConfigMap" "policies" "config-operators").data.infraBrokers (ne "" (index .ManagedClusterLabels "policies.infra-topic")) hub}}
+                - name: infra-receiver
                   kafka:
-                    brokers: {{hub (lookup "v1" "ConfigMap" "policies" "config-operators").data.logBrokers hub}}
-                    topic: {{hub (lookup "v1" "ConfigMap" "policies" "config-operators").data.logTopic hub}}
+                    brokers: {{hub (lookup "v1" "ConfigMap" "policies" "config-operators").data.infraBrokers hub}}
+                    topic: {{hub index .ManagedClusterLabels "policies.infra-topic" hub}}
                     tuning:
+                      compression: none
                       deliveryMode: AtLeastOnce
                       maxWrite: 10M
+                  type: kafka
+          {{hub- end hub}}
+                - name: event-receiver
+                  kafka:
+                    brokers: {{hub (lookup "v1" "ConfigMap" "policies" "config-operators").data.eventBrokers hub}}
+                    topic: {{hub index .ManagedClusterLabels "policies.event-topic" hub}}
+                    tuning:
                       compression: none
+                      deliveryMode: AtLeastOnce
+                      maxWrite: 10M
+                  type: kafka
+          {{hub- $sl := index .ManagedClusterLabels "policies.syslog-url" hub}}
+          {{hub- if ne "" $sl hub}}
+                - name: rsyslog
+                  syslog:
+                    facility: user
+                    rfc: RFC5424
+                    severity: debug
+                    url: tcp://{{hub (splitn ".." 2 $sl)._0 hub}}:{{hub (splitn ".." 2 $sl)._1 hub}}
+                  type: syslog
+          {{hub- end hub}}
                 pipelines:
+          {{hub- if ne "" $sl hub}}
                 - name: audit-log
                   inputRefs:
-                  - audit
+                  - audit-log
                   outputRefs:
-                  - kafka-receiver
+                  - rsyslog
                   filterRefs:
                   - add-cluster-name
+                  - audit-log-drop-verb
+                  - audit-log-drop-resource
+                  - audit-log-drop-username
+          {{hub- end hub}}
+          {{hub- if and (lookup "v1" "ConfigMap" "policies" "config-operators").data.infraBrokers (ne "" (index .ManagedClusterLabels "policies.infra-topic")) hub}}
                 - name: infra-log
                   inputRefs:
-                  - infrastructure
+                  - infra-log
                   outputRefs:
-                  - kafka-receiver
+                  - infra-receiver
+                  filterRefs:
+                  - add-cluster-name
+                  - important
+                  - core-infra-log
+          {{hub- end hub}}
+                - name: event-log
+                  inputRefs:
+                  - eventrouter
+                  outputRefs:
+                  - event-receiver
                   filterRefs:
                   - add-cluster-name
                 filters:
                 - name: add-cluster-name
                   type: openshiftLabels
                   openshiftLabels:
-                    cluster-name: {{hub .ManagedClusterName hub}}
+                    cluster-name: {{ (lookup "config.openshift.io/v1" "Infrastructure" "" "cluster").status.infrastructureName }}
+                - name: important
+                  type: drop
+                  drop:
+                  - test:
+                    - field: .message
+                      notMatches: "(?i)critical|error"
+                    - field: .level
+                      matches: "info|warning"
+                - name: core-infra-log
+                  type: drop
+                  drop:
+                  - test:
+                    - field: .kubernetes.namespace_name
+                      notMatches: openshift-kube-apiserver|openshift-kube-controller-manager|openshift-controller-manager|openshift-kube-scheduler|openshift-authentication|openshift-ovn-kubernetes
+                - name: audit-log-drop-verb
+                  type: drop
+                  drop:
+                  - test:
+                    - field: .verb
+                      matches: get|list|watch
+                - name: audit-log-drop-resource
+                  type: drop
+                  drop:
+                  - test:
+                    - field: .objectRef.resource
+                      matches: lease|subjectaccessreview|tokenreview
+                - name: audit-log-drop-username
+                  type: drop
+                  drop:
+                  - test:
+                    - field: .user.username
+                      matches: (olm-operator|openshift|hive|hypershift|multicluster|open-cluster|kiali|istio)
+                    - field: .user.username
+                      notMatches: (gitops)
           {{hub- end hub}}
-          {{hub- end hub}}
+          {{- end }}
         remediationAction: enforce
         severity: high
   - objectDefinition:
@@ -403,8 +711,12 @@ spec:
       metadata:
         name: config-operators-extra
       spec:
+        evaluationInterval:
+          compliant: 1m
+          noncompliant: 1m
         object-templates-raw: |
-          {{hub if ne "none" (index .ManagedClusterLabels "policies.extra") hub}}
+          {{- if not (hasKey (lookup "operators.coreos.com/v1alpha1" "Subscription" "openshift-gitops-operator" "openshift-gitops-operator").metadata.labels "policies.ignore") }}
+          {{hub- if ne "none" (index .ManagedClusterLabels "policies.extra") hub}}
           - complianceType: musthave
             objectDefinition:
               apiVersion: argoproj.io/v1beta1
@@ -464,7 +776,7 @@ spec:
                   enabled: false
                 nodePlacement:
                   nodeSelector:
-                    node-role.kubernetes.io/infra: ""
+                    node-role.kubernetes.io/worker: ""
                   tolerations:
                   - effect: NoSchedule
                     key: node-role.kubernetes.io/infra
@@ -528,7 +840,8 @@ spec:
                     enabled: true
                   service:
                     type: ""
-          {{hub end hub}}
+          {{hub- end hub}}
+          {{- end }}
         remediationAction: enforce
         severity: high
   - objectDefinition:
@@ -537,7 +850,11 @@ spec:
       metadata:
         name: config-operators-monitoring
       spec:
+        evaluationInterval:
+          compliant: 1m
+          noncompliant: 1m
         object-templates-raw: |
+          {{- if not (hasKey (lookup "v1" "ConfigMap" "openshift-monitoring" "cluster-monitoring-config").metadata.labels "policies.ignore") }}
           - complianceType: musthave
             objectDefinition:
               apiVersion: v1
@@ -594,14 +911,15 @@ spec:
                       operator: Exists
                   prometheusK8s:
                     externalLabels:
-                      managed_cluster: {{hub .ManagedClusterName hub}}
+                      managed_cluster: {{ (lookup "config.openshift.io/v1" "Infrastructure" "" "cluster").status.infrastructureName }}
                     nodeSelector:
                       node-role.kubernetes.io/infra: ""
-          {{- if eq "Service" (lookup "v1" "Service" "clushkube-monitoring" "kube-prometheus-stack-prometheus").kind }}
+          {{- $np := "{{hub index .ManagedClusterLabels "policies.ns-prefix" hub}}" }}
+          {{- $mn := "clushkube-monitoring" }}
+          {{- if ne "" $np }}{{ $mn = (cat $np "-monitoring-ns" | replace " " "") }}{{ end }}
                     remoteWrite:
-                      - url: http://kube-prometheus-stack-prometheus.clushkube-monitoring.svc.cluster.local:9090/api/v1/write
-          {{- end }}
-                    retentionSize: 60GiB
+                    - url: http://kube-prometheus-stack-prometheus.{{ $mn }}.svc.cluster.local:9090/api/v1/write
+                    retentionSize: 30GiB
                     tolerations:
                     - effect: NoSchedule
                       key: node-role.kubernetes.io/infra
@@ -633,6 +951,7 @@ spec:
                     - effect: NoSchedule
                       key: node-role.kubernetes.io/infra
                       operator: Exists
+          {{- end }}
         remediationAction: enforce
         severity: high
   - objectDefinition:
@@ -641,7 +960,11 @@ spec:
       metadata:
         name: config-operators-ingresscontroller
       spec:
+        evaluationInterval:
+          compliant: 1m
+          noncompliant: 1m
         object-templates-raw: |
+          {{- if not (hasKey (lookup "operator.openshift.io/v1" "IngressController" "openshift-ingress-operator" "default").metadata.labels "policies.ignore") }}
           {{- $rc := ( (lookup "machineconfiguration.openshift.io/v1" "MachineConfigPool" "" "infra").status.machineCount | toInt ) }}
           {{- if lt 1 $rc }}
           - complianceType: musthave
@@ -654,6 +977,7 @@ spec:
               spec:
                 replicas: {{ $rc }}
           {{- end }}
+          {{- end }}
         remediationAction: enforce
         severity: high
   - objectDefinition:
@@ -662,46 +986,10 @@ spec:
       metadata:
         name: config-operators
       spec:
+        evaluationInterval:
+          compliant: 1m
+          noncompliant: 1m
         object-templates:
-        - complianceType: musthave
-          objectDefinition:
-            apiVersion: v1
-            kind: Namespace
-            metadata:
-              annotations:
-                openshift.io/node-selector: node-role.kubernetes.io/master=
-              name: openshift-console
-        - complianceType: musthave
-          objectDefinition:
-            apiVersion: v1
-            kind: Namespace
-            metadata:
-              annotations:
-                openshift.io/node-selector: node-role.kubernetes.io/master=
-              name: openshift-kube-storage-version-migrator
-        - complianceType: musthave
-          objectDefinition:
-            apiVersion: v1
-            kind: Namespace
-            metadata:
-              annotations:
-                openshift.io/node-selector: node-role.kubernetes.io/infra=
-              name: openshift-network-console
-        - complianceType: musthave
-          objectDefinition:
-            apiVersion: self-node-remediation.medik8s.io/v1alpha1
-            kind: SelfNodeRemediationConfig
-            metadata:
-              name: self-node-remediation-config
-              namespace: openshift-workload-availability
-            spec:
-              customDsTolerations:
-              - effect: NoSchedule
-                key: node-role.kubernetes.io/infra
-                operator: Exists
-              peerApiServerTimeout: 30s
-              peerDialTimeout: 30s
-              peerRequestTimeout: 30s
         - complianceType: musthave
           objectDefinition:
             apiVersion: remediation.medik8s.io/v1alpha1
@@ -709,7 +997,7 @@ spec:
             metadata:
               name: nodehealthcheck-master
             spec:
-              minHealthy: 90%
+              minHealthy: 51%
               remediationTemplate:
                 apiVersion: self-node-remediation.medik8s.io/v1alpha1
                 kind: SelfNodeRemediationTemplate
@@ -809,10 +1097,19 @@ spec:
         - complianceType: musthave
           objectDefinition:
             apiVersion: v1
+            kind: Namespace
+            metadata:
+              annotations:
+                openshift.io/node-selector: node-role.kubernetes.io/infra=
+                scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator":"Exists","effect":"NoSchedule","key":"node-role.kubernetes.io/infra"}]'
+              name: ocp-logging
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: v1
             kind: ServiceAccount
             metadata:
               name: eventrouter
-              namespace: openshift-logging
+              namespace: ocp-logging
         - complianceType: musthave
           objectDefinition:
             apiVersion: rbac.authorization.k8s.io/v1
@@ -840,7 +1137,7 @@ spec:
             subjects:
             - kind: ServiceAccount
               name: eventrouter
-              namespace: openshift-logging
+              namespace: ocp-logging
         - complianceType: musthave
           objectDefinition:
             apiVersion: v1
@@ -852,7 +1149,7 @@ spec:
             kind: ConfigMap
             metadata:
               name: eventrouter
-              namespace: openshift-logging
+              namespace: ocp-logging
         - complianceType: musthave
           objectDefinition:
             apiVersion: apps/v1
@@ -863,7 +1160,7 @@ spec:
                 logging-infra: eventrouter
                 provider: openshift
               name: eventrouter
-              namespace: openshift-logging
+              namespace: ocp-logging
             spec:
               replicas: 1
               selector:
@@ -881,7 +1178,6 @@ spec:
                 spec:
                   containers:
                   - image: registry.redhat.io/openshift-logging/eventrouter-rhel9:v0.4
-                    imagePullPolicy: IfNotPresent
                     name: kube-eventrouter
                     resources:
                       requests:
@@ -1072,17 +1368,35 @@ metadata:
     policy.open-cluster-management.io/standards: NIST SP 800-53
   labels:
     open-cluster-management.io/policy-set: opp
+    policies.csv: ""
   name: install-operators
   namespace: policies
 spec:
-  dependencies:
-  - apiVersion: policy.open-cluster-management.io/v1
-    compliance: Compliant
-    kind: Policy
-    name: check-cv
-    namespace: policies
   disabled: false
   policy-templates:
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: install-operators-clean-og
+      spec:
+        evaluationInterval:
+          compliant: 1m
+          noncompliant: 1m
+        object-templates-raw: |
+          {{- range $og := (lookup "operators.coreos.com/v1" "OperatorGroup" "" "" "policies.install").items }}
+          {{- range $cg := (lookup "operators.coreos.com/v1" "OperatorGroup" $og.metadata.namespace "" "!policies.install").items }}
+          - complianceType: mustnothave
+            objectDefinition:
+              apiVersion: operators.coreos.com/v1
+              kind: OperatorGroup
+              metadata:
+                name: {{ $cg.metadata.name }}
+                namespace: {{ $cg.metadata.namespace }}
+          {{- end }}
+          {{- end }}
+        remediationAction: enforce
+        severity: high
   - objectDefinition:
       apiVersion: policy.open-cluster-management.io/v1
       kind: ConfigurationPolicy
@@ -1106,6 +1420,8 @@ spec:
               metadata:
                 name: openshift-nmstate
                 namespace: openshift-nmstate
+                labels:
+                  policies.install: ""
               spec:
                 targetNamespaces:
                 - openshift-nmstate
@@ -1134,30 +1450,38 @@ spec:
               apiVersion: v1
               kind: Namespace
               metadata:
-                name: openshift-storage
+                name: openshift-gitops-operator
                 annotations:
+                  scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator":"Exists","effect":"NoSchedule","key":"node-role.kubernetes.io/infra"}]'
+          - complianceType: musthave
+            objectDefinition:
+              apiVersion: v1
+              kind: Namespace
+              metadata:
+                name: openshift-gitops
+                annotations:
+                  openshift.io/node-selector: node-role.kubernetes.io/worker=
                   scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator":"Exists","effect":"NoSchedule","key":"node-role.kubernetes.io/infra"}]'
           - complianceType: musthave
             objectDefinition:
               apiVersion: operators.coreos.com/v1
               kind: OperatorGroup
               metadata:
-                name: openshift-storage
-                namespace: openshift-storage
-              spec:
-                targetNamespaces:
-                - openshift-storage
+                name: openshift-gitops-operator
+                namespace: openshift-gitops-operator
+                labels:
+                  policies.install: ""
           - complianceType: musthave
             objectDefinition:
               apiVersion: operators.coreos.com/v1alpha1
               kind: Subscription
               metadata:
-                name: lvms-operator
-                namespace: openshift-storage
+                name: openshift-gitops-operator
+                namespace: openshift-gitops-operator
                 labels:
                   policies.install: ""
               spec:
-                name: lvms-operator
+                name: openshift-gitops-operator
                 source: cs-redhat-operator-index
                 sourceNamespace: openshift-marketplace
                 config:
@@ -1172,36 +1496,193 @@ spec:
               apiVersion: v1
               kind: Namespace
               metadata:
-                name: openshift-gitops-operator
+                name: openshift-local-storage
                 annotations:
-                  scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator":"Exists","effect":"NoSchedule","key":"node-role.kubernetes.io/infra"}]'
-          - complianceType: musthave
-            objectDefinition:
-              apiVersion: v1
-              kind: Namespace
-              metadata:
-                name: openshift-gitops
-                annotations:
-                  openshift.io/node-selector: node-role.kubernetes.io/infra=
                   scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator":"Exists","effect":"NoSchedule","key":"node-role.kubernetes.io/infra"}]'
           - complianceType: musthave
             objectDefinition:
               apiVersion: operators.coreos.com/v1
               kind: OperatorGroup
               metadata:
-                name: openshift-gitops-operator
-                namespace: openshift-gitops-operator
+                name: openshift-local-storage
+                namespace: openshift-local-storage
+                labels:
+                  policies.install: ""
+              spec:
+                targetNamespaces:
+                - openshift-local-storage
           - complianceType: musthave
             objectDefinition:
               apiVersion: operators.coreos.com/v1alpha1
               kind: Subscription
               metadata:
-                name: openshift-gitops-operator
-                namespace: openshift-gitops-operator
+                name: local-storage-operator
+                namespace: openshift-local-storage
                 labels:
                   policies.install: ""
               spec:
-                name: openshift-gitops-operator
+                name: local-storage-operator
+                source: cs-redhat-operator-index
+                sourceNamespace: openshift-marketplace
+                config:
+                  nodeSelector:
+                    node-role.kubernetes.io/infra: ""
+                  tolerations:
+                  - effect: NoSchedule
+                    operator: Exists
+                    key: node-role.kubernetes.io/infra
+          - complianceType: musthave
+            objectDefinition:
+              apiVersion: v1
+              kind: Namespace
+              metadata:
+                name: openshift-operators
+                annotations:
+                  scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator":"Exists","effect":"NoSchedule","key":"node-role.kubernetes.io/infra"}]'
+          - complianceType: musthave
+            objectDefinition:
+              apiVersion: operators.coreos.com/v1alpha1
+              kind: Subscription
+              metadata:
+                name: servicemeshoperator
+                namespace: openshift-operators
+                labels:
+                  policies.install: ""
+              spec:
+                name: servicemeshoperator
+                source: cs-redhat-operator-index
+                sourceNamespace: openshift-marketplace
+                config:
+                  nodeSelector:
+                    node-role.kubernetes.io/infra: ""
+                  tolerations:
+                  - effect: NoSchedule
+                    operator: Exists
+                    key: node-role.kubernetes.io/infra
+          - complianceType: musthave
+            objectDefinition:
+              apiVersion: operators.coreos.com/v1alpha1
+              kind: Subscription
+              metadata:
+                name: kiali-ossm
+                namespace: openshift-operators
+                labels:
+                  policies.install: ""
+                  policies.stable: ""
+              spec:
+                channel: stable
+                name: kiali-ossm
+                source: cs-redhat-operator-index
+                sourceNamespace: openshift-marketplace
+                config:
+                  nodeSelector:
+                    node-role.kubernetes.io/infra: ""
+                  tolerations:
+                  - effect: NoSchedule
+                    operator: Exists
+                    key: node-role.kubernetes.io/infra
+          - complianceType: musthave
+            objectDefinition:
+              apiVersion: v1
+              kind: Namespace
+              metadata:
+                name: openshift-distributed-tracing
+                annotations:
+                  scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator":"Exists","effect":"NoSchedule","key":"node-role.kubernetes.io/infra"}]'
+          - complianceType: musthave
+            objectDefinition:
+              apiVersion: operators.coreos.com/v1
+              kind: OperatorGroup
+              metadata:
+                name: openshift-distributed-tracing
+                namespace: openshift-distributed-tracing
+                labels:
+                  policies.install: ""
+          - complianceType: musthave
+            objectDefinition:
+              apiVersion: operators.coreos.com/v1alpha1
+              kind: Subscription
+              metadata:
+                name: jaeger-product
+                namespace: openshift-distributed-tracing
+                labels:
+                  policies.install: ""
+              spec:
+                name: jaeger-product
+                source: cs-redhat-operator-index
+                sourceNamespace: openshift-marketplace
+                config:
+                  nodeSelector:
+                    node-role.kubernetes.io/infra: ""
+                  tolerations:
+                  - effect: NoSchedule
+                    operator: Exists
+                    key: node-role.kubernetes.io/infra
+          - complianceType: musthave
+            objectDefinition:
+              apiVersion: v1
+              kind: Namespace
+              metadata:
+                name: openshift-tempo-operator
+                annotations:
+                  scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator":"Exists","effect":"NoSchedule","key":"node-role.kubernetes.io/infra"}]'
+          - complianceType: musthave
+            objectDefinition:
+              apiVersion: operators.coreos.com/v1
+              kind: OperatorGroup
+              metadata:
+                name: openshift-tempo-operator
+                namespace: openshift-tempo-operator
+                labels:
+                  policies.install: ""
+          - complianceType: musthave
+            objectDefinition:
+              apiVersion: operators.coreos.com/v1alpha1
+              kind: Subscription
+              metadata:
+                name: tempo-product
+                namespace: openshift-tempo-operator
+                labels:
+                  policies.install: ""
+              spec:
+                name: tempo-product
+                source: cs-redhat-operator-index
+                sourceNamespace: openshift-marketplace
+                config:
+                  nodeSelector:
+                    node-role.kubernetes.io/infra: ""
+                  tolerations:
+                  - effect: NoSchedule
+                    operator: Exists
+                    key: node-role.kubernetes.io/infra
+          - complianceType: musthave
+            objectDefinition:
+              apiVersion: v1
+              kind: Namespace
+              metadata:
+                name: openshift-netobserv-operator
+                annotations:
+                  scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator":"Exists","effect":"NoSchedule","key":"node-role.kubernetes.io/infra"}]'
+          - complianceType: musthave
+            objectDefinition:
+              apiVersion: operators.coreos.com/v1
+              kind: OperatorGroup
+              metadata:
+                name: openshift-netobserv-operator
+                namespace: openshift-netobserv-operator
+                labels:
+                  policies.install: ""
+          - complianceType: musthave
+            objectDefinition:
+              apiVersion: operators.coreos.com/v1alpha1
+              kind: Subscription
+              metadata:
+                name: netobserv-operator
+                namespace: openshift-netobserv-operator
+                labels:
+                  policies.install: ""
+              spec:
+                name: netobserv-operator
                 source: cs-redhat-operator-index
                 sourceNamespace: openshift-marketplace
                 config:
@@ -1227,6 +1708,22 @@ spec:
             kind: Namespace
             metadata:
               annotations:
+                openshift.io/node-selector: node-role.kubernetes.io/master=
+              name: openshift-kube-storage-version-migrator
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: v1
+            kind: Namespace
+            metadata:
+              annotations:
+                openshift.io/node-selector: node-role.kubernetes.io/infra=
+              name: openshift-network-console
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: v1
+            kind: Namespace
+            metadata:
+              annotations:
                 scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator":"Exists","effect":"NoSchedule","key":"node-role.kubernetes.io/infra"}]'
               name: openshift-logging
         - complianceType: musthave
@@ -1234,6 +1731,8 @@ spec:
             apiVersion: operators.coreos.com/v1
             kind: OperatorGroup
             metadata:
+              labels:
+                policies.install: ""
               name: openshift-logging
               namespace: openshift-logging
             spec:
@@ -1272,6 +1771,8 @@ spec:
             apiVersion: operators.coreos.com/v1
             kind: OperatorGroup
             metadata:
+              labels:
+                policies.install: ""
               name: openshift-workload-availability
               namespace: openshift-workload-availability
         - complianceType: musthave
@@ -1314,6 +1815,26 @@ spec:
               name: self-node-remediation
               source: cs-redhat-operator-index
               sourceNamespace: openshift-marketplace
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: operators.coreos.com/v1alpha1
+            kind: Subscription
+            metadata:
+              labels:
+                policies.install: ""
+              name: node-maintenance-operator
+              namespace: openshift-workload-availability
+            spec:
+              config:
+                nodeSelector:
+                  node-role.kubernetes.io/infra: ""
+                tolerations:
+                - effect: NoSchedule
+                  key: node-role.kubernetes.io/infra
+                  operator: Exists
+              name: node-maintenance-operator
+              source: cs-redhat-operator-index
+              sourceNamespace: openshift-marketplace
         remediationAction: enforce
         severity: medium
   remediationAction: enforce
@@ -1332,12 +1853,6 @@ metadata:
   name: install-operators-hub
   namespace: policies
 spec:
-  dependencies:
-  - apiVersion: policy.open-cluster-management.io/v1
-    compliance: Compliant
-    kind: Policy
-    name: check-cv
-    namespace: policies
   disabled: false
   policy-templates:
   - objectDefinition:
@@ -1358,6 +1873,8 @@ spec:
             apiVersion: operators.coreos.com/v1
             kind: OperatorGroup
             metadata:
+              labels:
+                policies.install: ""
               name: open-cluster-management
               namespace: open-cluster-management
             spec:
@@ -1394,6 +1911,8 @@ spec:
             apiVersion: operators.coreos.com/v1
             kind: OperatorGroup
             metadata:
+              labels:
+                policies.install: ""
               name: default
               namespace: multicluster-engine
             spec:
@@ -1404,8 +1923,6 @@ spec:
             apiVersion: operators.coreos.com/v1alpha1
             kind: Subscription
             metadata:
-              labels:
-                policies.install: ""
               name: multicluster-engine
               namespace: multicluster-engine
             spec:
@@ -1435,6 +1952,8 @@ spec:
             apiVersion: operators.coreos.com/v1
             kind: OperatorGroup
             metadata:
+              labels:
+                policies.install: ""
               name: openshift-update-service
               namespace: openshift-update-service
             spec:
@@ -1484,46 +2003,15 @@ spec:
       apiVersion: policy.open-cluster-management.io/v1
       kind: ConfigurationPolicy
       metadata:
-        name: node-infra-label-remove
+        name: node-infra-label-add
       spec:
         evaluationInterval:
           compliant: 1m
           noncompliant: 1m
         object-templates-raw: |
-          {{- range $no := (lookup "v1" "Node" "" "" "!node-role.kubernetes.io/master").items }}
-          {{- if (regexMatch "infra" $no.metadata.name) }}
+          {{- range $no := (lookup "v1" "Node" "" "" "!node-role.kubernetes.io/master,!node-role.kubernetes.io/infra,node-role.kubernetes.io/worker").items }}
+          {{- if (regexMatch "^[a-z]*inf" $no.metadata.name) }}
           {{- if not (hasKey $no.metadata.annotations "policies.done") }}
-          {{- if (hasKey $no.metadata.labels "node-role.kubernetes.io/worker") }}
-          - complianceType: musthave
-            objectDefinition:
-              apiVersion: v1
-              kind: Node
-              metadata:
-                name: {{ $no.metadata.name }}
-                labels:
-                  node-role.kubernetes.io/infra: ""
-                  node-role.kubernetes.io/worker:
-              spec:
-                taints:
-                - effect: NoSchedule
-                  key: node-role.kubernetes.io/infra
-          {{- end }}
-          {{- end }}
-          {{- end }}
-          {{- end }}
-        remediationAction: enforce
-        severity: high
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1
-      kind: ConfigurationPolicy
-      metadata:
-        name: node-infra-label-add
-      spec:
-        object-templates-raw: |
-          {{- range $no := (lookup "v1" "Node" "" "" "!node-role.kubernetes.io/master").items }}
-          {{- if (regexMatch "infra" $no.metadata.name) }}
-          {{- if not (hasKey $no.metadata.annotations "policies.done") }}
-          {{- if and (not (hasKey $no.metadata.labels "node-role.kubernetes.io/worker")) (not (hasKey $no.metadata.labels "kubernetes.io/hostname")) }}
           - complianceType: musthave
             objectDefinition:
               apiVersion: v1
@@ -1533,10 +2021,11 @@ spec:
                 annotations:
                   policies.done: {{ now }}
                 labels:
-                  kubernetes.io/hostname: {{ $no.metadata.name }}
                   node-role.kubernetes.io/infra: ""
-                  node.openshift.io/os_id: rhcos
-          {{- end }}
+              spec:
+                taints:
+                - effect: NoSchedule
+                  key: node-role.kubernetes.io/infra
           {{- end }}
           {{- end }}
           {{- end }}
@@ -1568,6 +2057,7 @@ spec:
       spec:
         evaluationInterval:
           compliant: never
+          noncompliant: 1m
         object-templates:
         - complianceType: musthave
           objectDefinition:
@@ -1637,6 +2127,7 @@ spec:
       spec:
         evaluationInterval:
           compliant: never
+          noncompliant: 1m
         object-templates:
         - complianceType: musthave
           objectDefinition:
@@ -1704,9 +2195,16 @@ metadata:
     policy.open-cluster-management.io/standards: NIST SP 800-53
   labels:
     open-cluster-management.io/policy-set: opp
+    policies.cv: ""
   name: proxy-sync-hub
   namespace: policies
 spec:
+  dependencies:
+  - apiVersion: policy.open-cluster-management.io/v1
+    compliance: Compliant
+    kind: Policy
+    name: check-cv
+    namespace: policies
   disabled: false
   policy-templates:
   - objectDefinition:
@@ -1716,9 +2214,9 @@ spec:
         name: proxy-sync-hub-cm
       spec:
         object-templates-raw: |
-          {{- if ne "custom-ca" (lookup "config.openshift.io/v1" "Proxy" "" "cluster").spec.trustedCA.name }}
-          {{ $mt := "# hub openshift-ingress-operator router-ca tls.crt" }}
-          {{ $rc := (fromSecret "openshift-ingress-operator" "router-ca" "tls.crt") | base64dec }}
+          {{- if not (contains "custom-ca" (lookup "config.openshift.io/v1" "Proxy" "" "cluster").spec.trustedCA.name) }}
+          {{- $mt := "# hub openshift-ingress-operator router-ca tls.crt" }}
+          {{- $rc := (fromSecret "openshift-ingress-operator" "router-ca" "tls.crt") | base64dec }}
           {{- if eq (lookup "v1" "ConfigMap" "openshift-config" "router-bundle").kind "ConfigMap" }}{{ $ca := fromConfigMap "openshift-config" "router-bundle" "ca-bundle.crt" }}
           {{- if not (contains $rc $ca) }}
           {{- if contains $mt $ca }}
@@ -1776,7 +2274,7 @@ spec:
               apiVersion: v1
               data:
                 ca-bundle.crt: |
-                  {{ ( fromConfigMap "openshift-config" "custom-ca" "ca-bundle.crt" ) | autoindent }}
+                  {{ ( fromConfigMap "openshift-config" (lookup "config.openshift.io/v1" "Proxy" "" "cluster").spec.trustedCA.name "ca-bundle.crt" ) | autoindent }}
               kind: ConfigMap
               metadata:
                 name: hub-ca
@@ -1797,9 +2295,16 @@ metadata:
     policy.open-cluster-management.io/standards: NIST SP 800-53
   labels:
     open-cluster-management.io/policy-set: opp
+    policies.cv: ""
   name: proxy-sync-managed
   namespace: policies
 spec:
+  dependencies:
+  - apiVersion: policy.open-cluster-management.io/v1
+    compliance: Compliant
+    kind: Policy
+    name: check-cv
+    namespace: policies
   disabled: false
   policy-templates:
   - objectDefinition:
@@ -1808,10 +2313,13 @@ spec:
       metadata:
         name: proxy-sync-managed
       spec:
+        evaluationInterval:
+          compliant: 30m
+          noncompliant: 10m
         object-templates-raw: |
-          {{hub if eq "ConfigMap" (lookup "v1" "ConfigMap" "policies" "hub-ca").kind hub}}
-          {{ $mt := "# custom-ca copied from hub-ca" }}
-          {{ $rc := base64dec "{{hub fromConfigMap "policies" "hub-ca" "ca-bundle.crt" | base64enc hub}}" }}
+          {{hub- if eq "ConfigMap" (lookup "v1" "ConfigMap" "policies" "hub-ca").kind hub}}
+          {{- $mt := "# custom-ca copied from hub-ca" }}
+          {{- $rc := base64dec "{{hub fromConfigMap "policies" "hub-ca" "ca-bundle.crt" | base64enc hub}}" }}
           {{- if eq (lookup "v1" "ConfigMap" "openshift-config" "custom-ca").kind "ConfigMap" }}{{ $ca := fromConfigMap "openshift-config" "custom-ca" "ca-bundle.crt" }}
           {{- if not (contains $rc $ca) }}
           {{- if contains $mt $ca }}
@@ -1853,7 +2361,7 @@ spec:
               spec:
                 trustedCA:
                   name: custom-ca
-          {{hub end hub}}
+          {{hub- end hub}}
         remediationAction: enforce
         severity: high
   remediationAction: enforce
@@ -1869,6 +2377,51 @@ metadata:
     policy.open-cluster-management.io/standards: NIST SP 800-53
   labels:
     open-cluster-management.io/policy-set: opp
+    policies.cv: ""
+  name: upgrade-admin-acks
+  namespace: policies
+spec:
+  disabled: false
+  policy-templates:
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: upgrade-admin-acks
+      spec:
+        evaluationInterval:
+          compliant: 2m
+          noncompliant: 1m
+        object-templates-raw: |
+          {{hub- if and (ne "" (index .ManagedClusterLabels "policies.osus")) (ne "" (index .ManagedClusterLabels "openshiftVersion-major-minor")) hub}}
+          {{- $ov := semver (fromClusterClaim "version.openshift.io") }}
+          {{- $kv := semver (fromClusterClaim "kubeversion.open-cluster-management.io") }}
+          - complianceType: musthave
+            objectDefinition:
+              apiVersion: v1
+              kind: ConfigMap
+              metadata:
+                name: admin-acks
+                namespace: openshift-config
+              data:
+                ack-{{ $ov.Major }}.{{ $ov.Minor }}-kube-{{ $kv.Major }}.{{ add 1 $kv.Minor }}-api-removals-in-{{ $ov.Major }}.{{ add 1 $ov.Minor }}: "true"
+          {{hub- end hub}}
+        remediationAction: enforce
+        severity: high
+  remediationAction: enforce
+---
+apiVersion: policy.open-cluster-management.io/v1
+kind: Policy
+metadata:
+  annotations:
+    argocd.argoproj.io/compare-options: IgnoreExtraneous
+    policy.open-cluster-management.io/categories: CM Configuration Management
+    policy.open-cluster-management.io/controls: CM-2 Baseline Configuration
+    policy.open-cluster-management.io/description: ""
+    policy.open-cluster-management.io/standards: NIST SP 800-53
+  labels:
+    open-cluster-management.io/policy-set: opp
+    policies.csv: ""
   name: upgrade-cs-redhat-operator
   namespace: policies
 spec:
@@ -1896,7 +2449,7 @@ spec:
                 name: {{ $cs.metadata.name }}
                 namespace: {{ $cs.metadata.namespace }}
               spec:
-                image: {{ ( (cat (split ":v4." $cs.spec.image)._0 ":v4." (split "." (lookup "config.openshift.io/v1" "ClusterVersion" "" "version").status.desired.version)._1) | replace " " "" ) }}
+                image: {{ cat (split ":v" $cs.spec.image)._0 ":v" "{{hub index .ManagedClusterLabels "openshiftVersion-major-minor" hub}}" | replace " " "" }}
                 sourceType: grpc
         remediationAction: enforce
         severity: high
@@ -1913,9 +2466,16 @@ metadata:
     policy.open-cluster-management.io/standards: NIST SP 800-53
   labels:
     open-cluster-management.io/policy-set: opp
+    policies.csv: ""
   name: upgrade-marketplace-job
   namespace: policies
 spec:
+  dependencies:
+  - apiVersion: policy.open-cluster-management.io/v1
+    compliance: Compliant
+    kind: Policy
+    name: check-cv
+    namespace: policies
   disabled: false
   policy-templates:
   - objectDefinition:
@@ -1925,7 +2485,7 @@ spec:
         name: upgrade-marketplace-job
       spec:
         evaluationInterval:
-          compliant: 10m
+          compliant: 20m
           noncompliant: 10m
         object-templates-raw: |
           {{ range $mj := (lookup "batch/v1" "Job" "openshift-marketplace" "" "olm.managed").items }}
@@ -1934,6 +2494,13 @@ spec:
             objectDefinition:
               apiVersion: batch/v1
               kind: Job
+              metadata:
+                name: {{ $mj.metadata.name }}
+                namespace: openshift-marketplace
+          - complianceType: mustnothave
+            objectDefinition:
+              apiVersion: v1
+              kind: ConfigMap
               metadata:
                 name: {{ $mj.metadata.name }}
                 namespace: openshift-marketplace
@@ -1954,9 +2521,16 @@ metadata:
     policy.open-cluster-management.io/standards: NIST SP 800-53
   labels:
     open-cluster-management.io/policy-set: opp
+    policies.cv: ""
   name: upgrade-release-channel
   namespace: policies
 spec:
+  dependencies:
+  - apiVersion: policy.open-cluster-management.io/v1
+    compliance: Compliant
+    kind: Policy
+    name: check-cv
+    namespace: policies
   disabled: false
   policy-templates:
   - objectDefinition:
@@ -1965,6 +2539,9 @@ spec:
       metadata:
         name: upgrade-release-channel
       spec:
+        evaluationInterval:
+          compliant: 30m
+          noncompliant: 2m
         object-templates-raw: |
           {{hub if ne "" (index .ManagedClusterLabels "policies.release-channel") hub}}
           - complianceType: musthave
@@ -1991,6 +2568,7 @@ metadata:
     policy.open-cluster-management.io/standards: NIST SP 800-53
   labels:
     open-cluster-management.io/policy-set: opp
+    policies.cv: ""
   name: upgrade-signatures
   namespace: policies
 spec:
@@ -2002,6 +2580,9 @@ spec:
       metadata:
         name: upgrade-signatures-create
       spec:
+        evaluationInterval:
+          compliant: 2m
+          noncompliant: 1m
         object-templates-raw: |
           {{hub if ne "" (index .ManagedClusterLabels "policies.osus") hub}}
           {{hub range $hcm := (lookup "v1" "ConfigMap" "policies" "" "release.openshift.io/verification-signatures").items hub}}
@@ -2035,7 +2616,7 @@ spec:
           {{- if ne $cm.metadata.name "signatures-managed" }}
           {{- $not_exist := true }}
           {{hub range $hcm := (lookup "v1" "ConfigMap" "policies" "" "release.openshift.io/verification-signatures").items hub}}
-          {{- if eq $cm.metadata.name "{{hub $hcm.metadata.name hub}}" }} {{ $not_exist := false }} {{ continue }} {{ end }}
+          {{- if eq $cm.metadata.name "{{hub $hcm.metadata.name hub}}" }} {{ $not_exist = false }} {{ continue }} {{ end }}
           {{hub end hub}}
           {{- if $not_exist }}
           - complianceType: mustnothave
@@ -2065,9 +2646,17 @@ metadata:
     policy.open-cluster-management.io/standards: NIST SP 800-53
   labels:
     open-cluster-management.io/policy-set: opp
+    policies.csv: ""
+    policies.cv: ""
   name: upgrade-sub-automatic
   namespace: policies
 spec:
+  dependencies:
+  - apiVersion: policy.open-cluster-management.io/v1
+    compliance: Compliant
+    kind: Policy
+    name: check-cv
+    namespace: policies
   disabled: false
   policy-templates:
   - objectDefinition:
@@ -2097,10 +2686,10 @@ spec:
         name: upgrade-sub-reset
       spec:
         evaluationInterval:
-          compliant: 5m
-          noncompliant: 5m
+          compliant: 10m
+          noncompliant: 1m
         object-templates-raw: |
-          {{- range $sub := (lookup "operators.coreos.com/v1alpha1" "Subscription" "" "" "!policies.ignore,policies.install").items }}
+          {{- range $sub := (lookup "operators.coreos.com/v1alpha1" "Subscription" "" "" "!policies.stable,!policies.ignore,policies.install").items }}
           - complianceType: musthave
             objectDefinition:
               apiVersion: operators.coreos.com/v1alpha1
@@ -2117,21 +2706,84 @@ spec:
       apiVersion: policy.open-cluster-management.io/v1
       kind: ConfigurationPolicy
       metadata:
-        name: upgrade-sub-approval
+        name: upgrade-sub-remove-manual-ip
       spec:
         object-templates-raw: |
           {{- range $sb := (lookup "operators.coreos.com/v1alpha1" "Subscription" "" "" "!policies.ignore,policies.install").items }}
           {{- range $ip := (lookup "operators.coreos.com/v1alpha1" "InstallPlan" $sb.metadata.namespace "").items }}
-          {{- if contains $sb.spec.name (index $ip.spec.clusterServiceVersionNames 0) }}
-          - complianceType: musthave
+          {{- if contains (splitn "." 2 $sb.status.currentCSV)._0 (index $ip.spec.clusterServiceVersionNames 0) }}
+          {{- if and (eq "Manual" $ip.spec.approval) (eq false $ip.spec.approved) }}
+          - complianceType: mustnothave
             objectDefinition:
               apiVersion: operators.coreos.com/v1alpha1
               kind: InstallPlan
               metadata:
                 name: {{ $ip.metadata.name }}
                 namespace: {{ $ip.metadata.namespace }}
-              spec:
-                approved: true
+          {{- end }}
+          {{- end }}
+          {{- end }}
+          {{- end }}
+        remediationAction: enforce
+        severity: high
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: upgrade-sub-remove-unpack
+      spec:
+        evaluationInterval:
+          compliant: 10m
+          noncompliant: 2m
+        object-templates-raw: |
+          {{- range $sb := (lookup "operators.coreos.com/v1alpha1" "Subscription" "" "" "!policies.ignore,policies.install").items }}
+          {{- range $cd := (lookup "operators.coreos.com/v1alpha1" "Subscription" $sb.metadata.namespace $sb.metadata.name).status.conditions }}
+          {{- if and (eq "BundleUnpackFailed" $cd.type) (eq "True" $cd.status) }}
+          - complianceType: mustnothave
+            objectDefinition:
+              apiVersion: operators.coreos.com/v1alpha1
+              kind: Subscription
+              metadata:
+                name: {{ $sb.metadata.name }}
+                namespace: {{ $sb.metadata.namespace }}
+          {{- end }}
+          {{- end }}
+          {{- end }}
+        remediationAction: enforce
+        severity: high
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: upgrade-sub-remove-failed
+      spec:
+        evaluationInterval:
+          compliant: 10m
+          noncompliant: 5m
+        object-templates-raw: |
+          {{- range $sb := (lookup "operators.coreos.com/v1alpha1" "Subscription" "" "" "!policies.ignore,policies.install").items }}
+          {{- range $cd := (lookup "operators.coreos.com/v1alpha1" "Subscription" $sb.metadata.namespace $sb.metadata.name).status.conditions }}
+          {{- if and (or (eq "ResolutionFailed" $cd.type) (eq "InstallPlanFailed" $cd.type)) (eq "True" $cd.status) }}
+          - complianceType: mustnothave
+            objectDefinition:
+              apiVersion: operators.coreos.com/v1alpha1
+              kind: Subscription
+              metadata:
+                name: {{ $sb.metadata.name }}
+                namespace: {{ $sb.metadata.namespace }}
+          {{- range $csv := (lookup "operators.coreos.com/v1alpha1" "ClusterServiceVersion" $sb.metadata.namespace "" "!olm.copiedFrom").items }}
+          {{- range $pr := (index $csv.metadata.annotations "operatorframework.io/properties" | fromJson).properties }}
+          {{- if and (eq "olm.package" $pr.type) (eq $sb.spec.name $pr.value.packageName) }}
+          - complianceType: mustnothave
+            objectDefinition:
+              apiVersion: operators.coreos.com/v1alpha1
+              kind: ClusterServiceVersion
+              metadata:
+                name: {{ $csv.metadata.name }}
+                namespace: {{ $csv.metadata.namespace }}
+          {{- end }}
+          {{- end }}
+          {{- end }}
           {{- end }}
           {{- end }}
           {{- end }}
@@ -2150,6 +2802,60 @@ metadata:
     policy.open-cluster-management.io/standards: NIST SP 800-53
   labels:
     open-cluster-management.io/policy-set: opp
+  name: upgrade-sub-init
+  namespace: policies
+spec:
+  dependencies:
+  - apiVersion: policy.open-cluster-management.io/v1
+    compliance: Compliant
+    kind: Policy
+    name: check-upgradeable
+    namespace: policies
+  - apiVersion: policy.open-cluster-management.io/v1
+    compliance: Compliant
+    kind: Policy
+    name: config-operators
+    namespace: policies
+  disabled: false
+  policy-templates:
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: upgrade-sub-init
+      spec:
+        evaluationInterval:
+          compliant: 60m
+          noncompliant: 2m
+        object-templates-raw: |
+          {{- range $sub := (lookup "operators.coreos.com/v1alpha1" "Subscription" "" "" "!policies.ignore,policies.install").items }}
+          - complianceType: musthave
+            objectDefinition:
+              apiVersion: operators.coreos.com/v1alpha1
+              kind: Subscription
+              metadata:
+                name: {{ $sub.metadata.name }}
+                namespace: {{ $sub.metadata.namespace }}
+              spec:
+                installPlanApproval: Manual
+          {{- end }}
+        remediationAction: enforce
+        severity: high
+  remediationAction: enforce
+---
+apiVersion: policy.open-cluster-management.io/v1
+kind: Policy
+metadata:
+  annotations:
+    argocd.argoproj.io/compare-options: IgnoreExtraneous
+    policy.open-cluster-management.io/categories: CM Configuration Management
+    policy.open-cluster-management.io/controls: CM-2 Baseline Configuration
+    policy.open-cluster-management.io/description: ""
+    policy.open-cluster-management.io/standards: NIST SP 800-53
+  labels:
+    open-cluster-management.io/policy-set: opp
+    policies.csv: ""
+    policies.cv: ""
   name: upgrade-sub-manual
   namespace: policies
 spec:
@@ -2188,9 +2894,21 @@ metadata:
     policy.open-cluster-management.io/standards: NIST SP 800-53
   labels:
     open-cluster-management.io/policy-set: opp
+    policies.cv: ""
   name: upgrade-upstream
   namespace: policies
 spec:
+  dependencies:
+  - apiVersion: policy.open-cluster-management.io/v1
+    compliance: Compliant
+    kind: Policy
+    name: check-cv
+    namespace: policies
+  - apiVersion: policy.open-cluster-management.io/v1
+    compliance: Compliant
+    kind: Policy
+    name: install-operators
+    namespace: policies
   disabled: false
   policy-templates:
   - objectDefinition:
@@ -2199,10 +2917,13 @@ spec:
       metadata:
         name: upgrade-upstream
       spec:
+        evaluationInterval:
+          compliant: 30m
+          noncompliant: 2m
         object-templates-raw: |
-          {{hub $rp := index .ManagedClusterLabels "policies.osus" hub}}
-          {{hub if ne "" $rp hub}}
-          {{hub $gr := fromConfigMap "policies" (cat "upgrade-osus-" $rp | replace " " "") "graphUrl" hub}}
+          {{hub- $rp := index .ManagedClusterLabels "policies.osus" hub}}
+          {{hub- if ne "" $rp hub}}
+          {{hub- $gr := fromConfigMap "policies" (cat "upgrade-osus-" $rp | replace " " "") "graphUrl" hub}}
           - complianceType: musthave
             objectDefinition:
               apiVersion: config.openshift.io/v1
@@ -2211,11 +2932,7 @@ spec:
                 name: version
               spec:
                 upstream: {{hub $gr hub}}
-              status:
-                conditions:
-                - status: 'True'
-                  type: RetrievedUpdates
-          {{hub end hub}}
+          {{hub- end hub}}
         remediationAction: enforce
         severity: high
   remediationAction: enforce
@@ -2234,17 +2951,10 @@ spec:
   policies:
   - check-csv
   - check-cv
-  - config-operators
   - config-operators-hub
   - install-operators
   - install-operators-hub
-  - node-infra-label
-  - node-infra-mcp
-  - node-infra-toleration
   - proxy-sync-hub
-  - upgrade-release-channel
-  - upgrade-signatures
-  - upgrade-upstream
 ---
 apiVersion: policy.open-cluster-management.io/v1beta1
 kind: PolicySet
@@ -2260,13 +2970,24 @@ spec:
   policies:
   - check-csv
   - check-cv
-  - config-operators
   - config-operators-managed
   - install-operators
-  - node-infra-label
-  - node-infra-mcp
-  - node-infra-toleration
   - proxy-sync-managed
+---
+apiVersion: policy.open-cluster-management.io/v1beta1
+kind: PolicySet
+metadata:
+  annotations:
+    argocd.argoproj.io/compare-options: IgnoreExtraneous
+  labels:
+    open-cluster-management.io/policy-set: opp
+  name: osus
+  namespace: policies
+spec:
+  description: ""
+  policies:
+  - check-upgradeable
+  - upgrade-admin-acks
   - upgrade-release-channel
   - upgrade-signatures
   - upgrade-upstream
@@ -2286,6 +3007,24 @@ spec:
   - upgrade-cs-redhat-operator
   - upgrade-marketplace-job
   - upgrade-sub-automatic
+---
+apiVersion: policy.open-cluster-management.io/v1beta1
+kind: PolicySet
+metadata:
+  annotations:
+    argocd.argoproj.io/compare-options: IgnoreExtraneous
+  labels:
+    open-cluster-management.io/policy-set: opp
+  name: sub-init
+  namespace: policies
+spec:
+  description: ""
+  policies:
+  - config-operators
+  - node-infra-label
+  - node-infra-mcp
+  - node-infra-toleration
+  - upgrade-sub-init
 ---
 apiVersion: policy.open-cluster-management.io/v1beta1
 kind: PolicySet

@@ -1465,46 +1465,6 @@ spec:
               apiVersion: v1
               kind: Namespace
               metadata:
-                name: openshift-storage
-                annotations:
-                  scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator":"Exists","effect":"NoSchedule","key":"node-role.kubernetes.io/infra"}]'
-          - complianceType: musthave
-            objectDefinition:
-              apiVersion: operators.coreos.com/v1
-              kind: OperatorGroup
-              metadata:
-                name: openshift-storage
-                namespace: openshift-storage
-                labels:
-                  policies.install: ""
-              spec:
-                targetNamespaces:
-                - openshift-storage
-          - complianceType: musthave
-            objectDefinition:
-              apiVersion: operators.coreos.com/v1alpha1
-              kind: Subscription
-              metadata:
-                name: lvms-operator
-                namespace: openshift-storage
-                labels:
-                  policies.install: ""
-              spec:
-                name: lvms-operator
-                source: cs-redhat-operator-index
-                sourceNamespace: openshift-marketplace
-                config:
-                  nodeSelector:
-                    node-role.kubernetes.io/infra: ""
-                  tolerations:
-                  - effect: NoSchedule
-                    operator: Exists
-                    key: node-role.kubernetes.io/infra
-          - complianceType: musthave
-            objectDefinition:
-              apiVersion: v1
-              kind: Namespace
-              metadata:
                 name: openshift-gitops-operator
                 annotations:
                   scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator":"Exists","effect":"NoSchedule","key":"node-role.kubernetes.io/infra"}]'
@@ -1537,46 +1497,6 @@ spec:
                   policies.install: ""
               spec:
                 name: openshift-gitops-operator
-                source: cs-redhat-operator-index
-                sourceNamespace: openshift-marketplace
-                config:
-                  nodeSelector:
-                    node-role.kubernetes.io/infra: ""
-                  tolerations:
-                  - effect: NoSchedule
-                    operator: Exists
-                    key: node-role.kubernetes.io/infra
-          - complianceType: musthave
-            objectDefinition:
-              apiVersion: v1
-              kind: Namespace
-              metadata:
-                name: openshift-local-storage
-                annotations:
-                  scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator":"Exists","effect":"NoSchedule","key":"node-role.kubernetes.io/infra"}]'
-          - complianceType: musthave
-            objectDefinition:
-              apiVersion: operators.coreos.com/v1
-              kind: OperatorGroup
-              metadata:
-                name: openshift-local-storage
-                namespace: openshift-local-storage
-                labels:
-                  policies.install: ""
-              spec:
-                targetNamespaces:
-                - openshift-local-storage
-          - complianceType: musthave
-            objectDefinition:
-              apiVersion: operators.coreos.com/v1alpha1
-              kind: Subscription
-              metadata:
-                name: local-storage-operator
-                namespace: openshift-local-storage
-                labels:
-                  policies.install: ""
-              spec:
-                name: local-storage-operator
                 source: cs-redhat-operator-index
                 sourceNamespace: openshift-marketplace
                 config:
@@ -1815,83 +1735,6 @@ spec:
                   policies.install: ""
               spec:
                 name: netobserv-operator
-                source: cs-redhat-operator-index
-                sourceNamespace: openshift-marketplace
-                config:
-                  nodeSelector:
-                    node-role.kubernetes.io/infra: ""
-                  tolerations:
-                  - effect: NoSchedule
-                    operator: Exists
-                    key: node-role.kubernetes.io/infra
-          - complianceType: musthave
-            objectDefinition:
-              apiVersion: v1
-              kind: Namespace
-              metadata:
-                name: openshift-keda
-                annotations:
-                  scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator":"Exists","effect":"NoSchedule","key":"node-role.kubernetes.io/infra"}]'
-          - complianceType: musthave
-            objectDefinition:
-              apiVersion: operators.coreos.com/v1
-              kind: OperatorGroup
-              metadata:
-                name: openshift-keda
-                namespace: openshift-keda
-                labels:
-                  policies.install: ""
-          - complianceType: musthave
-            objectDefinition:
-              apiVersion: operators.coreos.com/v1alpha1
-              kind: Subscription
-              metadata:
-                name: openshift-custom-metrics-autoscaler-operator
-                namespace: openshift-keda
-                labels:
-                  policies.install: ""
-              spec:
-                name: openshift-custom-metrics-autoscaler-operator
-                source: cs-redhat-operator-index
-                sourceNamespace: openshift-marketplace
-                config:
-                  nodeSelector:
-                    node-role.kubernetes.io/infra: ""
-                  tolerations:
-                  - effect: NoSchedule
-                    operator: Exists
-                    key: node-role.kubernetes.io/infra
-          - complianceType: musthave
-            objectDefinition:
-              apiVersion: v1
-              kind: Namespace
-              metadata:
-                name: openshift-vertical-pod-autoscaler
-                annotations:
-                  scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator":"Exists","effect":"NoSchedule","key":"node-role.kubernetes.io/infra"}]'
-          - complianceType: musthave
-            objectDefinition:
-              apiVersion: operators.coreos.com/v1
-              kind: OperatorGroup
-              metadata:
-                name: openshift-vertical-pod-autoscaler
-                namespace: openshift-vertical-pod-autoscaler
-                labels:
-                  policies.install: ""
-              spec:
-                targetNamespaces:
-                - openshift-vertical-pod-autoscaler
-          - complianceType: musthave
-            objectDefinition:
-              apiVersion: operators.coreos.com/v1alpha1
-              kind: Subscription
-              metadata:
-                name: vertical-pod-autoscaler
-                namespace: openshift-vertical-pod-autoscaler
-                labels:
-                  policies.install: ""
-              spec:
-                name: vertical-pod-autoscaler
                 source: cs-redhat-operator-index
                 sourceNamespace: openshift-marketplace
                 config:
