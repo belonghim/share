@@ -36,6 +36,14 @@ spec:
   remediationAction: enforce
   severity: low
 ---
+apiVersion: operators.coreos.com/v1
+kind: OLMConfig
+metadata:
+  name: cluster
+spec:
+  features:
+    disableCopiedCSVs: true
+---
 apiVersion: remediation.medik8s.io/v1alpha1
 kind: NodeHealthCheck
 metadata:
