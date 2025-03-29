@@ -1293,6 +1293,19 @@ spec:
           compliant: 10m
           noncompliant: 10m
         object-templates-raw: |
+          - complianceType: musthave
+            objectDefinition:
+              apiVersion: multicluster.openshift.io/v1
+              kind: MultiClusterEngine
+              metadata:
+                name: multiclusterengine
+              spec:
+                overrides:
+                  components:
+                  - name: hypershift-local-hosting
+                    enabled: false
+                  - name: hypershift
+                    enabled: false
           {{- range $mca := (lookup "addon.open-cluster-management.io/v1alpha1" "ManagedClusterAddOn" "" "").items }}
           {{- if ne "local-cluster" $mca.metadata.namespace }}
           - complianceType: musthave
