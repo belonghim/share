@@ -308,7 +308,11 @@ spec:
   severity: high
   object-templates-raw: |
     {{- if not (hasKey (lookup "operators.coreos.com/v1alpha1" "Subscription" "openshift-logging" "cluster-logging").metadata.labels "policies.ignore") }}
-    {{hub- if and (lookup "v1" "ConfigMap" "policies" "config-operators").data.eventBrokers (ne "" (index .ManagedClusterLabels "policies.event-topic")) hub}}
+    {{hub- if and (lookup "v1" "ConfigMap" "policies" "config-operators").data.eventBrokers (lookup "v1" "ConfigMap" "policies" "config-operators").data.infraBrokers hub}}
+    {{hub- $su := index .ManagedClusterLabels "policies.syslog-url" hub}}
+    {{hub- $et := index .ManagedClusterLabels "policies.event-topic" hub}}
+    {{hub- $it := index .ManagedClusterLabels "policies.infra-topic" hub}}
+    {{hub- if ne "" (cat $su $et $it | replace " " "") hub}}
     - complianceType: musthave
       recreateOption: IfRequired
       objectDefinition:
@@ -346,6 +350,11 @@ spec:
               sources:
               - container
             type: infrastructure
+          - name: journal-log
+            infrastructure:
+              sources:
+              - node
+            type: infrastructure
           - name: audit-log
             audit:
               sources:
@@ -354,7 +363,7 @@ spec:
               - ovn
             type: audit
           outputs:
-    {{hub- if and (lookup "v1" "ConfigMap" "policies" "config-operators").data.infraBrokers (ne "" (index .ManagedClusterLabels "policies.infra-topic")) hub}}
+    {{hub- if ne "" $it hub}}
           - name: infra-receiver
             kafka:
               brokers: {{hub (lookup "v1" "ConfigMap" "policies" "config-operators").data.infraBrokers hub}}
@@ -365,6 +374,7 @@ spec:
                 maxWrite: 10M
             type: kafka
     {{hub- end hub}}
+    {{hub- if ne "" $et hub}}
           - name: event-receiver
             kafka:
               brokers: {{hub (lookup "v1" "ConfigMap" "policies" "config-operators").data.eventBrokers hub}}
@@ -374,30 +384,58 @@ spec:
                 deliveryMode: AtLeastOnce
                 maxWrite: 10M
             type: kafka
-    {{hub- $sl := index .ManagedClusterLabels "policies.syslog-url" hub}}
-    {{hub- if ne "" $sl hub}}
+    {{hub- end hub}}
+    {{hub- if ne "" $su hub}}
           - name: rsyslog
             syslog:
               facility: user
               rfc: RFC5424
               severity: debug
-              url: tcp://{{hub (splitn ".." 2 $sl)._0 hub}}:{{hub (splitn ".." 2 $sl)._1 hub}}
+              url: tcp://{{hub (splitn ".." 2 $su)._0 hub}}:{{hub (splitn ".." 2 $su)._1 hub}}
             type: syslog
     {{hub- end hub}}
           pipelines:
-    {{hub- if ne "" $sl hub}}
+    {{hub- if ne "" $it hub}}
           - name: audit-log
             inputRefs:
             - audit-log
             outputRefs:
-            - rsyslog
+            - infra-receiver
             filterRefs:
             - add-cluster-name
             - audit-log-drop-verb
             - audit-log-drop-resource
             - audit-log-drop-username
     {{hub- end hub}}
-    {{hub- if and (lookup "v1" "ConfigMap" "policies" "config-operators").data.infraBrokers (ne "" (index .ManagedClusterLabels "policies.infra-topic")) hub}}
+    {{hub- if or (ne "" $et) (ne "" $su) hub}}
+          - name: journal-log
+            inputRefs:
+            - journal-log
+            outputRefs:
+    {{hub- if ne "" $et hub}}
+            - event-receiver
+    {{hub- end hub}}
+    {{hub- if ne "" $su hub}}
+            - rsyslog
+    {{hub- end hub}}
+            filterRefs:
+            - add-cluster-name
+            - journal-filter
+            - multiline
+          - name: event-log
+            inputRefs:
+            - eventrouter
+            outputRefs:
+    {{hub- if ne "" $et hub}}
+            - event-receiver
+    {{hub- end hub}}
+    {{hub- if ne "" $su hub}}
+            - rsyslog
+    {{hub- end hub}}
+            filterRefs:
+            - add-cluster-name
+    {{hub- end hub}}
+    {{hub- if ne "" $it hub}}
           - name: infra-log
             inputRefs:
             - infra-log
@@ -408,18 +446,19 @@ spec:
             - important
             - core-infra-log
     {{hub- end hub}}
-          - name: event-log
-            inputRefs:
-            - eventrouter
-            outputRefs:
-            - event-receiver
-            filterRefs:
-            - add-cluster-name
           filters:
           - name: add-cluster-name
             type: openshiftLabels
             openshiftLabels:
               cluster-name: {{ (lookup "config.openshift.io/v1" "Infrastructure" "" "cluster").status.infrastructureName }}
+          - name: multiline
+            type: detectMultilineException
+          - name: journal-filter
+            type: drop
+            drop:
+            - test:
+              - field: .systemd.t.TRANSPORT
+                notMatches: kernel
           - name: important
             type: drop
             drop:
@@ -454,6 +493,7 @@ spec:
                 matches: (olm-operator|openshift|hive|hypershift|multicluster|open-cluster|kiali|istio)
               - field: .user.username
                 notMatches: (gitops)
+    {{hub- end hub}}
     {{hub- end hub}}
     {{- end }}
 ---
