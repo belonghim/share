@@ -308,7 +308,10 @@ spec:
   severity: high
   object-templates-raw: |
     {{- if not (hasKey (lookup "operators.coreos.com/v1alpha1" "Subscription" "openshift-logging" "cluster-logging").metadata.labels "policies.ignore") }}
-    {{hub- if and (lookup "v1" "ConfigMap" "policies" "config-operators").data.eventBrokers (lookup "v1" "ConfigMap" "policies" "config-operators").data.infraBrokers hub}}
+    {{hub- $kg := index .ManagedClusterLabels "policies.kafka-group" hub}}
+    {{hub- $eb := (cat $kg "eventBrokers" | replace " " "") hub}}
+    {{hub- $ib := (cat $kg "infraBrokers" | replace " " "") hub}}
+    {{hub- if and (hasKey (lookup "v1" "ConfigMap" "policies" "config-operators").data $eb) (hasKey (lookup "v1" "ConfigMap" "policies" "config-operators").data $ib) hub}}
     {{hub- $su := index .ManagedClusterLabels "policies.syslog-url" hub}}
     {{hub- $et := index .ManagedClusterLabels "policies.event-topic" hub}}
     {{hub- $it := index .ManagedClusterLabels "policies.infra-topic" hub}}
@@ -366,7 +369,7 @@ spec:
     {{hub- if ne "" $it hub}}
           - name: infra-receiver
             kafka:
-              brokers: {{hub (lookup "v1" "ConfigMap" "policies" "config-operators").data.infraBrokers hub}}
+              brokers: {{hub index (lookup "v1" "ConfigMap" "policies" "config-operators").data $ib hub}}
               topic: {{hub index .ManagedClusterLabels "policies.infra-topic" hub}}
               tuning:
                 compression: none
@@ -377,7 +380,7 @@ spec:
     {{hub- if ne "" $et hub}}
           - name: event-receiver
             kafka:
-              brokers: {{hub (lookup "v1" "ConfigMap" "policies" "config-operators").data.eventBrokers hub}}
+              brokers: {{hub index (lookup "v1" "ConfigMap" "policies" "config-operators").data $eb hub}}
               topic: {{hub index .ManagedClusterLabels "policies.event-topic" hub}}
               tuning:
                 compression: none
