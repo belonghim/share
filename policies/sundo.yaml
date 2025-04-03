@@ -563,8 +563,7 @@ spec:
           {{hub- $et := index .ManagedClusterLabels "policies.event-topic" hub}}
           {{hub- $it := index .ManagedClusterLabels "policies.infra-topic" hub}}
           {{hub- if ne "" (cat $su $et $it | replace " " "") hub}}
-          - complianceType: musthave
-            recreateOption: IfRequired
+          - complianceType: mustonlyhave
             objectDefinition:
               apiVersion: observability.openshift.io/v1
               kind: ClusterLogForwarder
