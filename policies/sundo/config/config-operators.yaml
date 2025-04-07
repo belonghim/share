@@ -239,6 +239,15 @@ spec:
       - name: config-volume
         configMap:
           name: eventrouter
+      tolerations:
+      - effect: NoExecute
+        key: node.kubernetes.io/not-ready
+        operator: Exists
+        tolerationSeconds: 30
+      - effect: NoExecute
+        key: node.kubernetes.io/unreachable
+        operator: Exists
+        tolerationSeconds: 30
 ---
 kind: ServiceAccount
 apiVersion: v1
