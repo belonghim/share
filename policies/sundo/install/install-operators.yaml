@@ -152,24 +152,24 @@ metadata:
   annotations:
     scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator":"Exists","effect":"NoSchedule","key":"node-role.kubernetes.io/infra"}]'
 ---
-#apiVersion: operators.coreos.com/v1alpha1
-#kind: Subscription
-#metadata:
-#  name: gatekeeper-operator-product
-#  namespace: openshift-operators
-#  labels:
-#    policies.install: ""
-#spec:
-#  name: gatekeeper-operator-product
-#  source: cs-redhat-operator-index
-#  sourceNamespace: openshift-marketplace
-#  config:
-#    nodeSelector:
-#      node-role.kubernetes.io/infra: ""
-#    tolerations:
-#    - effect: NoSchedule
-#      operator: Exists
-#      key: node-role.kubernetes.io/infra
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  name: gatekeeper-operator-product
+  namespace: openshift-operators
+  labels:
+    policies.install: ""
+spec:
+  name: gatekeeper-operator-product
+  source: cs-redhat-operator-index
+  sourceNamespace: openshift-marketplace
+  config:
+    nodeSelector:
+      node-role.kubernetes.io/infra: ""
+    tolerations:
+    - effect: NoSchedule
+      operator: Exists
+      key: node-role.kubernetes.io/infra
 ---
 apiVersion: policy.open-cluster-management.io/v1
 kind: ConfigurationPolicy

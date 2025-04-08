@@ -769,3 +769,61 @@ spec:
     {{- end }}
     {{- end }}
 ---
+apiVersion: templates.gatekeeper.sh/v1beta1
+kind: ConstraintTemplate
+metadata:
+  name: k8sblockprotectedresourcedeletion
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sBlockProtectedResourceDeletion
+      validation:
+        openAPIV3Schema:
+          properties:
+            blockedUsers:
+              type: array
+              items:
+                type: string
+  targets:
+  - target: admission.k8s.gatekeeper.sh
+    rego: |
+      package k8sblockprotectedresourcedeletion
+      protected_ns(ns) = true {
+        startswith(ns, "openshift")
+      }
+      protected_ns(ns) = true {
+        startswith(ns, "open-cluster-management")
+      }
+      violation[{"msg": msg}] {
+        input.review.operation == "DELETE"
+        ns := input.review.namespace
+        ns != ""
+        protected_ns(ns)
+        blocked_user := input.parameters.blockedUsers[_]
+        input.review.userInfo.username == blocked_user
+        msg := sprintf("User %v is not allowed to delete resources in namespace %v", [blocked_user, ns])
+      }
+      violation[{"msg": msg}] {
+        input.review.kind.kind == "Namespace"
+        input.review.operation == "DELETE"
+        ns_name := input.review.name
+        protected_ns(ns_name)
+        blocked_user := input.parameters.blockedUsers[_]
+        input.review.userInfo.username == blocked_user
+        msg := sprintf("User %v is not allowed to delete namespace %v", [blocked_user, ns_name])
+      }
+---
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sBlockProtectedResourceDeletion
+metadata:
+  name: block-protected-resource-delete
+spec:
+  match:
+    kinds:
+    - apiGroups: [""]
+      kinds: ["*"]
+  parameters:
+    blockedUsers:
+    - "user:pasptl"
+---

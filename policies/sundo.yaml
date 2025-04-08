@@ -1308,9 +1308,115 @@ spec:
             - kind: ServiceAccount
               name: log-collector
               namespace: openshift-logging
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: templates.gatekeeper.sh/v1beta1
+            kind: ConstraintTemplate
+            metadata:
+              name: k8sblockprotectedresourcedeletion
+            spec:
+              crd:
+                spec:
+                  names:
+                    kind: K8sBlockProtectedResourceDeletion
+                  validation:
+                    openAPIV3Schema:
+                      properties:
+                        blockedUsers:
+                          items:
+                            type: string
+                          type: array
+              targets:
+              - rego: |
+                  package k8sblockprotectedresourcedeletion
+                  protected_ns(ns) = true {
+                    startswith(ns, "openshift")
+                  }
+                  protected_ns(ns) = true {
+                    startswith(ns, "open-cluster-management")
+                  }
+                  violation[{"msg": msg}] {
+                    input.review.operation == "DELETE"
+                    ns := input.review.namespace
+                    ns != ""
+                    protected_ns(ns)
+                    blocked_user := input.parameters.blockedUsers[_]
+                    input.review.userInfo.username == blocked_user
+                    msg := sprintf("User %v is not allowed to delete resources in namespace %v", [blocked_user, ns])
+                  }
+                  violation[{"msg": msg}] {
+                    input.review.kind.kind == "Namespace"
+                    input.review.operation == "DELETE"
+                    ns_name := input.review.name
+                    protected_ns(ns_name)
+                    blocked_user := input.parameters.blockedUsers[_]
+                    input.review.userInfo.username == blocked_user
+                    msg := sprintf("User %v is not allowed to delete namespace %v", [blocked_user, ns_name])
+                  }
+                target: admission.k8s.gatekeeper.sh
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: constraints.gatekeeper.sh/v1beta1
+            kind: K8sBlockProtectedResourceDeletion
+            metadata:
+              name: block-protected-resource-delete
+            spec:
+              match:
+                kinds:
+                - apiGroups:
+                  - ""
+                  kinds:
+                  - '*'
+              parameters:
+                blockedUsers:
+                - user:pasptl
         remediationAction: enforce
         severity: medium
-  remediationAction: enforce
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: inform-gatekeeper-audit-block-protected-resource-delete
+      spec:
+        namespaceSelector:
+          exclude:
+          - kube-*
+          include:
+          - '*'
+        object-templates:
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: constraints.gatekeeper.sh/v1beta1
+            kind: K8sBlockProtectedResourceDeletion
+            metadata:
+              name: block-protected-resource-delete
+            status:
+              totalViolations: 0
+        remediationAction: inform
+        severity: medium
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: inform-gatekeeper-admission-block-protected-resource-delete
+      spec:
+        namespaceSelector:
+          exclude:
+          - kube-*
+          include:
+          - '*'
+        object-templates:
+        - complianceType: mustnothave
+          objectDefinition:
+            annotations:
+              constraint_action: deny
+              constraint_kind: K8sBlockProtectedResourceDeletion
+              constraint_name: block-protected-resource-delete
+              event_type: violation
+            apiVersion: v1
+            kind: Event
+        remediationAction: inform
+        severity: medium
 ---
 apiVersion: policy.open-cluster-management.io/v1
 kind: Policy
