@@ -1581,14 +1581,6 @@ spec:
                     key: node-role.kubernetes.io/infra
           - complianceType: musthave
             objectDefinition:
-              apiVersion: v1
-              kind: Namespace
-              metadata:
-                name: openshift-operators
-                annotations:
-                  scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator":"Exists","effect":"NoSchedule","key":"node-role.kubernetes.io/infra"}]'
-          - complianceType: musthave
-            objectDefinition:
               apiVersion: operators.coreos.com/v1alpha1
               kind: Subscription
               metadata:
@@ -1958,6 +1950,34 @@ spec:
                   key: node-role.kubernetes.io/infra
                   operator: Exists
               name: node-maintenance-operator
+              source: cs-redhat-operator-index
+              sourceNamespace: openshift-marketplace
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: v1
+            kind: Namespace
+            metadata:
+              annotations:
+                scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator":"Exists","effect":"NoSchedule","key":"node-role.kubernetes.io/infra"}]'
+              name: openshift-operators
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: operators.coreos.com/v1alpha1
+            kind: Subscription
+            metadata:
+              labels:
+                policies.install: ""
+              name: gatekeeper-operator-product
+              namespace: openshift-operators
+            spec:
+              config:
+                nodeSelector:
+                  node-role.kubernetes.io/infra: ""
+                tolerations:
+                - effect: NoSchedule
+                  key: node-role.kubernetes.io/infra
+                  operator: Exists
+              name: gatekeeper-operator-product
               source: cs-redhat-operator-index
               sourceNamespace: openshift-marketplace
         remediationAction: enforce
@@ -2791,7 +2811,7 @@ spec:
         name: upgrade-sub-automatic
       spec:
         object-templates-raw: |
-          {{- range $sub := (lookup "operators.coreos.com/v1alpha1" "Subscription" "" "" "!policies.ignore,policies.install").items }}
+          {{- range $sub := (lookup "operators.coreos.com/v1alpha1" "Subscription" "" "" "!policies.stable,!policies.ignore,policies.install").items }}
           - complianceType: musthave
             objectDefinition:
               apiVersion: operators.coreos.com/v1alpha1
