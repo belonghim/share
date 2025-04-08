@@ -509,6 +509,25 @@ spec:
     {{hub- if ne "none" (index .ManagedClusterLabels "policies.extra") hub}}
     - complianceType: musthave
       objectDefinition:
+        apiVersion: pipelines.openshift.io/v1alpha1
+        kind: GitopsService
+        metadata:
+          name: cluster
+        spec:
+          tolerations:
+          - effect: NoSchedule
+            key: node-role.kubernetes.io/infra
+            operator: Exists
+          - effect: NoExecute
+            key: node.kubernetes.io/not-ready
+            operator: Exists
+            tolerationSeconds: 60
+          - effect: NoExecute
+            key: node.kubernetes.io/unreachable
+            operator: Exists
+            tolerationSeconds: 60
+    - complianceType: musthave
+      objectDefinition:
         apiVersion: argoproj.io/v1beta1
         kind: ArgoCD
         metadata:
@@ -821,8 +840,7 @@ spec:
                 properties:
                   blockedUsers:
                     type: array
-                    items:
-                      type: string
+                    items: string
         targets:
         - target: admission.k8s.gatekeeper.sh
           rego: |
@@ -860,9 +878,9 @@ spec:
       spec:
         match:
           kinds:
-          - apiGroups: [""]
+          - apiGroups: ["*"]
             kinds: ["*"]
         parameters:
           blockedUsers:
-          - "user:pasptl"
+          - "pasptl"
 ---
