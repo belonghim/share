@@ -152,6 +152,13 @@ metadata:
   annotations:
     scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator":"Exists","effect":"NoSchedule","key":"node-role.kubernetes.io/infra"}]'
 ---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: openshift-gatekeeper-system
+  annotations:
+    scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator":"Exists","effect":"NoSchedule","key":"node-role.kubernetes.io/infra"}]'
+---
 #apiVersion: operators.coreos.com/v1alpha1
 #kind: Subscription
 #metadata:
