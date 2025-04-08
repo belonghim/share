@@ -1310,6 +1310,23 @@ spec:
               namespace: openshift-logging
         - complianceType: musthave
           objectDefinition:
+            apiVersion: operator.gatekeeper.sh/v1alpha1
+            kind: Gatekeeper
+            metadata:
+              name: gatekeeper
+            spec:
+              audit:
+                auditChunkSize: 500
+                logLevel: INFO
+                replicas: 1
+              mutatingWebhook: Disabled
+              validatingWebhook: Enabled
+              webhook:
+                emitAdmissionEvents: Enabled
+                logLevel: INFO
+                replicas: 2
+        - complianceType: musthave
+          objectDefinition:
             apiVersion: templates.gatekeeper.sh/v1beta1
             kind: ConstraintTemplate
             metadata:
@@ -1974,6 +1991,26 @@ spec:
               annotations:
                 scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator":"Exists","effect":"NoSchedule","key":"node-role.kubernetes.io/infra"}]'
               name: openshift-operators
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: operators.coreos.com/v1alpha1
+            kind: Subscription
+            metadata:
+              labels:
+                policies.install: ""
+              name: gatekeeper-operator-product
+              namespace: openshift-operators
+            spec:
+              config:
+                nodeSelector:
+                  node-role.kubernetes.io/infra: ""
+                tolerations:
+                - effect: NoSchedule
+                  key: node-role.kubernetes.io/infra
+                  operator: Exists
+              name: gatekeeper-operator-product
+              source: cs-redhat-operator-index
+              sourceNamespace: openshift-marketplace
         remediationAction: enforce
         severity: medium
   remediationAction: enforce
