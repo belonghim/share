@@ -228,9 +228,9 @@ $ sh adding-signatures.sh | oc apply -f -
 
 ```
 
-### Apply policies.osus label
+### Check policies.osus label
 ```
-## Apply policies.osus label is "ocp4"
+## Check policies.osus label is "ocp4"
 $ CLUSTER=local-cluster
 $ oc label mcl $CLUSTER policies.osus=ocp4
 
