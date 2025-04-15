@@ -31,7 +31,7 @@ metadata:
   namespace: $CLUSTER
 spec:
   applicationManager:
-    enabled: true
+    enabled: false
   certPolicyController:
     enabled: true
   policyController:
