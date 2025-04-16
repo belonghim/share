@@ -10,7 +10,7 @@
 $ mkdir redhat
 $ cat >redhat/redhat.yaml <<EOF
 kind: ImageSetConfiguration
-apiVersion: mirror.openshift.io/v1alpha2
+apiVersion: mirror.openshift.io/v2alpha1
 mirror:
   operators:
   - catalog: registry.redhat.io/redhat/redhat-operator-index:v4.14
@@ -38,6 +38,7 @@ mirror:
     - name: servicemeshoperator
       channels:
       - name: stable
+      - name: "1.0"
         minVersion: 2.6.1
     - name: kiali-ossm
       channels:
@@ -56,10 +57,6 @@ mirror:
       channels:
       - name: stable
         minVersion: 1.3.0
-    - name: node-observability-operator
-      channels:
-      - name: alpha
-        minVersion: 0.2.0
     - name: openshift-gitops-operator
       channels:
       - name: latest
@@ -114,6 +111,10 @@ mirror:
       channels:
       - name: stable
         minVersion: 4.14.0-202403221232
+    - name: metallb-operator
+      channels:
+      - name: stable
+        minVersion: 4.14.0-202406180839
   - catalog: registry.redhat.io/redhat/redhat-operator-index:v4.15
     packages:
     - name: advanced-cluster-management
@@ -125,7 +126,6 @@ mirror:
     - name: jaeger-product
     - name: tempo-product
     - name: netobserv-operator
-    - name: node-observability-operator
     - name: openshift-gitops-operator
     - name: cincinnati-operator
     - name: cluster-logging
@@ -138,6 +138,7 @@ mirror:
     - name: web-terminal
     - name: devworkspace-operator
     - name: vertical-pod-autoscaler
+    - name: metallb-operator
   - catalog: registry.redhat.io/redhat/redhat-operator-index:v4.16
     packages:
     - name: advanced-cluster-management
@@ -149,7 +150,6 @@ mirror:
     - name: jaeger-product
     - name: tempo-product
     - name: netobserv-operator
-    - name: node-observability-operator
     - name: openshift-gitops-operator
     - name: cincinnati-operator
     - name: cluster-logging
@@ -162,14 +162,65 @@ mirror:
     - name: web-terminal
     - name: devworkspace-operator
     - name: vertical-pod-autoscaler
+    - name: metallb-operator
+  - catalog: registry.redhat.io/redhat/redhat-operator-index:v4.17
+    packages:
+    - name: advanced-cluster-management
+    - name: multicluster-engine
+    - name: local-storage-operator
+    - name: lvms-operator
+    - name: servicemeshoperator
+    - name: kiali-ossm
+    - name: jaeger-product
+    - name: tempo-product
+    - name: netobserv-operator
+    - name: openshift-gitops-operator
+    - name: cincinnati-operator
+    - name: cluster-logging
+    - name: kubernetes-nmstate-operator
+    - name: node-healthcheck-operator
+    - name: self-node-remediation
+    - name: node-maintenance-operator
+    - name: openshift-custom-metrics-autoscaler-operator
+    - name: opentelemetry-product
+    - name: web-terminal
+    - name: devworkspace-operator
+    - name: vertical-pod-autoscaler
+    - name: metallb-operator
+  - catalog: registry.redhat.io/redhat/redhat-operator-index:v4.18
+    packages:
+    - name: advanced-cluster-management
+    - name: multicluster-engine
+    - name: local-storage-operator
+    - name: lvms-operator
+    - name: servicemeshoperator
+    - name: kiali-ossm
+    - name: jaeger-product
+    - name: tempo-product
+    - name: netobserv-operator
+    - name: openshift-gitops-operator
+    - name: cincinnati-operator
+    - name: cluster-logging
+    - name: kubernetes-nmstate-operator
+    - name: node-healthcheck-operator
+    - name: self-node-remediation
+    - name: node-maintenance-operator
+    - name: openshift-custom-metrics-autoscaler-operator
+    - name: opentelemetry-product
+    - name: web-terminal
+    - name: devworkspace-operator
+    - name: vertical-pod-autoscaler
+    - name: metallb-operator
 EOF
 
 $ cat >1.sh <<\EOF
+#!/usr/bin/bash
 RPN=$(basename $(realpath $1))
 [ $? -ne 0 ] && echo "Example: 1.sh <dir>" && exit 1
 echo $$ >$1/1.pid
-unset ok;while [ "$ok" != "true" ]; do oc-mirror --config=$1/$RPN.yaml file://$1 --ignore-history --continue-on-error >$1/$RPN.out 2>&1
-if grep -v ": manifest unknown" $1/$RPN.out | grep error: ; then mv $1/$RPN.out $1/$RPN.out.$(date +%Y%m%d_%H%M);rm -rf $1/mirror_seq1_000000.tar
+unset ok; while [ "$ok" != "true" ]; do
+oc-mirror --v2 --log-level debug --retry-times 999 --image-timeout 1h -c $1/$RPN.yaml file://$1/file >$1/$RPN.out 2>&1
+if [ ! -s $1/file/mirror_000001.tar ] || ! grep " mirror time " $1/$RPN.out; then mv $1/$RPN.out $1/$RPN.out.$(date +%Y%m%d_%H%M)
 else ok=true; break; fi; done
 rm -f $1/$RPN.out.$(date +%Y)* $1/1.pid
 EOF
@@ -190,16 +241,22 @@ $ nohup sh 1.sh redhat >redhat/1.out 2>&1 &
 ```
 ## Operators images
 $ cat >2.sh <<\EOF
-[ "$1" = "" ] && echo "Example: 2.sh <Repository>" && exit 1
-echo $$ >2.pid
-unset ok; while [ "$ok" != "true" ]; do oc-mirror --from mirror_seq1_000000.tar docker://$1 --skip-metadata-check >2-1.out 2>&1
-if grep error: 2-1.out ; then mv 2-1.out 2-1.out.$(date +%Y%m%d_%H%M)
+#!/usr/bin/bash
+RPN=$(basename $(realpath $1))
+[ $? -ne 0 ] && echo "Example: 2.sh <dir>" && exit 1
+RPSTR=${2:=$HOSTNAME:8443/$RPN}
+echo $$ >$1/2.pid
+while [ ! -f $1/file/mirror_000001.tar ] || [ -f $1/1.pid ] ; do echo -n \.; sleep 10; done
+rm -rf file ~/.oc-mirror; cp -R $1/$1.yaml $1/file .; rm -f file/working-dir/logs/mirroring_errors_*.txt
+unset ok; while [ "$ok" != "true" ]; do
+oc-mirror --v2 --log-level debug --retry-times 999 --image-timeout 1h -c $1.yaml --from file://file docker://$RPSTR >$1/$RPN-2.out 2>&1
+if egrep -v 'Failed to copy|manifest unknown|skipping operator bundle' $1/$RPN-2.out | grep ERROR || ! grep " mirror time " $1/$RPN-2.out; then mv $1/$RPN-2.out $1/$RPN-2.out.$(date +%Y%m%d_%H%M)
 else ok=true; break; fi; done
-rm -f 2-1.out.$(date +%Y)* 2.pid
+rm -f $1/$RPN-2.out.$(date +%Y)* $1/2.pid
 EOF
 
 $ Repository=$HOSTNAME:8443/olm-redhat
-$ nohup sh 2.sh $Repository >2.out 2>&1 &
+$ nohup sh 2.sh redhat $Repository >2.out 2>&1 &
 
 ... Release images skip ...
 
