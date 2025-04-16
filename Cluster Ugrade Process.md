@@ -244,7 +244,8 @@ $ cat >2.sh <<\EOF
 #!/usr/bin/bash
 RPN=$(basename $(realpath $1))
 [ $? -ne 0 ] && echo "Example: 2.sh <dir>" && exit 1
-RPSTR=${2:=$HOSTNAME:8443/$RPN}
+RPSTR=$2
+RPSTR=${RPSTR:=$HOSTNAME:8443/$RPN}
 echo $$ >$1/2.pid
 while [ ! -f $1/file/mirror_000001.tar ] || [ -f $1/1.pid ] ; do echo -n \.; sleep 10; done
 rm -rf file ~/.oc-mirror; cp -R $1/$1.yaml $1/file .; rm -f file/working-dir/logs/mirroring_errors_*.txt
