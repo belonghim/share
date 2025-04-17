@@ -119,6 +119,7 @@ spec:
           operator: In
           values:
           - automatic
+          - Automatic
 ---
 apiVersion: cluster.open-cluster-management.io/v1beta1
 kind: Placement
@@ -1353,6 +1354,49 @@ spec:
         object-templates-raw: |
           - complianceType: musthave
             objectDefinition:
+              apiVersion: operator.open-cluster-management.io/v1
+              kind: MultiClusterHub
+              metadata:
+                namespace: open-cluster-management
+                name: multiclusterhub
+              spec:
+                disableUpdateClusterImageSets: true
+                nodeSelector:
+                  node-role.kubernetes.io/acm: ""
+                tolerations:
+                - effect: NoSchedule
+                  operator: Exists
+                  key: node-role.kubernetes.io/infra
+          - complianceType: musthave
+            objectDefinition:
+              apiVersion: addon.open-cluster-management.io/v1alpha1
+              kind: AddOnDeploymentConfig
+              metadata:
+                name: managed
+                namespace: open-cluster-management-hub
+              spec:
+                nodePlacement:
+                  tolerations:
+                  - key: node-role.kubernetes.io/infra
+                    operator: Exists
+                    effect: NoSchedule
+          - complianceType: musthave
+            objectDefinition:
+              apiVersion: addon.open-cluster-management.io/v1alpha1
+              kind: AddOnDeploymentConfig
+              metadata:
+                name: hub
+                namespace: open-cluster-management-hub
+              spec:
+                nodePlacement:
+                  tolerations:
+                  - key: node-role.kubernetes.io/infra
+                    operator: Exists
+                    effect: NoSchedule
+                  nodeSelector:
+                    node-role.kubernetes.io/acm: ""
+          - complianceType: musthave
+            objectDefinition:
               apiVersion: multicluster.openshift.io/v1
               kind: MultiClusterEngine
               metadata:
@@ -1608,7 +1652,6 @@ spec:
                   policies.install: ""
                   policies.stable: ""
               spec:
-                channel: stable
                 name: kiali-ossm
                 source: cs-redhat-operator-index
                 sourceNamespace: openshift-marketplace

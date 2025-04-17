@@ -1,6 +1,8 @@
 generators:
 - ./policyGenerator.yaml
-commonLabels:
-  open-cluster-management.io/policy-set: opp
+labels:
+- includeSelectors: true
+  pairs:
+    open-cluster-management.io/policy-set: opp
 commonAnnotations:
   argocd.argoproj.io/compare-options: IgnoreExtraneous
