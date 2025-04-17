@@ -1,4 +1,4 @@
-# Deploy Customized ACM policies example
+# Deploy Customized ACM policies
 
 
 ## MultiClusterHub Preparation
