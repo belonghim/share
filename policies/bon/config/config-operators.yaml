@@ -445,6 +445,7 @@ spec:
     {{hub- end hub}}
             filterRefs:
             - add-cluster-name
+            - multiline
     {{hub- end hub}}
     {{hub- if ne "" $it hub}}
           - name: infra-log
