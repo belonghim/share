@@ -231,6 +231,7 @@ spec:
           allowPrivilegeEscalation: false
           capabilities:
             drop: ["ALL"]
+          readOnlyRootFilesystem: true
       securityContext:
         runAsNonRoot: true
         seccompProfile:

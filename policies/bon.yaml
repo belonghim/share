@@ -1253,6 +1253,7 @@ spec:
                       capabilities:
                         drop:
                         - ALL
+                      readOnlyRootFilesystem: true
                     volumeMounts:
                     - mountPath: /etc/eventrouter
                       name: config-volume
