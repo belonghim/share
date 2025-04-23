@@ -462,6 +462,11 @@ spec:
                 notMatches: kernel
               - field: .systemd.t.SYSTEMD_UNIT
                 notMatches: kubelet.service
+            - test:
+              - field: .systemd.t.SYSTEMD_UNIT
+                matches: kubelet.service
+              - field: .message
+                matches: ^I[0-9]
           - name: important
             type: drop
             drop:
