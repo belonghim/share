@@ -710,6 +710,8 @@ spec:
                   - test:
                     - field: .systemd.t.TRANSPORT
                       notMatches: kernel
+                    - field: .systemd.t.SYSTEMD_UNIT
+                      notMatches: kubelet.service
                 - name: important
                   type: drop
                   drop:
@@ -2241,6 +2243,8 @@ spec:
             metadata:
               annotations:
                 scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator":"Exists","effect":"NoSchedule","key":"node-role.kubernetes.io/infra"}]'
+              labels:
+                openshift.io/cluster-monitoring: "true"
               name: openshift-operator-lifecycle-manager
         - complianceType: musthave
           objectDefinition:
@@ -2249,6 +2253,8 @@ spec:
             metadata:
               annotations:
                 scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator":"Exists","effect":"NoSchedule","key":"node-role.kubernetes.io/infra"}]'
+              labels:
+                openshift.io/cluster-monitoring: "true"
               name: openshift-image-registry
         - complianceType: musthave
           objectDefinition:
@@ -2257,6 +2263,8 @@ spec:
             metadata:
               annotations:
                 scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator":"Exists","effect":"NoSchedule","key":"node-role.kubernetes.io/infra"}]'
+              labels:
+                openshift.io/cluster-monitoring: "true"
               name: openshift-marketplace
         - complianceType: musthave
           objectDefinition:
@@ -2265,6 +2273,8 @@ spec:
             metadata:
               annotations:
                 scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator":"Exists","effect":"NoSchedule","key":"node-role.kubernetes.io/infra"}]'
+              labels:
+                openshift.io/cluster-monitoring: "true"
               name: openshift-network-console
         - complianceType: musthave
           objectDefinition:

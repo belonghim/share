@@ -5,6 +5,8 @@ metadata:
   name: openshift-operator-lifecycle-manager
   annotations:
     scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator":"Exists","effect":"NoSchedule","key":"node-role.kubernetes.io/infra"}]'
+  labels:
+    openshift.io/cluster-monitoring: "true"
 ---
 kind: Namespace
 apiVersion: v1
@@ -12,6 +14,8 @@ metadata:
   name: openshift-image-registry
   annotations:
     scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator":"Exists","effect":"NoSchedule","key":"node-role.kubernetes.io/infra"}]'
+  labels:
+    openshift.io/cluster-monitoring: "true"
 ---
 kind: Namespace
 apiVersion: v1
@@ -19,6 +23,8 @@ metadata:
   name: openshift-marketplace
   annotations:
     scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator":"Exists","effect":"NoSchedule","key":"node-role.kubernetes.io/infra"}]'
+  labels:
+    openshift.io/cluster-monitoring: "true"
 ---
 kind: Namespace
 apiVersion: v1
@@ -26,6 +32,8 @@ metadata:
   name: openshift-network-console
   annotations:
     scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator":"Exists","effect":"NoSchedule","key":"node-role.kubernetes.io/infra"}]'
+  labels:
+    openshift.io/cluster-monitoring: "true"
 ---
 kind: Namespace
 apiVersion: v1

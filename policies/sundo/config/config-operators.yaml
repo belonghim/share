@@ -460,6 +460,8 @@ spec:
             - test:
               - field: .systemd.t.TRANSPORT
                 notMatches: kernel
+              - field: .systemd.t.SYSTEMD_UNIT
+                notMatches: kubelet.service
           - name: important
             type: drop
             drop:
