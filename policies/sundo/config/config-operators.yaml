@@ -465,7 +465,7 @@ spec:
               - field: .message
                 notMatches: "(?i)critical|error"
               - field: .level
-                matches: "info|warning"
+                matches: "trace|debug|default"
           - name: core-infra-log
             type: drop
             drop:
