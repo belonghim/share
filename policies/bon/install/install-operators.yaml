@@ -42,6 +42,8 @@ metadata:
   name: openshift-logging
   annotations:
     scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator":"Exists","effect":"NoSchedule","key":"node-role.kubernetes.io/infra"}]'
+  labels:
+    openshift.io/cluster-monitoring: "true"
 ---
 apiVersion: operators.coreos.com/v1
 kind: OperatorGroup
@@ -209,6 +211,8 @@ spec:
           name: openshift-gitops-operator
           annotations:
             scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator":"Exists","effect":"NoSchedule","key":"node-role.kubernetes.io/infra"}]'
+          labels:
+            openshift.io/cluster-monitoring: "true"
     - complianceType: musthave
       objectDefinition:
         apiVersion: v1
@@ -373,6 +377,8 @@ spec:
           name: openshift-tempo-operator
           annotations:
             scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator":"Exists","effect":"NoSchedule","key":"node-role.kubernetes.io/infra"}]'
+          labels:
+            openshift.io/cluster-monitoring: "true"
     - complianceType: musthave
       objectDefinition:
         apiVersion: operators.coreos.com/v1

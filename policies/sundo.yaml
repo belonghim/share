@@ -1168,6 +1168,8 @@ spec:
               annotations:
                 openshift.io/node-selector: node-role.kubernetes.io/infra=
                 scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator":"Exists","effect":"NoSchedule","key":"node-role.kubernetes.io/infra"}]'
+              labels:
+                openshift.io/cluster-monitoring: "true"
               name: ocp-logging
         - complianceType: musthave
           objectDefinition:
@@ -1585,6 +1587,8 @@ spec:
                 name: openshift-gitops-operator
                 annotations:
                   scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator":"Exists","effect":"NoSchedule","key":"node-role.kubernetes.io/infra"}]'
+                labels:
+                  openshift.io/cluster-monitoring: "true"
           - complianceType: musthave
             objectDefinition:
               apiVersion: v1
@@ -1709,6 +1713,8 @@ spec:
                 name: openshift-tempo-operator
                 annotations:
                   scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator":"Exists","effect":"NoSchedule","key":"node-role.kubernetes.io/infra"}]'
+                labels:
+                  openshift.io/cluster-monitoring: "true"
           - complianceType: musthave
             objectDefinition:
               apiVersion: operators.coreos.com/v1
@@ -1808,6 +1814,8 @@ spec:
             metadata:
               annotations:
                 scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator":"Exists","effect":"NoSchedule","key":"node-role.kubernetes.io/infra"}]'
+              labels:
+                openshift.io/cluster-monitoring: "true"
               name: openshift-logging
         - complianceType: musthave
           objectDefinition:
@@ -1958,6 +1966,8 @@ spec:
             apiVersion: v1
             kind: Namespace
             metadata:
+              labels:
+                openshift.io/cluster-monitoring: "true"
               name: open-cluster-management
         - complianceType: musthave
           objectDefinition:
@@ -1996,6 +2006,8 @@ spec:
             apiVersion: v1
             kind: Namespace
             metadata:
+              labels:
+                openshift.io/cluster-monitoring: "true"
               name: multicluster-engine
         - complianceType: musthave
           objectDefinition:
