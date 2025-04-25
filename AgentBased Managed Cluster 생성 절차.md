@@ -1148,7 +1148,7 @@ done; unset IFS
 ### Importing a cluster by using the auto import secret (in Hub Cluster)
 ```
 ## create Namespace
-$ ManagedCluster=compact
+$ ManagedCluster=ocp-compact
 $ oc create namespace ${ManagedCluster}
 
 ## create auto import secret
