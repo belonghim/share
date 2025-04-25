@@ -334,10 +334,10 @@ $ oc get policy,sub,csv,ip -A -l \!olm.copiedFrom
 ### Delete Managed Cluster from old Hub Cluster
 ```
 ## Delete Managed Cluster from old Hub Cluster
-$ CLUSTER=ocp-paas
+$ CLUSTER=paas
 $ export KUBECONFIG=/opt/$CLUSTER/auth/kubeconfig
-$ oc delete --cascade=foreground managedcluster mngda
-$ oc delete ns mngda
+$ oc delete --cascade=foreground managedcluster ocp-mngda
+$ oc delete ns ocp-mngda
 
 ```
 
@@ -347,7 +347,7 @@ $ oc delete ns mngda
 $ cd share/policies
 
 ## Test import-cluster script
-$ ManagedCluster=mngda
+$ ManagedCluster=ocp-mngda
 $ ManagedKubeconfig=/opt/mngda/auth/kubeconfig
 $ sh import-cluster.sh ${ManagedCluster} ${ManagedKubeconfig}
 
