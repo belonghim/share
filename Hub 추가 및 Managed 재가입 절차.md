@@ -334,7 +334,7 @@ $ oc get policy,sub,csv,ip -A -l \!olm.copiedFrom
 ### Delete Managed Cluster from old Hub Cluster
 ```
 ## Delete Managed Cluster from old Hub Cluster
-$ CLUSTER=paas
+$ CLUSTER=ocp-paas
 $ export KUBECONFIG=/opt/$CLUSTER/auth/kubeconfig
 $ oc delete --cascade=foreground managedcluster mngda
 $ oc delete ns mngda
