@@ -1691,6 +1691,9 @@ spec:
                   - effect: NoSchedule
                     operator: Exists
                     key: node-role.kubernetes.io/infra
+                sourceNamespace: openshift-marketplace
+                installPlanApproval: Manual
+                startingCSV: kiali-operator.v1.89.10
           - complianceType: musthave
             objectDefinition:
               apiVersion: v1

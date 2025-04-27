@@ -292,6 +292,8 @@ spec:
             - effect: NoSchedule
               operator: Exists
               key: node-role.kubernetes.io/infra
+          installPlanApproval: Manual
+          startingCSV: kiali-operator.v1.89.1
     - complianceType: musthave
       objectDefinition:
         apiVersion: v1
