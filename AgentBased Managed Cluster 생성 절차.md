@@ -1206,6 +1206,13 @@ EOF
 ```
 
 
+### Apply sub-approval=init label
+```
+$ oc label mcl ${ManagedCluster} policies.sub-approval=init
+
+```
+
+
 ### (Optional) Apply cluster-log-forwarder's topics and syslog-url
 ```
 $ oc label mcl ${ManagedCluster} policies.event-topic=event policies.infra-topic=infra policies.syslog-url=192.168.10.100..514
@@ -1255,7 +1262,7 @@ $ oc -n ${ManagedCluster} delete secret auto-import-secret
 
 ### Apply manaul subscription approval label
 ```
-$ oc label mcl ${ManagedCluster} policies.sub-approval=manual
+$ oc label mcl ${ManagedCluster} policies.sub-approval=manual --overwrite
 
 ```
 
