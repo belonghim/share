@@ -183,9 +183,14 @@ $ sh osus.sh | oc create -f -
 
 ```
 
-### Apply osus
+### Apply policies.osus label
 ```
 $ oc label mcl local-cluster policies.osus=$REPO
+```
+
+### Apply policies.sub-approval=init
+```
+$ oc label mcl local-cluster policies.sub-approval=init
 ```
 
 ### (Optional) Apply cluster-log-forwarder's brokers
@@ -217,7 +222,7 @@ $ oc get policy,sub,csv,ip -A -l \!olm.copiedFrom
 
 ### Apply manaul subscription approval label
 ```
-$ oc label mcl local-cluster policies.sub-approval=manual
+$ oc label mcl local-cluster policies.sub-approval=manual --overwrite
 
 ```
 
