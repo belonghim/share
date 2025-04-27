@@ -1332,21 +1332,6 @@ spec:
             - kind: ServiceAccount
               name: log-collector
               namespace: openshift-logging
-        - complianceType: musthave
-          objectDefinition:
-            apiVersion: controller.devfile.io/v1alpha1
-            config:
-              webhook:
-                nodeSelector:
-                  node-role.kubernetes.io/infra: ""
-                tolerations:
-                - effect: NoSchedule
-                  key: node-role.kubernetes.io/infra
-                  operator: Exists
-            kind: DevWorkspaceOperatorConfig
-            metadata:
-              name: devworkspace-operator-config
-              namespace: openshift-operators
         remediationAction: enforce
         severity: medium
   remediationAction: enforce
@@ -1771,6 +1756,15 @@ spec:
                   - effect: NoSchedule
                     operator: Exists
                     key: node-role.kubernetes.io/infra
+          - complianceType: musthave
+            objectDefinition:
+              apiVersion: v1
+              kind: Namespace
+              metadata:
+                name: openshift-terminal
+                annotations:
+                  openshift.io/node-selector: node-role.kubernetes.io/infra=
+                  scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator":"Exists","effect":"NoSchedule","key":"node-role.kubernetes.io/infra"}]'
           - complianceType: musthave
             objectDefinition:
               apiVersion: v1

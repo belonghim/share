@@ -294,20 +294,6 @@ roleRef:
   kind: ClusterRole
   name: collect-infrastructure-logs
 ---
-kind: DevWorkspaceOperatorConfig
-apiVersion: controller.devfile.io/v1alpha1
-metadata:
-  name: devworkspace-operator-config
-  namespace: openshift-operators
-config:
-  webhook:
-    nodeSelector:
-      node-role.kubernetes.io/infra: ""
-    tolerations:
-    - effect: NoSchedule
-      key: node-role.kubernetes.io/infra
-      operator: Exists
----
 apiVersion: policy.open-cluster-management.io/v1
 kind: ConfigurationPolicy
 metadata:
