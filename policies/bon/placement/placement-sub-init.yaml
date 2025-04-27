@@ -11,7 +11,7 @@ spec:
         - {key: vendor, operator: In, values: ["OpenShift"]}
         - {key: "policies.undeploy", operator: DoesNotExist}
         - {key: "policies.osus", operator: Exists}
-        - {key: "policies.sub-approval", operator: DoesNotExist}
+        - {key: "policies.sub-approval", operator: In, values: ["init","Init"]}
       claimSelector:
         matchExpressions:
         - {key: "policies.undeploy", operator: NotIn, values: ["true"]}

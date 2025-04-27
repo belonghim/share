@@ -150,7 +150,10 @@ spec:
         - key: policies.osus
           operator: Exists
         - key: policies.sub-approval
-          operator: DoesNotExist
+          operator: In
+          values:
+          - init
+          - Init
 ---
 apiVersion: cluster.open-cluster-management.io/v1beta1
 kind: Placement
@@ -1676,9 +1679,6 @@ spec:
                   - effect: NoSchedule
                     operator: Exists
                     key: node-role.kubernetes.io/infra
-                sourceNamespace: openshift-marketplace
-                installPlanApproval: Manual
-                startingCSV: kiali-operator.v1.89.10
           - complianceType: musthave
             objectDefinition:
               apiVersion: v1
