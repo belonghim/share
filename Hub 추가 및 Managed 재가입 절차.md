@@ -336,6 +336,7 @@ $ oc get policy,sub,csv,ip -A -l \!olm.copiedFrom
 ## Delete Managed Cluster from old Hub Cluster
 $ CLUSTER=paas
 $ export KUBECONFIG=/opt/$CLUSTER/auth/kubeconfig
+$ oc get managedcluster ocp-mngda -oyaml >ocp-mngda.yaml.bak
 $ oc delete --cascade=foreground managedcluster ocp-mngda
 $ oc delete ns ocp-mngda
 
@@ -351,8 +352,21 @@ $ ManagedCluster=ocp-mngda
 $ ManagedKubeconfig=/opt/mngda/auth/kubeconfig
 $ sh import-cluster.sh ${ManagedCluster} ${ManagedKubeconfig}
 
+## Create importing yaml file
+$ sh import-cluster.sh ${ManagedCluster} ${ManagedKubeconfig} >imporing.yaml
+$ grep policies ocp-mngda.yaml.bak
+    policies.event-topic=event
+    policies.infra-topic=infra
+    policies.ns-prefix=g-tpj-dev
+    policies.osus: ocp4
+    policies.sub-approval=manual
+    policies.syslog-url=192.168.10.100..514
+
+## Edit importing yaml file
+$ vi imporging.yaml
+
 ## Start to import the cluster
-$ sh import-cluster.sh ${ManagedCluster} ${ManagedKubeconfig} | oc create -f -
+$ oc create -f importing.yaml
 
 ## Apply sub-approval=manual label
 $ oc label ${ManagedKubeconfig} policies.sub-approval=manual
@@ -401,12 +415,6 @@ $ oc wait mcl ${ManagedCluster} --for=condition=ManagedClusterImportSucceeded &&
 
 ## Delete auto-import-secret
 $ oc -n ${ManagedCluster} delete secret auto-import-secret
-
-```
-
-### Apply manaul subscription approval label
-```
-$ oc label mcl ${ManagedCluster} policies.sub-approval=manual
 
 ```
 
