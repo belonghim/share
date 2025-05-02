@@ -383,7 +383,7 @@ $ oc label mcl ${ManagedCluster} policies.ns-prefix=g-tpj-dev
 
 ### (Optional) Apply dev environment
 ```
-$ oc label mcl local-cluster policies.extra=dev
+$ oc label mcl ${ManagedCluster} policies.extra=dev
 
 ```
 
