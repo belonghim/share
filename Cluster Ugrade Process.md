@@ -401,6 +401,18 @@ policy.policy.open-cluster-management.io/policies.check-cv condition met
 #  installPlanApproval: Manual
 #..
 
+## Or
+#apiVersion: operators.coreos.com/v1alpha1
+#kind: Subscription
+#metadata:
+#  labels:
+#    policies.stable: ""
+#..
+#spec:
+#  installPlanApproval: Manual
+#  startingCSV: kiali-operator.v1.89.10
+#..
+
 ```
 
 ### Check csv-check
