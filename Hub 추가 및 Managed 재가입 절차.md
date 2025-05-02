@@ -388,9 +388,9 @@ $ oc label mcl ${ManagedCluster} policies.ns-prefix=g-tpj-dev
 ```
 
 
-### (Optional) Apply dev environment
+### (For sub hub-cluster) Apply policies.extra=none label
 ```
-$ oc label mcl ${ManagedCluster} policies.extra=dev
+$ oc label mcl ${ManagedCluster} policies.extra=none
 
 ```
 
