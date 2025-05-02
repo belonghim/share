@@ -129,13 +129,6 @@ $ oc label node infra-2.$DOMAIN node-role.kubernetes.io/infra=
 
 ```
 
-### Delete acm MCP (for extra hub)
-```
-## Delete mcp/acm 
-$ oc delete mcp/acm
-
-```
-
 ### Deploy ACM operator
 ```
 ## create Namespace, OperatorGroup, Subscription for  operator
