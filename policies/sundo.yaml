@@ -1668,7 +1668,6 @@ spec:
                 namespace: openshift-operators
                 labels:
                   policies.install: ""
-                  policies.stable: ""
               spec:
                 name: kiali-ossm
                 source: cs-redhat-operator-index
