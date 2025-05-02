@@ -284,6 +284,13 @@ $ sh script/osus.sh ${Registry} ${Repo} | oc create -f -
 ```
 
 
+### (For sub hub-cluster) Apply policies.extra=none label
+```
+$ oc label mcl local-cluster policies.extra=none
+
+```
+
+
 ### Apply osus
 ```
 $ oc label mcl local-cluster policies.osus=${Repo}
@@ -309,13 +316,6 @@ $ oc label mcl local-cluster policies.event-topic=event policies.infra-topic=inf
 ### (Optional) Apply cluster-monitoring-config's remote write monitoring namespace prefix
 ```
 $ oc label mcl local-cluster policies.ns-prefix=g-tpj-dev
-
-```
-
-
-### (Optional) Apply dev environment
-```
-$ oc label mcl local-cluster policies.extra=dev
 
 ```
 
@@ -388,9 +388,9 @@ $ oc label mcl ${ManagedCluster} policies.ns-prefix=g-tpj-dev
 ```
 
 
-### (For sub hub-cluster) Apply policies.extra=none label
+### (Optional) Apply dev environment
 ```
-$ oc label mcl ${ManagedCluster} policies.extra=none
+$ oc label mcl local-cluster policies.extra=dev
 
 ```
 
