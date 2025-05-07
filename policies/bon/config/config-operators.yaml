@@ -395,12 +395,17 @@ spec:
             type: syslog
     {{hub- end hub}}
           pipelines:
-    {{hub- if ne "" $it hub}}
+    {{hub- if or (ne "" $it) (ne "" $su) hub}}
           - name: audit-log
             inputRefs:
             - audit-log
             outputRefs:
+    {{hub- if ne "" $it hub}}
             - infra-receiver
+    {{hub- end hub}}
+    {{hub- if ne "" $su hub}}
+            - rsyslog
+    {{hub- end hub}}
             filterRefs:
             - add-cluster-name
             - audit-log-drop-verb
