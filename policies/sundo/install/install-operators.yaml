@@ -25,20 +25,6 @@ spec:
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: openshift-kube-storage-version-migrator
-  annotations:
-    openshift.io/node-selector: node-role.kubernetes.io/master=
----
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: openshift-network-console
-  annotations:
-    openshift.io/node-selector: node-role.kubernetes.io/infra=
----
-apiVersion: v1
-kind: Namespace
-metadata:
   name: openshift-logging
   annotations:
     scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator":"Exists","effect":"NoSchedule","key":"node-role.kubernetes.io/infra"}]'

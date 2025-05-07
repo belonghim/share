@@ -1900,22 +1900,6 @@ spec:
             kind: Namespace
             metadata:
               annotations:
-                openshift.io/node-selector: node-role.kubernetes.io/master=
-              name: openshift-kube-storage-version-migrator
-        - complianceType: musthave
-          objectDefinition:
-            apiVersion: v1
-            kind: Namespace
-            metadata:
-              annotations:
-                openshift.io/node-selector: node-role.kubernetes.io/infra=
-              name: openshift-network-console
-        - complianceType: musthave
-          objectDefinition:
-            apiVersion: v1
-            kind: Namespace
-            metadata:
-              annotations:
                 scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator":"Exists","effect":"NoSchedule","key":"node-role.kubernetes.io/infra"}]'
               labels:
                 openshift.io/cluster-monitoring: "true"
@@ -2339,29 +2323,8 @@ spec:
             kind: Namespace
             metadata:
               annotations:
+                openshift.io/node-selector: node-role.kubernetes.io/infra=
                 scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator":"Exists","effect":"NoSchedule","key":"node-role.kubernetes.io/infra"}]'
-              labels:
-                openshift.io/cluster-monitoring: "true"
-              name: openshift-operator-lifecycle-manager
-        - complianceType: musthave
-          objectDefinition:
-            apiVersion: v1
-            kind: Namespace
-            metadata:
-              annotations:
-                scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator":"Exists","effect":"NoSchedule","key":"node-role.kubernetes.io/infra"}]'
-              labels:
-                openshift.io/cluster-monitoring: "true"
-              name: openshift-image-registry
-        - complianceType: musthave
-          objectDefinition:
-            apiVersion: v1
-            kind: Namespace
-            metadata:
-              annotations:
-                scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator":"Exists","effect":"NoSchedule","key":"node-role.kubernetes.io/infra"}]'
-              labels:
-                openshift.io/cluster-monitoring: "true"
               name: openshift-marketplace
         - complianceType: musthave
           objectDefinition:
@@ -2369,9 +2332,8 @@ spec:
             kind: Namespace
             metadata:
               annotations:
+                openshift.io/node-selector: node-role.kubernetes.io/infra=
                 scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator":"Exists","effect":"NoSchedule","key":"node-role.kubernetes.io/infra"}]'
-              labels:
-                openshift.io/cluster-monitoring: "true"
               name: openshift-network-console
         - complianceType: musthave
           objectDefinition:
@@ -2381,6 +2343,14 @@ spec:
               annotations:
                 scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator":"Exists","effect":"NoSchedule","key":"node-role.kubernetes.io/infra"}]'
               name: openshift-network-diagnostics
+        - complianceType: musthave
+          objectDefinition:
+            apiVersion: v1
+            kind: Namespace
+            metadata:
+              annotations:
+                openshift.io/node-selector: node-role.kubernetes.io/master=
+              name: openshift-kube-storage-version-migrator
         - complianceType: musthave
           objectDefinition:
             apiVersion: operator.openshift.io/v1
