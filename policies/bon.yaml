@@ -2782,39 +2782,6 @@ spec:
           {{hub end hub}}
         remediationAction: enforce
         severity: high
-  - objectDefinition:
-      apiVersion: policy.open-cluster-management.io/v1
-      kind: ConfigurationPolicy
-      metadata:
-        name: upgrade-signatures-delete
-      spec:
-        evaluationInterval:
-          compliant: 5m
-          noncompliant: 5m
-        object-templates-raw: |
-          {{hub if ne "" (index .ManagedClusterLabels "policies.osus") hub}}
-          {{hub if gt (len (lookup "v1" "ConfigMap" "policies" "" "release.openshift.io/verification-signatures").items) 0 hub}}
-          {{- range $cm := (lookup "v1" "ConfigMap" "openshift-config-managed" "" "release.openshift.io/verification-signatures").items }}
-          {{- if ne $cm.metadata.name "signatures-managed" }}
-          {{- $not_exist := true }}
-          {{hub range $hcm := (lookup "v1" "ConfigMap" "policies" "" "release.openshift.io/verification-signatures").items hub}}
-          {{- if eq $cm.metadata.name "{{hub $hcm.metadata.name hub}}" }} {{ $not_exist = false }} {{ continue }} {{ end }}
-          {{hub end hub}}
-          {{- if $not_exist }}
-          - complianceType: mustnothave
-            objectDefinition:
-              apiVersion: v1
-              kind: ConfigMap
-              metadata:
-                name: {{ $cm.metadata.name }}
-                namespace: openshift-config-managed
-          {{- end }}
-          {{- end }}
-          {{- end }}
-          {{hub end hub}}
-          {{hub end hub}}
-        remediationAction: enforce
-        severity: high
   remediationAction: enforce
 ---
 apiVersion: policy.open-cluster-management.io/v1
