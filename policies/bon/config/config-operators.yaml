@@ -511,7 +511,8 @@ spec:
             type: prune
             prune:
               notIn:
-              - .message
+              - .hostname
+              - .app_name
               - .kubernetes.event
               - .openshift.labels
               - .log_source
