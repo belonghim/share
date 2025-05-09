@@ -764,9 +764,11 @@ spec:
                   type: prune
                   prune:
                     notIn:
-                    - .kubernetes.event
                     - .message
+                    - .kubernetes.event
                     - .openshift.labels
+                    - .log_source
+                    - .log_type
           {{hub- end hub}}
           {{hub- end hub}}
           {{- end }}
