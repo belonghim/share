@@ -693,6 +693,7 @@ spec:
                   filterRefs:
                   - add-cluster-name
                   - multiline
+                  - event-prune
           {{hub- end hub}}
           {{hub- if ne "" $it hub}}
                 - name: infra-log
@@ -759,6 +760,13 @@ spec:
                       matches: (olm-operator|openshift|hive|hypershift|multicluster|open-cluster|kiali|istio)
                     - field: .user.username
                       notMatches: (gitops)
+                - name: event-prune
+                  type: prune
+                  prune:
+                    notIn:
+                    - .kubernetes.event
+                    - .message
+                    - .openshift.labels
           {{hub- end hub}}
           {{hub- end hub}}
           {{- end }}
