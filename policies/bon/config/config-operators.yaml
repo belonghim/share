@@ -512,11 +512,14 @@ spec:
             prune:
               notIn:
               - .hostname
-              - .app_name
+              - .kubernetes.container_name
               - .kubernetes.event
-              - .openshift.labels
+              - .kubernetes.namespace_name
+              - .kubernetes.pod_name
               - .log_source
               - .log_type
+              - .message
+              - .openshift.labels
     {{hub- end hub}}
     {{hub- end hub}}
     {{- end }}
