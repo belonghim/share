@@ -7,7 +7,7 @@ spec:
   remediationAction: enforce
   severity: high
   object-templates-raw: |
-    {{hub if ne "" (index .ManagedClusterLabels "policies.release-force") hub}}
+    {{hub if eq "true" (index .ManagedClusterLabels "policies.release-force") hub}}
     - complianceType: musthave
       objectDefinition:
         apiVersion: config.openshift.io/v1
