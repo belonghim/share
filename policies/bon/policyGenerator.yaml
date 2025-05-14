@@ -250,18 +250,6 @@ policies:
   - osus
   remediationAction: enforce
 # upgrade release channel Policies - end
-# upgrade release force Policies - start
-- name: upgrade-release-force
-  dependencies:
-  - name: check-cv
-  manifests:
-  - path: upgrade/upgrade-release-force.yaml
-  policyLabels:
-    policies.cv: ""
-  policySets:
-  - osus
-  remediationAction: enforce
-# upgrade release force Policies - end
 policySets:
   - name: hub
     placement:

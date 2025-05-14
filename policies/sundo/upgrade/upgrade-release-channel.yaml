@@ -21,3 +21,33 @@ spec:
           channel: {{hub index .ManagedClusterLabels "policies.release-channel" hub}}
     {{hub end hub}}
 ---
+apiVersion: policy.open-cluster-management.io/v1
+kind: ConfigurationPolicy
+metadata:
+  name: upgrade-release-force
+spec:
+  evaluationInterval:
+    compliant: 1m
+    noncompliant: 1m
+  remediationAction: enforce
+  severity: high
+  object-templates-raw: |
+    {{hub- if ne "" (index .ManagedClusterLabels "policies.release-channel") hub}}
+    {{- cv := (lookup "config.openshift.io/v1" "ClusterVersion" "" "version") }}
+    {{- if ne $cv.spec.desiredUpdate.version $cv.status.desired.version }}
+    {{- range $cd := $cv.status.conditions }}
+    {{- if and (eq "ReleaseAccepted" $cd.type) (eq "False" $cd.status) }}
+    - complianceType: musthave
+      objectDefinition:
+        apiVersion: config.openshift.io/v1
+        kind: ClusterVersion
+        metadata:
+          name: version
+        spec:
+          desiredUpdate:
+            force: true
+    {{- end }}
+    {{- end }}
+    {{- end }}
+    {{hub- end hub}}
+---

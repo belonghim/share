@@ -2751,31 +2751,6 @@ spec:
           {{hub end hub}}
         remediationAction: enforce
         severity: high
-  remediationAction: enforce
----
-apiVersion: policy.open-cluster-management.io/v1
-kind: Policy
-metadata:
-  annotations:
-    argocd.argoproj.io/compare-options: IgnoreExtraneous
-    policy.open-cluster-management.io/categories: CM Configuration Management
-    policy.open-cluster-management.io/controls: CM-2 Baseline Configuration
-    policy.open-cluster-management.io/description: ""
-    policy.open-cluster-management.io/standards: NIST SP 800-53
-  labels:
-    open-cluster-management.io/policy-set: opp
-    policies.cv: ""
-  name: upgrade-release-force
-  namespace: policies
-spec:
-  dependencies:
-  - apiVersion: policy.open-cluster-management.io/v1
-    compliance: Compliant
-    kind: Policy
-    name: check-cv
-    namespace: policies
-  disabled: false
-  policy-templates:
   - objectDefinition:
       apiVersion: policy.open-cluster-management.io/v1
       kind: ConfigurationPolicy
@@ -2786,8 +2761,11 @@ spec:
           compliant: 1m
           noncompliant: 1m
         object-templates-raw: |
-          {{hub- if eq "true" (index .ManagedClusterLabels "policies.release-force") hub}}
-          {{- if ne (lookup "config.openshift.io/v1" "ClusterVersion" "" "version").spec.desiredUpdate.version (lookup "config.openshift.io/v1" "ClusterVersion" "" "version").status.desired.version }}
+          {{hub- if ne "" (index .ManagedClusterLabels "policies.release-channel") hub}}
+          {{- cv := (lookup "config.openshift.io/v1" "ClusterVersion" "" "version") }}
+          {{- if ne $cv.spec.desiredUpdate.version $cv.status.desired.version }}
+          {{- range $cd := $cv.status.conditions }}
+          {{- if and (eq "ReleaseAccepted" $cd.type) (eq "False" $cd.status) }}
           - complianceType: musthave
             objectDefinition:
               apiVersion: config.openshift.io/v1
@@ -2797,6 +2775,8 @@ spec:
               spec:
                 desiredUpdate:
                   force: true
+          {{- end }}
+          {{- end }}
           {{- end }}
           {{hub- end hub}}
         remediationAction: enforce
@@ -3202,7 +3182,6 @@ spec:
   - check-upgradeable
   - upgrade-admin-acks
   - upgrade-release-channel
-  - upgrade-release-force
   - upgrade-signatures
   - upgrade-upstream
 ---
