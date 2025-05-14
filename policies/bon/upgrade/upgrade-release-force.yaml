@@ -4,10 +4,14 @@ kind: ConfigurationPolicy
 metadata:
   name: upgrade-release-force
 spec:
+  evaluationInterval:
+    compliant: 1m
+    noncompliant: 1m
   remediationAction: enforce
   severity: high
   object-templates-raw: |
-    {{hub if eq "true" (index .ManagedClusterLabels "policies.release-force") hub}}
+    {{hub- if eq "true" (index .ManagedClusterLabels "policies.release-force") hub}}
+    {{- if ne (lookup "config.openshift.io/v1" "ClusterVersion" "" "version").spec.desiredUpdate.version (lookup "config.openshift.io/v1" "ClusterVersion" "" "version").status.desired.version }}
     - complianceType: musthave
       objectDefinition:
         apiVersion: config.openshift.io/v1
@@ -17,5 +21,6 @@ spec:
         spec:
           desiredUpdate:
             force: true
-    {{hub end hub}}
+    {{- end }}
+    {{hub- end hub}}
 ---
