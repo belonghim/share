@@ -2765,6 +2765,51 @@ metadata:
   labels:
     open-cluster-management.io/policy-set: opp
     policies.cv: ""
+  name: upgrade-release-force
+  namespace: policies
+spec:
+  dependencies:
+  - apiVersion: policy.open-cluster-management.io/v1
+    compliance: Compliant
+    kind: Policy
+    name: check-cv
+    namespace: policies
+  disabled: false
+  policy-templates:
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: upgrade-release-force
+      spec:
+        object-templates-raw: |
+          {{hub if ne "" (index .ManagedClusterLabels "policies.release-force") hub}}
+          - complianceType: musthave
+            objectDefinition:
+              apiVersion: config.openshift.io/v1
+              kind: ClusterVersion
+              metadata:
+                name: version
+              spec:
+                desiredUpdate:
+                  force: true
+          {{hub end hub}}
+        remediationAction: enforce
+        severity: high
+  remediationAction: enforce
+---
+apiVersion: policy.open-cluster-management.io/v1
+kind: Policy
+metadata:
+  annotations:
+    argocd.argoproj.io/compare-options: IgnoreExtraneous
+    policy.open-cluster-management.io/categories: CM Configuration Management
+    policy.open-cluster-management.io/controls: CM-2 Baseline Configuration
+    policy.open-cluster-management.io/description: ""
+    policy.open-cluster-management.io/standards: NIST SP 800-53
+  labels:
+    open-cluster-management.io/policy-set: opp
+    policies.cv: ""
   name: upgrade-signatures
   namespace: policies
 spec:
@@ -3152,6 +3197,7 @@ spec:
   - check-upgradeable
   - upgrade-admin-acks
   - upgrade-release-channel
+  - upgrade-release-force
   - upgrade-signatures
   - upgrade-upstream
 ---

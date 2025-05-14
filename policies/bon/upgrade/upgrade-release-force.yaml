@@ -1,0 +1,21 @@
+---
+apiVersion: policy.open-cluster-management.io/v1
+kind: ConfigurationPolicy
+metadata:
+  name: upgrade-release-force
+spec:
+  remediationAction: enforce
+  severity: high
+  object-templates-raw: |
+    {{hub if ne "" (index .ManagedClusterLabels "policies.release-force") hub}}
+    - complianceType: musthave
+      objectDefinition:
+        apiVersion: config.openshift.io/v1
+        kind: ClusterVersion
+        metadata:
+          name: version
+        spec:
+          desiredUpdate:
+            force: true
+    {{hub end hub}}
+---
