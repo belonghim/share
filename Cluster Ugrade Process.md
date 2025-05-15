@@ -263,6 +263,7 @@ $ nohup sh 2.sh redhat $Repository >2.out 2>&1 &
 
 ```
 
+<br><br>
 
 ## Release Upgrade
 
@@ -326,7 +327,23 @@ managedclusterinfo.internal.open-cluster-management.io/compact condition met
 
 ```
 
-### Delete release channel
+### Check policies.cv states are all "Compliant"
+```
+## Check cv-check state is "Compliant"
+$ oc -n $CLUSTER get policy -l policies.cv
+NAME                               REMEDIATION ACTION   COMPLIANCE STATE   AGE
+policies.check-cv                  inform               Compliant          3h14m
+policies.check-upgradeable         inform               Compliant          3h14m
+policies.proxy-sync-managed        enforce              Compliant          3h14m
+policies.upgrade-admin-acks        enforce              Compliant          3h14m
+policies.upgrade-release-channel   enforce              Compliant          3h14m
+policies.upgrade-signatures        enforce              Compliant          3h14m
+policies.upgrade-sub-automatic     enforce              Compliant          75m
+policies.upgrade-upstream          enforce              Compliant          3h14m
+
+```
+
+### Delete release channel (for signature varification)
 ```
 ## Delete managecluster's release-channel label
 $ oc label mcl $CLUSTER policies.release-channel-
@@ -372,6 +389,13 @@ $ [ $? -eq 0 ] && sh upgrade.sh | oc replace --force -f -
 
 ## Wait until upgrade version is updated
 $ oc -n $CLUSTER wait --timeout=1h --for=jsonpath='{.status.distributionInfo.ocp.version}'=${VERSION} managedclusterinfo $CLUSTER
+
+```
+
+### Delete release channel
+```
+## Delete managecluster's release-channel label
+$ oc label mcl $CLUSTER policies.release-channel-
 
 ```
 
