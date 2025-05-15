@@ -2762,7 +2762,7 @@ spec:
           noncompliant: 1m
         object-templates-raw: |
           {{hub- if ne "" (index .ManagedClusterLabels "policies.release-channel") hub}}
-          {{- cv := (lookup "config.openshift.io/v1" "ClusterVersion" "" "version") }}
+          {{- $cv := (lookup "config.openshift.io/v1" "ClusterVersion" "" "version") }}
           {{- if ne $cv.spec.desiredUpdate.version $cv.status.desired.version }}
           {{- range $cd := $cv.status.conditions }}
           {{- if and (eq "ReleaseAccepted" $cd.type) (eq "False" $cd.status) }}
