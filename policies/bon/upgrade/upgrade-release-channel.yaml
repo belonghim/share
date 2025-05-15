@@ -5,7 +5,7 @@ metadata:
   name: upgrade-release-channel
 spec:
   evaluationInterval:
-    compliant: 30m
+    compliant: 2m
     noncompliant: 2m
   remediationAction: enforce
   severity: high

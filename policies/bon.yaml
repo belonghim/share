@@ -2736,7 +2736,7 @@ spec:
         name: upgrade-release-channel
       spec:
         evaluationInterval:
-          compliant: 30m
+          compliant: 2m
           noncompliant: 2m
         object-templates-raw: |
           {{hub if ne "" (index .ManagedClusterLabels "policies.release-channel") hub}}
