@@ -802,6 +802,14 @@ spec:
                 - effect: NoSchedule
                   key: node-role.kubernetes.io/infra
                   operator: Exists
+                - effect: NoExecute
+                  key: node.kubernetes.io/not-ready
+                  operator: Exists
+                  tolerationSeconds: 60
+                - effect: NoExecute
+                  key: node.kubernetes.io/unreachable
+                  operator: Exists
+                  tolerationSeconds: 60
           - complianceType: musthave
             objectDefinition:
               apiVersion: argoproj.io/v1beta1
@@ -859,13 +867,6 @@ spec:
                 initialSSHKnownHosts: {}
                 monitoring:
                   enabled: false
-                nodePlacement:
-                  nodeSelector:
-                    node-role.kubernetes.io/infra: ""
-                  tolerations:
-                  - effect: NoSchedule
-                    key: node-role.kubernetes.io/infra
-                    operator: Exists
                 notifications:
                   enabled: true
                 prometheus:
