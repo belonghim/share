@@ -165,7 +165,7 @@ listen ingress-router-80
 ### 사전 설치된 Packages 확인 (registry.redhat.io/ubi8/ubi 기준 추가 필요)
 
 ```
-$ dnf info nmstate bind-utils iputils iproute coreos-installer
+$ dnf info nmstate bind-utils iputils iproute coreos-installer rsync
 ```
 
 ### 사전 다운로드된 tools 확인
