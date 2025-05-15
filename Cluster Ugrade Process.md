@@ -327,19 +327,11 @@ managedclusterinfo.internal.open-cluster-management.io/compact condition met
 
 ```
 
-### Check policies.cv states are all "Compliant"
+### Wait policies.cv states are all "Compliant"
 ```
-## Check cv-check state is "Compliant"
-$ oc -n $CLUSTER get policy -l policies.cv
-NAME                               REMEDIATION ACTION   COMPLIANCE STATE   AGE
-policies.check-cv                  inform               Compliant          3h14m
-policies.check-upgradeable         inform               Compliant          3h14m
-policies.proxy-sync-managed        enforce              Compliant          3h14m
-policies.upgrade-admin-acks        enforce              Compliant          3h14m
-policies.upgrade-release-channel   enforce              Compliant          3h14m
-policies.upgrade-signatures        enforce              Compliant          3h14m
-policies.upgrade-sub-automatic     enforce              Compliant          75m
-policies.upgrade-upstream          enforce              Compliant          3h14m
+## Wait until policies.cv states are all "Compliant"
+$ oc -n $CLUSTER wait --timeout=20m --for=jsonpath='{.status.compliant}'=Compliant policy -l policies.cv
+policy.policy.open-cluster-management.io/policies.check-cv condition met
 
 ```
 
