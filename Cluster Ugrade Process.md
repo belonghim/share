@@ -332,6 +332,13 @@ managedclusterinfo.internal.open-cluster-management.io/compact condition met
 ## Wait until policies.cv states are all "Compliant"
 $ oc -n $CLUSTER wait --timeout=20m --for=jsonpath='{.status.compliant}'=Compliant policy -l policies.cv
 policy.policy.open-cluster-management.io/policies.check-cv condition met
+policy.policy.open-cluster-management.io/policies.check-upgradeable condition met
+policy.policy.open-cluster-management.io/policies.proxy-sync-managed condition met
+policy.policy.open-cluster-management.io/policies.upgrade-admin-acks condition met
+policy.policy.open-cluster-management.io/policies.upgrade-release-channel condition met
+policy.policy.open-cluster-management.io/policies.upgrade-signatures condition met
+policy.policy.open-cluster-management.io/policies.upgrade-sub-manual condition met
+policy.policy.open-cluster-management.io/policies.upgrade-upstream condition met
 
 ```
 
