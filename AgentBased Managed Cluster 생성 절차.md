@@ -197,6 +197,7 @@ $ ping -c3 192.168.1.1
 ```
 $ SshKey="$(cat /root/.ssh/id_rsa.pub)"
 $ echo $SshKey
+from="192.168.1.5,192.168.1.6" ssh-ed25519 AAAA...
 ```
 
 ### additionalTrustBundle 확인
