@@ -306,7 +306,7 @@ policies.proxy-sync-managed        enforce              Compliant          3h14m
 policies.upgrade-admin-acks        enforce              Compliant          3h14m
 policies.upgrade-release-channel   enforce              Compliant          3h14m
 policies.upgrade-signatures        enforce              Compliant          3h14m
-policies.upgrade-sub-automatic     enforce              Compliant          75m
+policies.upgrade-sub-manual        enforce              Compliant          75m
 policies.upgrade-upstream          enforce              Compliant          3h14m
 
 ```
