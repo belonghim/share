@@ -261,11 +261,8 @@ $ nohup sh 2.sh redhat $Repository >2.out 2>&1 &
 
 ... Release images skip ...
 
+
 ```
-
-<br><br>
-
-## Release Upgrade
 
 ### Download the git repo
 ```
@@ -287,10 +284,15 @@ $ sh adding-signatures.sh | oc apply -f -
 
 ```
 
+
+<br><br>
+
+## Release Upgrade
+
 ### Check policies.osus label
 ```
 ## Check policies.osus label is "ocp4"
-$ CLUSTER=local-cluster
+$ CLUSTER=test
 $ oc label mcl $CLUSTER policies.osus=ocp4
 
 ```
@@ -314,7 +316,7 @@ policies.upgrade-upstream          enforce              Compliant          3h14m
 ### Change release channel
 ```
 ## Change managecluster's release-channel label
-$ CHANNEL=eus-4.18
+$ CHANNEL=stable-4.18
 $ oc label mcl $CLUSTER policies.release-channel=${CHANNEL} --overwrite
 
 ```
@@ -323,7 +325,7 @@ $ oc label mcl $CLUSTER policies.release-channel=${CHANNEL} --overwrite
 ```
 ## Wait until channel is updated
 $ oc -n $CLUSTER wait --timeout=10m --for=jsonpath='{.status.distributionInfo.ocp.channel}'=${CHANNEL} managedclusterinfo $CLUSTER
-managedclusterinfo.internal.open-cluster-management.io/compact condition met
+managedclusterinfo.internal.open-cluster-management.io/test condition met
 
 ```
 
@@ -351,9 +353,6 @@ $ oc label mcl $CLUSTER policies.release-channel-
 
 ### Execute version upgrade curator
 ```
-## set $CLUSTER variable
-$ export CLUSTER=local-cluster
-
 ## Check available release versions
 $ oc -n $CLUSTER get -ojsonpath='{.status.distributionInfo.ocp.availableUpdates}' managedclusterinfo $CLUSTER
 ...
@@ -362,7 +361,7 @@ $ oc -n $CLUSTER get -ojsonpath='{.status.distributionInfo.ocp.availableUpdates}
 $ export VERSION=4.18.1
 
 $ oc -n $CLUSTER wait --timeout=20m --for=jsonpath='{.status.distributionInfo.ocp.availableUpdates[?(@=="'$VERSION'")]}' managedclusterinfo $CLUSTER
-managedclusterinfo.internal.open-cluster-management.io/local-cluster condition met
+managedclusterinfo.internal.open-cluster-management.io/test condition met
 
 ## Check check-upgradeable state is "Compliant"
 $ oc -n $CLUSTER get policy policies.check-upgradeable
@@ -370,7 +369,17 @@ NAME                         REMEDIATION ACTION   COMPLIANCE STATE   AGE
 policies.check-upgradeable   inform               Compliant          13h
 
 ## Recreate curator-upgrade
-$ sh upgrade.sh | oc replace --force -f -
+$ oc replace --force -f - <<EOF
+apiVersion: cluster.open-cluster-management.io/v1beta1
+kind: ClusterCurator
+metadata:
+  name: $CLUSTER
+  namespace: $CLUSTER
+spec:
+  desiredCuration: upgrade
+  upgrade:
+    desiredUpdate: $VERSION
+EOF
 
 ```
 
@@ -378,7 +387,7 @@ $ sh upgrade.sh | oc replace --force -f -
 ```
 ## Wait until curator-upgrade is updated
 $ oc -n $CLUSTER wait --timeout=3h --for=condition=clustercurator-job=true clustercurator $CLUSTER
-clustercurator.cluster.open-cluster-management.io/local-cluster condition met
+clustercurator.cluster.open-cluster-management.io/test condition met
 
 ## Check clustercurator state is "Job_failed"
 $ oc -n $CLUSTER get clustercurator $CLUSTER -ojsonpath='{.status.conditions[?(@.type=="clustercurator-job")].reason}' | grep Job_failed
@@ -409,37 +418,13 @@ policy.policy.open-cluster-management.io/policies.check-cv condition met
 
 <br><br>
 
-## Operators Upgrade (to latest)
-
-### (Optional) Manual Subscription
-```
-## Example of Subscription that should not be upgrade
-#apiVersion: operators.coreos.com/v1alpha1
-#kind: Subscription
-#metadata:
-#  labels:
-#    policies.ignore: ""
-#..
-#spec:
-#  installPlanApproval: Manual
-#..
-
-## Or
-#apiVersion: operators.coreos.com/v1alpha1
-#kind: Subscription
-#metadata:
-#  labels:
-#    policies.stable: ""
-#..
-#spec:
-#  installPlanApproval: Manual
-#  startingCSV: kiali-operator.v1.89.10
-#..
-
-```
+## Operators Upgrade
 
 ### Check csv-check
 ```
+## set $CLUSTER variable
+$ export CLUSTER=test
+
 ## Check check-csv's state
 $ oc -n $CLUSTER get policy policies.check-csv
 NAME                 REMEDIATION ACTION   COMPLIANCE STATE   AGE
@@ -451,7 +436,7 @@ policies.check-csv   inform               NonCompliant       15h
 ```
 ## Change managecluster's sub-approval label to automatic
 $ oc label --overwrite managedcluster $CLUSTER policies.sub-approval=automatic
-managedcluster.cluster.open-cluster-management.io/local-cluster labeled
+managedcluster.cluster.open-cluster-management.io/test labeled
 
 ## Check upgrade-sub-automatic state is "Compliant"
 $ oc -n $CLUSTER get policy policies.upgrade-sub-automatic
@@ -484,7 +469,7 @@ policy.policy.open-cluster-management.io/policies.upgrade-sub-automatic conditio
 ```
 ## Change managecluster's sub-approval label to manual
 $ oc label --overwrite managedcluster $CLUSTER policies.sub-approval=manual
-managedcluster.cluster.open-cluster-management.io/local-cluster labeled
+managedcluster.cluster.open-cluster-management.io/test labeled
 
 ## Check upgrade-sub-manual state is "Compliant"
 $ oc -n $CLUSTER get policy policies.upgrade-sub-manual
