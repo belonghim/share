@@ -248,6 +248,7 @@ RPSTR=$2
 RPSTR=${RPSTR:=$HOSTNAME:8443/$RPN}
 echo $$ >$1/2.pid
 while [ ! -f $1/file/mirror_000001.tar ] || [ -f $1/1.pid ] ; do echo -n \.; sleep 10; done
+echo
 rm -rf file ~/.oc-mirror; cp -R $1/$1.yaml $1/file .; rm -f file/working-dir/logs/mirroring_errors_*.txt
 unset ok; while [ "$ok" != "true" ]; do
 oc-mirror --v2 --log-level debug --retry-times 999 --image-timeout 1h -c $1.yaml --from file://file docker://$RPSTR >$1/$RPN-2.out 2>&1
@@ -289,10 +290,17 @@ $ sh adding-signatures.sh | oc apply -f -
 
 ## Release Upgrade
 
+### Check ManagedClusterAddOns are all "Available"
+```
+## Check ManagedClusterAddOns are all "Available"
+$ CLUSTER=test
+$ oc -n $CLUSTER wait mca --all --for=condition=Available
+
+```
+
 ### Check policies.osus label
 ```
 ## Check policies.osus label is "ocp4"
-$ CLUSTER=test
 $ oc label mcl $CLUSTER policies.osus=ocp4
 
 ```
@@ -420,11 +428,16 @@ policy.policy.open-cluster-management.io/policies.check-cv condition met
 
 ## Operators Upgrade
 
+### Check ManagedClusterAddOns are all "Available"
+```
+## Check ManagedClusterAddOns are all "Available"
+$ CLUSTER=test
+$ oc -n $CLUSTER wait mca --all --for=condition=Available
+
+```
+
 ### Check csv-check
 ```
-## set $CLUSTER variable
-$ export CLUSTER=test
-
 ## Check check-csv's state
 $ oc -n $CLUSTER get policy policies.check-csv
 NAME                 REMEDIATION ACTION   COMPLIANCE STATE   AGE
