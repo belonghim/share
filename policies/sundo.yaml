@@ -490,7 +490,7 @@ metadata:
   labels:
     open-cluster-management.io/policy-set: opp
     policies.cv: ""
-  name: check-cv-upgradeable
+  name: check-upgradeable
   namespace: policies
 spec:
   dependencies:
@@ -505,7 +505,7 @@ spec:
       apiVersion: policy.open-cluster-management.io/v1
       kind: ConfigurationPolicy
       metadata:
-        name: check-cv-upgradeable
+        name: check-upgradeable
       spec:
         object-templates:
         - complianceType: mustnothave
@@ -2975,7 +2975,7 @@ spec:
   - apiVersion: policy.open-cluster-management.io/v1
     compliance: Compliant
     kind: Policy
-    name: check-cv-upgradeable
+    name: check-upgradeable
     namespace: policies
   - apiVersion: policy.open-cluster-management.io/v1
     compliance: Compliant
@@ -3152,7 +3152,7 @@ metadata:
 spec:
   description: ""
   policies:
-  - check-cv-upgradeable
+  - check-upgradeable
   - upgrade-admin-acks
   - upgrade-release-channel
   - upgrade-signatures

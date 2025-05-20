@@ -34,7 +34,7 @@ policies:
 # Subscription Init Policies - start
 - name: upgrade-sub-init
   dependencies:
-  - name: check-cv-upgradeable
+  - name: check-upgradeable
   - name: config-operators
   manifests:
   - path: upgrade/upgrade-sub-init.yaml
@@ -140,12 +140,12 @@ policies:
   remediationAction: inform
 # Upgradeable check Policies - end
 # CV check Policies - start
-- name: check-cv-upgradeable
+- name: check-upgradeable
   complianceType: mustnothave
   dependencies:
   - name: check-cv
   manifests:
-  - path: check/check-cv-upgradeable.yaml
+  - path: check/check-upgradeable.yaml
   policyLabels:
     policies.cv: ""
   policySets:
