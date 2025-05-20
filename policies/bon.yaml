@@ -349,6 +349,54 @@ metadata:
   labels:
     open-cluster-management.io/policy-set: opp
     policies.csv: ""
+  name: check-csv-latest
+  namespace: policies
+spec:
+  disabled: false
+  policy-templates:
+  - objectDefinition:
+      apiVersion: policy.open-cluster-management.io/v1
+      kind: ConfigurationPolicy
+      metadata:
+        name: check-csv-latest
+      spec:
+        evaluationInterval:
+          compliant: 1m
+          noncompliant: 1m
+        object-templates-raw: |
+          {{- range $sub := (lookup "operators.coreos.com/v1alpha1" "Subscription" "" "" "!policies.ignore,policies.install").items }}{{ $pkg := lookup "packages.operators.coreos.com/v1" "PackageManifest" "openshift-marketplace" $sub.spec.name }}
+          {{- if eq "PackageManifest" $pkg.kind }}
+          {{- range $chn := index $pkg.status.channels }}
+          {{- if eq $pkg.status.defaultChannel $chn.name }}
+          - complianceType: musthave
+            objectDefinition:
+              apiVersion: operators.coreos.com/v1alpha1
+              kind: ClusterServiceVersion
+              metadata:
+                name: {{ $chn.currentCSV }}
+                namespace: {{ $sub.metadata.namespace }}
+              status:
+                phase: Succeeded
+          {{- end }}
+          {{- end }}
+          {{- end }}
+          {{- end }}
+        remediationAction: inform
+        severity: high
+  remediationAction: inform
+---
+apiVersion: policy.open-cluster-management.io/v1
+kind: Policy
+metadata:
+  annotations:
+    argocd.argoproj.io/compare-options: IgnoreExtraneous
+    policy.open-cluster-management.io/categories: CM Configuration Management
+    policy.open-cluster-management.io/controls: CM-2 Baseline Configuration
+    policy.open-cluster-management.io/description: ""
+    policy.open-cluster-management.io/standards: NIST SP 800-53
+  labels:
+    open-cluster-management.io/policy-set: opp
+    policies.csv: ""
     policies.cv: ""
   name: check-cv
   namespace: policies
@@ -442,7 +490,7 @@ metadata:
   labels:
     open-cluster-management.io/policy-set: opp
     policies.cv: ""
-  name: check-upgradeable
+  name: check-cv-upgradeable
   namespace: policies
 spec:
   dependencies:
@@ -457,7 +505,7 @@ spec:
       apiVersion: policy.open-cluster-management.io/v1
       kind: ConfigurationPolicy
       metadata:
-        name: check-upgradeable
+        name: check-cv-upgradeable
       spec:
         object-templates:
         - complianceType: mustnothave
@@ -529,6 +577,13 @@ spec:
               kind: SelfNodeRemediationConfig
               metadata:
                 name: self-node-remediation-config
+                namespace: openshift-workload-availability
+          - complianceType: mustnothave
+            objectDefinition:
+              apiVersion: self-node-remediation.medik8s.io/v1alpha1
+              kind: SelfNodeRemediationTemplate
+              metadata:
+                name: self-node-remediation-automatic-strategy-template
                 namespace: openshift-workload-availability
           {{- else }}
           - complianceType: musthave
@@ -726,6 +781,8 @@ spec:
                       matches: kubelet.service
                     - field: .message
                       matches: ^I[0-9]
+                    - field: .message
+                      notMatches: OOM event
                 - name: important
                   type: drop
                   drop:
@@ -3003,7 +3060,7 @@ spec:
   - apiVersion: policy.open-cluster-management.io/v1
     compliance: Compliant
     kind: Policy
-    name: check-upgradeable
+    name: check-cv-upgradeable
     namespace: policies
   - apiVersion: policy.open-cluster-management.io/v1
     compliance: Compliant
@@ -3180,7 +3237,7 @@ metadata:
 spec:
   description: ""
   policies:
-  - check-upgradeable
+  - check-cv-upgradeable
   - upgrade-admin-acks
   - upgrade-release-channel
   - upgrade-signatures
@@ -3198,6 +3255,7 @@ metadata:
 spec:
   description: ""
   policies:
+  - check-csv-latest
   - upgrade-cs-redhat-operator
   - upgrade-marketplace-job
   - upgrade-sub-automatic

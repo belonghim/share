@@ -34,7 +34,7 @@ policies:
 # Subscription Init Policies - start
 - name: upgrade-sub-init
   dependencies:
-  - name: check-upgradeable
+  - name: check-cv-upgradeable
   - name: config-operators
   manifests:
   - path: upgrade/upgrade-sub-init.yaml
@@ -98,7 +98,7 @@ policies:
   policySets:
   - managed
 # Proxy Router Bundle Policies - end
-# Config  operators Policies - start
+# Config operators Policies - start
 - name: config-operators
   dependencies:
   - name: check-csv
@@ -140,12 +140,12 @@ policies:
   remediationAction: inform
 # Upgradeable check Policies - end
 # CV check Policies - start
-- name: check-upgradeable
+- name: check-cv-upgradeable
   complianceType: mustnothave
   dependencies:
   - name: check-cv
   manifests:
-  - path: check/check-upgradeable.yaml
+  - path: check/check-cv-upgradeable.yaml
   policyLabels:
     policies.cv: ""
   policySets:
@@ -163,6 +163,16 @@ policies:
   - managed
   remediationAction: inform
 # CSV check Policies - end
+# latest CSV check Policies - start
+- name: check-csv-latest
+  manifests:
+  - path: check/check-csv-latest.yaml
+  policyLabels:
+    policies.csv: ""
+  policySets:
+  - sub-automatic
+  remediationAction: inform
+# latest CSV check Policies - end
 # infra label Policies - start
 - name: node-infra-label
   manifests:
