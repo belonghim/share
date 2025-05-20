@@ -143,7 +143,7 @@ spec:
           namespace: openshift-workload-availability
           labels:
             policies.install: ""
-                spec:
+        spec:
           name: node-maintenance-operator
           source: cs-redhat-operator-index
           sourceNamespace: openshift-marketplace
