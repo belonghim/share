@@ -415,11 +415,18 @@ $ oc label mcl $CLUSTER policies.release-channel-
 
 ```
 
-### Wait ClusterVersion compliant
+### Wait policies.cv states are all "Compliant"
 ```
-## Wait until check-cv state is "Compliant"
-$ oc -n $CLUSTER wait --timeout=1h --for=jsonpath='{.status.compliant}'=Compliant policy policies.check-cv
+## Wait until policies.cv states are all "Compliant"
+$ oc -n $CLUSTER wait --timeout=1h --for=jsonpath='{.status.compliant}'=Compliant policy -l policies.cv
 policy.policy.open-cluster-management.io/policies.check-cv condition met
+policy.policy.open-cluster-management.io/policies.check-upgradeable condition met
+policy.policy.open-cluster-management.io/policies.proxy-sync-managed condition met
+policy.policy.open-cluster-management.io/policies.upgrade-admin-acks condition met
+policy.policy.open-cluster-management.io/policies.upgrade-release-channel condition met
+policy.policy.open-cluster-management.io/policies.upgrade-signatures condition met
+policy.policy.open-cluster-management.io/policies.upgrade-sub-manual condition met
+policy.policy.open-cluster-management.io/policies.upgrade-upstream condition met
 
 ```
 
