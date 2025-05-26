@@ -438,11 +438,13 @@ $ oc -n $CLUSTER wait mca --all --for=condition=Available
 
 ### Check csv-check
 ```
-## Check check-csv's state
-$ oc -n $CLUSTER get policy policies.check-csv
-NAME                 REMEDIATION ACTION   COMPLIANCE STATE   AGE
-policies.check-csv   inform               NonCompliant       15h
-
+## Check policies.csv's state
+$ oc -n $CLUSTER get policy -l policies.csv
+NAME                          REMEDIATION ACTION   COMPLIANCE STATE   AGE
+policies.check-csv            inform               Compliant          15h
+policies.check-cv             inform               Compliant          15h
+policies.install-operators    enforce              Compliant          15h
+policies.upgrade-sub-manual   enforce              Compliant          15h
 ```
 
 ### Change installPlanApproval to automatic
