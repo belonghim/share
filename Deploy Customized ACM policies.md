@@ -94,6 +94,9 @@ $ oc -n open-cluster-management wait --timeout=10m mch/multiclusterhub --for=jso
 
 ### Update ClusterManagementAddon 
 ```
+## Wait for open-cluster-management-hub namespace is exist
+$ while ! oc get ns open-cluster-management-hub;do sleep 10;done
+
 ## Create AddOnDeploymentConfig
 $ oc create -f - <<EOF
 apiVersion: addon.open-cluster-management.io/v1alpha1
