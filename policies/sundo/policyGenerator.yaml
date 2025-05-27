@@ -163,16 +163,6 @@ policies:
   - managed
   remediationAction: inform
 # CSV check Policies - end
-# latest CSV check Policies - start
-- name: check-csv-latest
-  manifests:
-  - path: check/check-csv-latest.yaml
-  policyLabels:
-    policies.csv: ""
-  policySets:
-  - sub-automatic
-  remediationAction: inform
-# latest CSV check Policies - end
 # infra label Policies - start
 - name: node-infra-label
   manifests:
