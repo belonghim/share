@@ -1398,7 +1398,6 @@ spec:
                 namespace: open-cluster-management
                 name: multiclusterhub
               spec:
-                disableUpdateClusterImageSets: true
                 nodeSelector:
                   node-role.kubernetes.io/acm: ""
                 tolerations:
