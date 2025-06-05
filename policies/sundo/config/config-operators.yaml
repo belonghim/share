@@ -424,9 +424,9 @@ spec:
             - rsyslog
     {{hub- end hub}}
             filterRefs:
-            - add-cluster-name
             - journal-filter
             - multiline
+            - journal-prune
           - name: event-log
             inputRefs:
             - eventrouter
@@ -438,7 +438,6 @@ spec:
             - rsyslog
     {{hub- end hub}}
             filterRefs:
-            - add-cluster-name
             - multiline
             - event-prune
     {{hub- end hub}}
@@ -452,6 +451,17 @@ spec:
             - add-cluster-name
             - important
             - core-infra-log
+    {{hub- end hub}}
+    {{hub- if ne "" $et hub}}
+          - name: event-kafka
+            inputRefs:
+            - eventrouter
+            outputRefs:
+            - event-receiver
+            filterRefs:
+            - multiline
+            - event-kafka-prune
+            - event-kafka-drop
     {{hub- end hub}}
           filters:
           - name: add-cluster-name
@@ -522,6 +532,35 @@ spec:
               - .log_type
               - .message
               - .openshift.labels
+          - name: event-kafka-prune
+            type: prune
+            prune:
+              notIn:
+              - .kubernetes.event.involvedObject.name
+              - .kubernetes.event.involvedObject.namespace
+              - .kubernetes.event.lastTimestamp
+              - .kubernetes.event.reason
+              - .kubernetes.event.type
+              - .kubernetes.event.eventTime
+              - .log_source
+              - .log_type
+              - .message
+          - name: event-kafka-drop
+            type: drop
+            drop:
+            - test:
+              - field: .kubernetes.event.type
+                matches: Normal
+          - name: journal-prune
+            type: prune
+            prune:
+              notIn:
+              - .hostname
+              - .log_source
+              - .log_type
+              - .message
+              - .systemd.u.SYSLOG_IDENTIFIER
+              - .time
     {{hub- end hub}}
     {{hub- end hub}}
     {{- end }}
@@ -640,7 +679,7 @@ spec:
                 cpu: 250m
                 memory: 128Mi
           repo:
-            replicas: 1
+            replicas: 2
             resources:
               limits:
                 cpu: "1"
@@ -664,7 +703,7 @@ spec:
                 enabled: false
             ingress:
               enabled: false
-            replicas: 1
+            replicas: 2
             resources:
               limits:
                 cpu: 500m
