@@ -684,9 +684,6 @@ spec:
                   inputRefs:
                   - eventrouter
                   outputRefs:
-          {{hub- if ne "" $et hub}}
-                  - event-receiver
-          {{hub- end hub}}
           {{hub- if ne "" $su hub}}
                   - rsyslog
           {{hub- end hub}}
