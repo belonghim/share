@@ -677,6 +677,7 @@ spec:
                   - rsyslog
           {{hub- end hub}}
                   filterRefs:
+                  - add-cluster-name
                   - journal-filter
                   - multiline
                   - journal-prune
@@ -688,6 +689,7 @@ spec:
                   - rsyslog
           {{hub- end hub}}
                   filterRefs:
+                  - add-cluster-name
                   - multiline
                   - event-prune
           {{hub- end hub}}
@@ -709,6 +711,7 @@ spec:
                   outputRefs:
                   - event-receiver
                   filterRefs:
+                  - add-cluster-name
                   - multiline
                   - event-kafka-prune
                   - event-kafka-drop
@@ -795,6 +798,7 @@ spec:
                     - .log_source
                     - .log_type
                     - .message
+                    - .openshift.labels
                 - name: event-kafka-drop
                   type: drop
                   drop:
@@ -811,6 +815,7 @@ spec:
                     - .message
                     - .systemd.u.SYSLOG_IDENTIFIER
                     - .time
+                    - .openshift.labels
           {{hub- end hub}}
           {{hub- end hub}}
           {{- end }}
