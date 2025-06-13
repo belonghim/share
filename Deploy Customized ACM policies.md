@@ -204,7 +204,7 @@ $ oc -n policies label cm config-operators policies.config=
 
 ### (Optional) Apply cluster-log-forwarder's topics and syslog-url
 ```
-$ oc label mcl local-cluster policies.event-topic=event policies.infra-topic=infra policies.syslog-url="192.168.10.100..514"
+$ oc label mcl local-cluster policies.event-topic=ocpevent policies.journal-topic=ocpsystem policies.infra-topic=ocpinfra policies.syslog-url="192.168.10.100..514"
 ```
 
 ### (Optional) Apply cluster-monitoring-config's remote write monitoring namespace prefix
