@@ -312,9 +312,9 @@ spec:
     {{hub- if and (hasKey (lookup "v1" "ConfigMap" "policies" "config-operators").data $eb) (hasKey (lookup "v1" "ConfigMap" "policies" "config-operators").data $ib) hub}}
     {{hub- $su := index .ManagedClusterLabels "policies.syslog-url" hub}}
     {{hub- $et := index .ManagedClusterLabels "policies.event-topic" hub}}
-    {{hub- $st := index .ManagedClusterLabels "policies.journal-topic" hub}}
+    {{hub- $jt := index .ManagedClusterLabels "policies.journal-topic" hub}}
     {{hub- $it := index .ManagedClusterLabels "policies.infra-topic" hub}}
-    {{hub- if ne "" (cat $su $et $st $it | replace " " "") hub}}
+    {{hub- if ne "" (cat $su $et $jt $it | replace " " "") hub}}
     - complianceType: mustonlyhave
       objectDefinition:
         apiVersion: observability.openshift.io/v1
@@ -386,7 +386,7 @@ spec:
                 maxWrite: 10M
             type: kafka
     {{hub- end hub}}
-    {{hub- if ne "" $st hub}}
+    {{hub- if ne "" $jt hub}}
           - name: journal-receiver
             kafka:
               brokers: {{hub index (lookup "v1" "ConfigMap" "policies" "config-operators").data $eb hub}}
@@ -424,12 +424,12 @@ spec:
             - audit-log-drop-resource
             - audit-log-drop-username
     {{hub- end hub}}
-    {{hub- if or (ne "" $st) (ne "" $su) hub}}
+    {{hub- if or (ne "" $jt) (ne "" $su) hub}}
           - name: journal-log
             inputRefs:
             - journal-log
             outputRefs:
-    {{hub- if ne "" $st hub}}
+    {{hub- if ne "" $jt hub}}
             - journal-receiver
     {{hub- end hub}}
     {{hub- if ne "" $su hub}}
