@@ -1216,7 +1216,7 @@ $ oc label mcl ${ManagedCluster} policies.sub-approval=init
 
 ### (Optional) Apply cluster-log-forwarder's topics and syslog-url
 ```
-$ oc label mcl ${ManagedCluster} policies.event-topic=ocpevent policies.journal-topic=ocpsystem policies.infra-topic=ocpinfra policies.syslog-url=192.168.10.100..514
+$ oc label mcl ${ManagedCluster} policies.event-topic=ocpevent policies.journal-topic=ocpsystem policies.infra-topic=ocplog policies.syslog-url=192.168.10.100..514
 
 ```
 
