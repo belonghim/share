@@ -776,6 +776,14 @@ spec:
               - effect: NoSchedule
                 key: node-role.kubernetes.io/infra
                 operator: Exists
+              - effect: NoExecute
+                key: node.kubernetes.io/not-ready
+                operator: Exists
+                tolerationSeconds: 30
+              - effect: NoExecute
+                key: node.kubernetes.io/unreachable
+                operator: Exists
+                tolerationSeconds: 30
             metricsServer:
               nodeSelector:
                 node-role.kubernetes.io/infra: ""
@@ -797,6 +805,14 @@ spec:
               - effect: NoSchedule
                 key: node-role.kubernetes.io/infra
                 operator: Exists
+              - effect: NoExecute
+                key: node.kubernetes.io/not-ready
+                operator: Exists
+                tolerationSeconds: 30
+              - effect: NoExecute
+                key: node.kubernetes.io/unreachable
+                operator: Exists
+                tolerationSeconds: 30
             prometheusK8s:
               externalLabels:
                 managed_cluster: {{ (lookup "config.openshift.io/v1" "Infrastructure" "" "cluster").status.infrastructureName }}
