@@ -1215,6 +1215,7 @@ EOF
 ### (Option 2) manual import on Managed cluster
 ```
 ## Create import yamls on Hub cluster
+$ mkdir import; cd import
 $ oc -n ${ManagedCluster} extract secret/${ManagedCluster}-import
 crds.yaml
 (...)
