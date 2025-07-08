@@ -1214,12 +1214,12 @@ EOF
 
 ### (Option 2) manual import on Managed cluster
 ```
-## Create import.yaml on Hub cluster
+## Create import yamls on Hub cluster
 $ oc -n ${ManagedCluster} extract secret/${ManagedCluster}-import
 crds.yaml
 (...)
 
-## Apply import.yaml on Managed cluster
+## Apply import yamls on Managed cluster
 $ ManagedKubeconfig="/opt/compact/auth/kubeconfig"
 $ export KUBECONFIG=${ManagedKubeconfig}
 $ oc apply -f .
