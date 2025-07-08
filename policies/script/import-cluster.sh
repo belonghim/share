@@ -1,6 +1,6 @@
 if [ "$CLUSTER" = "" ];then CLUSTER=$1;fi
 if [ "$KUBECON" = "" ];then KUBECON=$2;fi
-if [ "$CLUSTER" = "" -o "$KUBECON" = "" ];then echo "Example: import-cluster.sh <cluster> <kubeconfig>";exit 1;fi
+if [ "$CLUSTER" = "" ];then echo "Example: import-cluster.sh <cluster> <kubeconfig>";exit 1;fi
 
 cat <<EOF
 ---
@@ -9,6 +9,9 @@ kind: Namespace
 metadata:
   name: $CLUSTER
 ---
+EOF
+if [ "$KUBECON" != "" ];then
+cat <<EOF
 apiVersion: v1
 kind: Secret
 metadata:
@@ -24,6 +27,9 @@ stringData:
 $(sed 's/^/    /g' $KUBECON)
 type: Opaque
 ---
+EOF
+fi
+cat <<EOF
 apiVersion: agent.open-cluster-management.io/v1
 kind: KlusterletAddonConfig
 metadata:
@@ -52,4 +58,5 @@ metadata:
 spec:
   hubAcceptsClient: true
   leaseDurationSeconds: 120
+---
 EOF
