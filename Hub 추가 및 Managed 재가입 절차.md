@@ -420,7 +420,8 @@ crds.yaml
 ## Apply on managed cluster
 $ ManagedKubeconfig=/opt/mngda/auth/kubeconfig
 $ export KUBECONFIG=${ManagedKubeconfig}
-$ oc apply -f .
+$ oc apply -f crds.yaml
+$ oc apply -f import.yaml
 $ unset KUBECONFIG
 
 ```
