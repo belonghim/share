@@ -335,7 +335,7 @@ $ oc delete ns ocp-mngda
 
 ```
 
-### Importing managed cluster by using the auto import secret
+### (Option 1) Importing managed cluster by using the auto import secret
 ```
 ## Change directory to policies script
 $ cd share/policies
@@ -372,7 +372,63 @@ metadata:
 ## Start to import the cluster
 $ oc create -f importing.yaml
 
-## Apply sub-approval=manual label
+```
+
+
+### (Option 2) Importing managed cluster on managed cluster
+```
+## Change directory to policies script
+$ cd share/policies
+
+## Test import-cluster script
+$ ManagedCluster=ocp-mngda
+$ sh import-cluster.sh ${ManagedCluster}
+
+## Create importing yaml file
+$ sh import-cluster.sh ${ManagedCluster} >imporing.yaml
+$ grep policies ocp-mngda.yaml.bak
+    policies.event-topic=event
+    policies.infra-topic=infra
+    policies.ns-prefix=g-tpj-dev
+    policies.osus: ocp4
+    policies.sub-approval=manual
+    policies.syslog-url=192.168.10.100..514
+
+## Edit importing yaml file
+$ vi importing.yaml
+(...)
+kind: ManagedCluster
+metadata:
+  labels:
+    policies.event-topic=event
+    policies.infra-topic=infra
+    policies.ns-prefix=g-tpj-dev
+    policies.osus: ocp4
+    policies.sub-approval=manual
+    policies.syslog-url=192.168.10.100..514
+(...)
+
+## Start to import the cluster
+$ oc create -f importing.yaml
+
+## Extract import yamls
+$ mkdir import; cd import
+$ oc -n ${ManagedCluster} extract secret/${ManagedCluster}-import
+crds.yaml
+(...)
+
+## Apply on managed cluster
+$ ManagedKubeconfig=/opt/mngda/auth/kubeconfig
+$ export KUBECONFIG=${ManagedKubeconfig}
+$ oc apply -f .
+$ unset KUBECONFIG
+
+```
+
+
+### Apply policies.sub-approval=manual label
+```
+## Apply policies.sub-approval=manual label
 $ oc label ${ManagedKubeconfig} policies.sub-approval=manual
 
 ```
