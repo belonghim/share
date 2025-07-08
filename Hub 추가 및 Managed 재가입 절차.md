@@ -356,7 +356,18 @@ $ grep policies ocp-mngda.yaml.bak
     policies.syslog-url=192.168.10.100..514
 
 ## Edit importing yaml file
-$ vi imporging.yaml
+$ vi importing.yaml
+(...)
+kind: ManagedCluster
+metadata:
+  labels:
+    policies.event-topic=event
+    policies.infra-topic=infra
+    policies.ns-prefix=g-tpj-dev
+    policies.osus: ocp4
+    policies.sub-approval=manual
+    policies.syslog-url=192.168.10.100..514
+(...)
 
 ## Start to import the cluster
 $ oc create -f importing.yaml
