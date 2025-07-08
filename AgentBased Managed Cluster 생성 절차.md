@@ -1152,23 +1152,6 @@ done; unset IFS
 $ ManagedCluster=ocp-compact
 $ oc create namespace ${ManagedCluster}
 
-## create auto import secret
-$ ManagedKubeconfig="/opt/compact/auth/kubeconfig"
-$ oc create -f - <<EOF
-apiVersion: v1
-kind: Secret
-metadata:
-  name: auto-import-secret
-  namespace: ${ManagedCluster}
-  annotations:
-    managedcluster-import-controller.open-cluster-management.io/keeping-auto-import-secret: ""
-stringData:
-  autoImportRetry: "21600"
-  kubeconfig: |-
-$(sed 's/^/    /g' ${ManagedKubeconfig})
-type: Opaque
-EOF
-
 ## create klusterlet addon config
 $ oc create -f - <<EOF
 apiVersion: agent.open-cluster-management.io/v1
@@ -1203,6 +1186,44 @@ spec:
   hubAcceptsClient: true
   leaseDurationSeconds: 120
 EOF
+
+```
+
+
+### (Option 1) auto import on Hub cluster
+```
+## create auto import secret
+$ ManagedKubeconfig="/opt/compact/auth/kubeconfig"
+$ oc create -f - <<EOF
+apiVersion: v1
+kind: Secret
+metadata:
+  name: auto-import-secret
+  namespace: ${ManagedCluster}
+  annotations:
+    managedcluster-import-controller.open-cluster-management.io/keeping-auto-import-secret: ""
+stringData:
+  autoImportRetry: "21600"
+  kubeconfig: |-
+$(sed 's/^/    /g' ${ManagedKubeconfig})
+type: Opaque
+EOF
+
+```
+
+
+### (Option 2) manual import on Managed cluster
+```
+## Create import.yaml on Hub cluster
+$ oc -n ${ManagedCluster} extract secret/${ManagedCluster}-import
+crds.yaml
+(...)
+
+## Apply import.yaml on Managed cluster
+$ ManagedKubeconfig="/opt/compact/auth/kubeconfig"
+$ export KUBECONFIG=${ManagedKubeconfig}
+$ oc apply -f .
+$ unset KUBECONFIG
 
 ```
 
