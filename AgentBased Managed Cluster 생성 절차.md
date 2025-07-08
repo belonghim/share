@@ -1222,7 +1222,8 @@ crds.yaml
 ## Apply import yamls on Managed cluster
 $ ManagedKubeconfig="/opt/compact/auth/kubeconfig"
 $ export KUBECONFIG=${ManagedKubeconfig}
-$ oc apply -f .
+$ oc apply -f crds.yaml
+$ oc apply -f import.yaml
 $ unset KUBECONFIG
 
 ```
