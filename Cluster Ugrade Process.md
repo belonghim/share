@@ -408,7 +408,7 @@ $ oc -n $CLUSTER wait --timeout=1h --for=jsonpath='{.status.distributionInfo.ocp
 
 ```
 
-### Delete release channel
+### Delete release channel (reconfirm)
 ```
 ## Delete managecluster's release-channel label
 $ oc label mcl $CLUSTER policies.release-channel-
