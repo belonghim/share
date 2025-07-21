@@ -2505,19 +2505,6 @@ spec:
                 name: router-bundle
                 namespace: openshift-config
           {{- end }}
-          {{- else }}
-          - complianceType: musthave
-            objectDefinition:
-              apiVersion: v1
-              data:
-                ca-bundle.crt: |
-                  {{ $mt }}
-                  {{ $rc | autoindent }}
-              kind: ConfigMap
-              metadata:
-                name: router-bundle
-                namespace: openshift-config
-          {{- end }}
           - complianceType: musthave
             objectDefinition:
               apiVersion: config.openshift.io/v1
@@ -2537,6 +2524,19 @@ spec:
               metadata:
                 name: hub-ca
                 namespace: policies
+          {{- else }}
+          - complianceType: musthave
+            objectDefinition:
+              apiVersion: v1
+              data:
+                ca-bundle.crt: |
+                  {{ $mt }}
+                  {{ $rc | autoindent }}
+              kind: ConfigMap
+              metadata:
+                name: router-bundle
+                namespace: openshift-config
+          {{- end }}
           {{- else }}
           - complianceType: musthave
             objectDefinition:
