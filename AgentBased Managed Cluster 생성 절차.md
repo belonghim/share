@@ -672,8 +672,6 @@ spec:
     matchExpressions:
     - key: node-role.kubernetes.io/infra
       operator: Exists
-    - key: node-role.kubernetes.io/acm
-      operator: DoesNotExist
 EOF
 
 ## acm mcp 생성
