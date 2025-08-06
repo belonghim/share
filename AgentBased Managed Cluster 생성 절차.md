@@ -746,8 +746,9 @@ metadata:
 spec:
   autoSizingReserved: true
   machineConfigPoolSelector:
-    matchLabels:
-      pools.operator.machineconfiguration.openshift.io/worker: ""
+    matchExpressions:
+    - key: pools.operator.machineconfiguration.openshift.io/master
+      operator: DoesNotExist
 EOF
 
 ## master 에 timezone 설정
