@@ -732,6 +732,9 @@ metadata:
   name: master-dynamic-kubeletconfig
 spec:
   autoSizingReserved: true
+  kubeletConfig:
+    imageGCHighThresholdPercent: 75
+    imageGCLowThresholdPercent: 70
   machineConfigPoolSelector:
     matchLabels:
       pools.operator.machineconfiguration.openshift.io/master: ""
@@ -745,6 +748,9 @@ metadata:
   name: worker-dynamic-kubeletconfig
 spec:
   autoSizingReserved: true
+  kubeletConfig:
+    imageGCHighThresholdPercent: 75
+    imageGCLowThresholdPercent: 70
   machineConfigPoolSelector:
     matchExpressions:
     - key: pools.operator.machineconfiguration.openshift.io/master
