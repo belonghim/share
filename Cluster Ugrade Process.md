@@ -211,6 +211,10 @@ mirror:
     - name: devworkspace-operator
     - name: vertical-pod-autoscaler
     - name: metallb-operator
+  additionalImages: 
+  - name: registry.redhat.io/ubi8/ubi:latest
+  - name: registry.redhat.io/rhel9/support-tools
+  - name: registry.redhat.io/openshift-logging/eventrouter-rhel9
 EOF
 
 $ cat >1.sh <<\EOF
