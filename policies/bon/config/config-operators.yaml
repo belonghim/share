@@ -525,8 +525,6 @@ spec:
             - test:
               - field: .user.username
                 matches: (olm-operator|openshift|hive|hypershift|multicluster|open-cluster|kiali|istio)
-              - field: .user.username
-                notMatches: (gitops)
           - name: event-prune
             type: prune
             prune:
