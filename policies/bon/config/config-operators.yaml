@@ -561,14 +561,9 @@ spec:
           - name: journal-prune
             type: prune
             prune:
-              notIn:
-              - .hostname
-              - .log_source
-              - .log_type
-              - .message
-              - .systemd.u.SYSLOG_IDENTIFIER
-              - .time
-              - .openshift.labels
+              in:
+              - .level
+              - .systemd.t
     {{hub- end hub}}
     {{hub- end hub}}
     {{- end }}
