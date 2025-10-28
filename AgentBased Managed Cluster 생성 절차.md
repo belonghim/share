@@ -1096,6 +1096,41 @@ spec:
     source: registry.redhat.io/openshift-logging/eventrouter-rhel9
 EOF
 
+## namespace encapsulation
+cat > ${INSTALL_DIR}/openshift/99-kubens-master.yml<<EOF
+apiVersion: machineconfiguration.openshift.io/v1
+kind: MachineConfig
+metadata:
+  labels:
+    machineconfiguration.openshift.io/role: master
+  name: 99-kubens-master
+spec:
+  config:
+    ignition:
+      version: 3.4.0
+    systemd:
+      units:
+      - enabled: true
+        name: kubens.service
+EOF
+
+cat > ${INSTALL_DIR}/openshift/99-kubens-worker.yml<<EOF
+apiVersion: machineconfiguration.openshift.io/v1
+kind: MachineConfig
+metadata:
+  labels:
+    machineconfiguration.openshift.io/role: worker
+  name: 99-kubens-worker
+spec:
+  config:
+    ignition:
+      version: 3.4.0
+    systemd:
+      units:
+      - enabled: true
+        name: kubens.service
+EOF
+
 ```
 
 ### agent image 생성
